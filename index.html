@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Makotsu Shift beta4.8.1</title>
+  <title>Makotsu Shift beta4.8.2</title>
   <style>
     :root {
       color-scheme: light;
@@ -834,7 +834,7 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>Makotsu Shift beta4.8.1</h1>
+        <h1>Makotsu Shift beta4.8.2</h1>
         <p>週単位の完成シフト表示と印刷に対応した版</p>
       </div>
       <div class="role-switch" aria-label="表示モード">
@@ -1221,7 +1221,7 @@
           <a class="btn" href="#availabilityView" data-view="availability">希望休</a>
           <a class="btn" href="#staffView" data-view="staff">スタッフ</a>
           <a class="btn" href="#dataView" data-view="data">保存/出力</a>
-          <div class="sub">beta4.6の軸</div>
+          <div class="sub">beta4.8.2の軸</div>
           <div class="muted">手書きメモの条件に加えて、過剰配置・前後勤務・本人希望を見ながら自動作成する。</div>
         </nav>
       </aside>
@@ -1779,6 +1779,10 @@
       map[person.name] = [];
       return map;
     }, {});
+    const staffNameAliases = {
+      "塚用船": "塚脇",
+      "富崎": "宮崎"
+    };
     const incompatiblePairs = [
       ["芳澤", "下田"],
       ["和田", "工藤"],
@@ -1923,7 +1927,12 @@
     }
 
     function findStaff(name) {
-      return staff.find(person => person.name === name);
+      return staff.find(person => person.name === canonicalStaffName(name));
+    }
+
+    function canonicalStaffName(name) {
+      const value = String(name || "").trim();
+      return staffNameAliases[value] || value;
     }
 
     function hasTag(person, text) {
@@ -3148,7 +3157,7 @@
     function upsertStaff(person) {
       if (!person.name) return false;
       const clean = {
-        name: person.name.trim(),
+        name: canonicalStaffName(person.name),
         stores: person.stores && person.stores.length ? person.stores : [...storeOrder],
         days: person.days && person.days.length ? person.days : ["月", "火", "水", "木", "金", "土", "日"],
         times: person.times && person.times.length ? person.times : ["9-18"],
@@ -3225,12 +3234,56 @@
     }
 
     function removeStaffFromSchedule(name) {
+      const targetName = canonicalStaffName(name);
       Object.values(state.schedule).forEach(storeMap => {
         Object.values(storeMap).forEach(slotMap => {
           Object.keys(slotMap).forEach(slot => {
-            slotMap[slot] = slotMap[slot].filter(person => person.name !== name);
+            slotMap[slot] = slotMap[slot].filter(person => canonicalStaffName(person.name) !== targetName);
           });
         });
+      });
+    }
+
+    function normalizeSavedNames() {
+      staff.forEach(person => {
+        person.name = canonicalStaffName(person.name);
+      });
+      const uniqueStaff = new Map();
+      staff.forEach(person => {
+        const existing = uniqueStaff.get(person.name);
+        if (!existing) {
+          uniqueStaff.set(person.name, person);
+          return;
+        }
+        existing.stores = [...new Set([...(existing.stores || []), ...(person.stores || [])])];
+        existing.days = [...new Set([...(existing.days || []), ...(person.days || [])])];
+        existing.times = [...new Set([...(existing.times || []), ...(person.times || [])])];
+        existing.tags = [...new Set([...(existing.tags || []), ...(person.tags || [])])];
+        existing.support = existing.support || person.support;
+        existing.slots = slotsFromTimes(existing.times);
+      });
+      staff.length = 0;
+      uniqueStaff.forEach(person => staff.push(person));
+
+      Object.values(state.schedule).forEach(storeMap => {
+        Object.values(storeMap).forEach(slotMap => {
+          Object.keys(slotMap).forEach(slot => {
+            if (!Array.isArray(slotMap[slot])) return;
+            slotMap[slot].forEach(assignment => {
+              assignment.name = canonicalStaffName(assignment.name);
+            });
+          });
+        });
+      });
+
+      Object.entries(staffNameAliases).forEach(([oldName, newName]) => {
+        if (availability[oldName]) {
+          availability[newName] = [...new Set([...(availability[newName] || []), ...availability[oldName]])];
+          delete availability[oldName];
+        }
+      });
+      staff.forEach(person => {
+        if (!availability[person.name]) availability[person.name] = [];
       });
     }
 
@@ -3271,9 +3324,11 @@
       if (payload.availability) {
         Object.keys(availability).forEach(name => delete availability[name]);
         Object.entries(payload.availability).forEach(([name, dates]) => {
-          availability[name] = Array.isArray(dates) ? dates : [];
+          const cleanName = canonicalStaffName(name);
+          availability[cleanName] = [...new Set([...(availability[cleanName] || []), ...(Array.isArray(dates) ? dates : [])])];
         });
       }
+      normalizeSavedNames();
       sanitizeInvalidStoreAssignments();
       document.getElementById("homeMonth").value = state.month;
       document.getElementById("monthInput").value = state.month;
@@ -3287,7 +3342,7 @@
     function persistState() {
       if (!state.ready) return;
       try {
-        localStorage.setItem("makotsuShiftBeta48", JSON.stringify(serializeState()));
+        localStorage.setItem("makotsuShiftBeta482", JSON.stringify(serializeState()));
       } catch (error) {
         console.warn("save failed", error);
       }
@@ -3295,7 +3350,7 @@
 
     function loadPersistedState() {
       try {
-        const raw = localStorage.getItem("makotsuShiftBeta48") || localStorage.getItem("makotsuShiftBeta47") || localStorage.getItem("makotsuShiftBeta465") || localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
+        const raw = localStorage.getItem("makotsuShiftBeta482") || localStorage.getItem("makotsuShiftBeta48") || localStorage.getItem("makotsuShiftBeta47") || localStorage.getItem("makotsuShiftBeta465") || localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
         if (!raw) return false;
         return applySerialized(JSON.parse(raw));
       } catch (error) {
