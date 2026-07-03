@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Makotsu Shift beta4.6.4</title>
+  <title>Makotsu Shift beta4.7</title>
   <style>
     :root {
       color-scheme: light;
@@ -547,6 +547,34 @@
       font-size: 16px;
     }
 
+    .weekly-sheet {
+      margin-bottom: 14px;
+    }
+
+    .weekly-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .weekly-print-note {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .weekly-print-active .monthly-print-section {
+      display: none;
+    }
+
+    .monthly-print-active .weekly-print-section {
+      display: none;
+    }
+
     .hidden {
       display: none !important;
     }
@@ -746,7 +774,9 @@
       .sidebar,
       .controls,
       .side-card,
-      .no-print {
+      .no-print,
+      .status-bar,
+      .no-js-fallback {
         display: none !important;
       }
 
@@ -781,6 +811,22 @@
         border-color: #999;
         padding: 4px;
       }
+
+      .weekly-print-active .monthly-print-section {
+        display: none !important;
+      }
+
+      .monthly-print-active .weekly-print-section {
+        display: none !important;
+      }
+
+      .weekly-print-active .weekly-print-section {
+        display: block !important;
+      }
+
+      .weekly-print-section {
+        page-break-after: avoid;
+      }
     }
   </style>
 </head>
@@ -788,8 +834,8 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>Makotsu Shift beta4.6.4</h1>
-        <p>スマホでJavaScriptが動かない環境でも、最低限の確認画面へ移動できる版</p>
+        <h1>Makotsu Shift beta4.7</h1>
+        <p>週単位の完成シフト表示と印刷に対応した版</p>
       </div>
       <div class="role-switch" aria-label="表示モード">
         <a class="btn active" id="managerMode" href="#monthlyView" data-jump="monthly">りえ用</a>
@@ -1365,9 +1411,29 @@
                 <option value="ougicho">扇町</option>
               </select>
             </label>
-            <button class="btn" id="finishedPrintBtn" type="button">印刷</button>
+            <label>週
+              <select id="finishedWeekStart"></select>
+            </label>
+            <button class="btn primary" id="weeklyPrintBtn" type="button">この週を印刷</button>
+            <button class="btn" id="finishedPrintBtn" type="button">月間を印刷</button>
           </div>
-          <div class="print-sheet">
+          <div class="print-sheet weekly-sheet weekly-print-section">
+            <div class="print-head">
+              <div>
+                <strong id="weeklyFinishedTitle">週シフト</strong>
+                <div class="weekly-meta" id="weeklyFinishedPeriod">-</div>
+              </div>
+              <span class="muted">月曜始まり / 日曜終わり</span>
+            </div>
+            <div class="table-wrap">
+              <table aria-label="週単位完成シフト表">
+                <thead id="weeklyFinishedHead"></thead>
+                <tbody id="weeklyFinishedBody"></tbody>
+              </table>
+            </div>
+            <p class="weekly-print-note">りえちゃん確認用。1週間だけ印刷する時は「この週を印刷」。</p>
+          </div>
+          <div class="print-sheet monthly-print-section">
             <div class="print-head">
               <strong id="finishedTitle">完成シフト</strong>
               <span class="muted" id="finishedPeriod">-</span>
@@ -1726,6 +1792,7 @@
       startDay: 16,
       today: "2026-07-16",
       selectedStore: "miyanoshita",
+      selectedWeekStart: "",
       selected: null,
       schedule: {},
       ready: false,
@@ -1780,6 +1847,43 @@
       return dates;
     }
 
+    function mondayOf(date) {
+      const copy = new Date(date);
+      const day = copy.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      return addDays(copy, diff);
+    }
+
+    function weekDates(startIso) {
+      const start = new Date(`${startIso}T00:00:00`);
+      return Array.from({ length: 7 }, (_, index) => addDays(start, index));
+    }
+
+    function weekOptions() {
+      const dates = periodDates();
+      if (!dates.length) return [];
+      const firstMonday = mondayOf(dates[0]);
+      const lastDate = dates[dates.length - 1];
+      const weeks = [];
+      for (let d = new Date(firstMonday); d <= lastDate; d = addDays(d, 7)) {
+        weeks.push(new Date(d));
+      }
+      return weeks;
+    }
+
+    function ensureSelectedWeekStart() {
+      const weeks = weekOptions();
+      if (!weeks.length) {
+        state.selectedWeekStart = "";
+        return "";
+      }
+      const valid = weeks.map(date => iso(date));
+      if (!state.selectedWeekStart || !valid.includes(state.selectedWeekStart)) {
+        state.selectedWeekStart = valid[0];
+      }
+      return state.selectedWeekStart;
+    }
+
     function dateLabel(date) {
       return `${date.getMonth() + 1}/${date.getDate()}`;
     }
@@ -1820,6 +1924,10 @@
 
     function hasTag(person, text) {
       return Boolean(person && person.tags && person.tags.some(tag => tag.includes(text)));
+    }
+
+    function canWorkAtStore(person, storeKey) {
+      return Boolean(person && person.stores && person.stores.includes(storeKey));
     }
 
     function matchesDay(person, dateIso) {
@@ -1911,6 +2019,7 @@
 
     function canPlaceShift(dateIso, storeKey, person, time, options = {}) {
       if (!person || !time) return false;
+      if (!canWorkAtStore(person, storeKey)) return false;
       if (isUnavailable(person.name, dateIso)) return false;
       if (!matchesDay(person, dateIso)) return false;
       if (hasIncompatiblePerson(dateIso, storeKey, person.name)) return false;
@@ -2022,8 +2131,9 @@
     }
 
     function scoreCandidate(person, storeKey, slot, dateIso, options = {}) {
+      if (!canWorkAtStore(person, storeKey)) return -10000;
       let score = 0;
-      if (person.stores.includes(storeKey)) score += 40;
+      if (canWorkAtStore(person, storeKey)) score += 40;
       if (person.slots.includes(slot) || person.times.some(time => coversSlot(time, slot))) score += 40;
       const time = bestTimeFor(person, storeKey, slot, dateIso, options);
       if (!time) score -= 1000;
@@ -2042,6 +2152,7 @@
 
     function candidatesFor(storeKey, slot, dateIso, options = {}) {
       return staff
+        .filter(person => canWorkAtStore(person, storeKey))
         .map(person => {
           const time = bestTimeFor(person, storeKey, slot, dateIso, options);
           return { person, time, score: scoreCandidate(person, storeKey, slot, dateIso, options) };
@@ -2388,6 +2499,7 @@
 
     function renderFinished() {
       const storeKey = document.getElementById("finishedStore").value;
+      renderWeeklyFinished(storeKey);
       renderHead("finishedHead");
       document.getElementById("finishedTitle").textContent = `${stores[storeKey].name} 完成シフト`;
       document.getElementById("finishedPeriod").textContent = periodLabel();
@@ -2411,6 +2523,66 @@
                       <span class="time">${person.time}</span>
                     </div>
                   `).join("") || `<span class="muted">-</span>`}
+                </td>
+              `;
+            }).join("")}
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderWeeklyFinished(storeKey) {
+      const select = document.getElementById("finishedWeekStart");
+      const weeks = weekOptions();
+      const previous = select.value || state.selectedWeekStart;
+      select.innerHTML = weeks.map(startDate => {
+        const startIso = iso(startDate);
+        const endDate = addDays(startDate, 6);
+        return `<option value="${startIso}">${dateLabel(startDate)}(${dowLabel(startDate)})〜${dateLabel(endDate)}(${dowLabel(endDate)})</option>`;
+      }).join("");
+      if (previous && weeks.some(date => iso(date) === previous)) {
+        state.selectedWeekStart = previous;
+      }
+      const weekStartIso = ensureSelectedWeekStart();
+      if (weekStartIso) select.value = weekStartIso;
+
+      const dates = weekStartIso ? weekDates(weekStartIso) : [];
+      const periodSet = new Set(periodDates().map(date => iso(date)));
+      const weekEnd = dates.length ? dates[dates.length - 1] : null;
+      document.getElementById("weeklyFinishedTitle").textContent = `${stores[storeKey].name} 週シフト`;
+      document.getElementById("weeklyFinishedPeriod").textContent = dates.length
+        ? `${dateLabel(dates[0])}(${dowLabel(dates[0])})〜${dateLabel(weekEnd)}(${dowLabel(weekEnd)})`
+        : "-";
+      document.getElementById("weeklyFinishedHead").innerHTML = `
+        <tr>
+          <th>日付</th>
+          ${slots.map(slot => `<th>${slot}<br><span class="muted">必要 ${requirement(storeKey, slot)}</span></th>`).join("")}
+        </tr>
+      `;
+      document.getElementById("weeklyFinishedBody").innerHTML = dates.map(date => {
+        const dateIso = iso(date);
+        const weekend = date.getDay() === 0 || date.getDay() === 6;
+        return `
+          <tr>
+            <td class="date-cell ${weekend ? "weekend" : ""}">
+              ${dateLabel(date)}
+              <span class="dow">${dowLabel(date)}</span>
+            </td>
+            ${slots.map(slot => {
+              if (!periodSet.has(dateIso)) {
+                return `<td><span class="muted">対象外</span></td>`;
+              }
+              const people = ensureCell(dateIso, storeKey, slot);
+              const shortage = Math.max(0, requirement(storeKey, slot) - people.length);
+              return `
+                <td>
+                  ${people.map(person => `
+                    <div class="person ${person.support ? "support" : ""}">
+                      <span>${person.name}</span>
+                      <span class="time">${person.time}</span>
+                    </div>
+                  `).join("") || `<span class="muted">-</span>`}
+                  ${shortage ? `<span class="tag bad">不足 ${shortage}</span>` : ""}
                 </td>
               `;
             }).join("")}
@@ -2594,6 +2766,27 @@
       return issues.sort((a, b) => b.severity - a.severity || a.date - b.date);
     }
 
+    function sanitizeInvalidStoreAssignments() {
+      let removed = 0;
+      Object.keys(state.schedule).forEach(dateIso => {
+        const storeMap = state.schedule[dateIso] || {};
+        storeOrder.forEach(storeKey => {
+          const slotMap = storeMap[storeKey] || {};
+          slots.forEach(slot => {
+            const cell = slotMap[slot];
+            if (!Array.isArray(cell)) return;
+            const valid = cell.filter(assignment => {
+              const master = findStaff(assignment.name);
+              return master && canWorkAtStore(master, storeKey);
+            });
+            removed += cell.length - valid.length;
+            slotMap[slot] = valid;
+          });
+        });
+      });
+      return removed;
+    }
+
     function renderIssues() {
       const filter = document.getElementById("issuesStore").value;
       const rows = collectIssues(filter);
@@ -2753,6 +2946,7 @@
     }
 
     function renderAll() {
+      sanitizeInvalidStoreAssignments();
       renderRequirements();
       renderMonthlyTable();
       renderSelectedDetail();
@@ -2827,6 +3021,20 @@
       link.download = `makotsu-shift-${stores[storeKey].name}-${state.month}.csv`;
       link.click();
       URL.revokeObjectURL(url);
+    }
+
+    function printFinishedMonth() {
+      document.body.classList.remove("weekly-print-active");
+      document.body.classList.add("monthly-print-active");
+      window.print();
+      window.setTimeout(() => document.body.classList.remove("monthly-print-active"), 300);
+    }
+
+    function printFinishedWeek() {
+      document.body.classList.remove("monthly-print-active");
+      document.body.classList.add("weekly-print-active");
+      window.print();
+      window.setTimeout(() => document.body.classList.remove("weekly-print-active"), 300);
     }
 
     function showToast(message) {
@@ -2969,6 +3177,7 @@
         startDay: state.startDay,
         today: state.today,
         selectedStore: state.selectedStore,
+        selectedWeekStart: state.selectedWeekStart,
         schedule: state.schedule,
         staff,
         requirements: storeOrder.reduce((map, storeKey) => {
@@ -2985,6 +3194,7 @@
       if (payload.startDay) state.startDay = Number(payload.startDay);
       if (payload.today) state.today = payload.today;
       if (payload.selectedStore) state.selectedStore = payload.selectedStore;
+      if (payload.selectedWeekStart) state.selectedWeekStart = payload.selectedWeekStart;
       if (payload.schedule) state.schedule = payload.schedule;
       if (Array.isArray(payload.staff) && payload.staff.length) {
         staff.length = 0;
@@ -3001,6 +3211,7 @@
           availability[name] = Array.isArray(dates) ? dates : [];
         });
       }
+      sanitizeInvalidStoreAssignments();
       document.getElementById("homeMonth").value = state.month;
       document.getElementById("monthInput").value = state.month;
       document.getElementById("homeStartDay").value = String(state.startDay);
@@ -3013,7 +3224,7 @@
     function persistState() {
       if (!state.ready) return;
       try {
-        localStorage.setItem("makotsuShiftBeta464", JSON.stringify(serializeState()));
+        localStorage.setItem("makotsuShiftBeta47", JSON.stringify(serializeState()));
       } catch (error) {
         console.warn("save failed", error);
       }
@@ -3021,7 +3232,7 @@
 
     function loadPersistedState() {
       try {
-        const raw = localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
+        const raw = localStorage.getItem("makotsuShiftBeta47") || localStorage.getItem("makotsuShiftBeta465") || localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
         if (!raw) return false;
         return applySerialized(JSON.parse(raw));
       } catch (error) {
@@ -3041,6 +3252,7 @@
       state.month = "2026-07";
       state.startDay = 16;
       state.today = "2026-07-16";
+      state.selectedWeekStart = "";
       const original = state.selectedStore;
       state.bulkGenerating = true;
       storeOrder.forEach(storeKey => {
@@ -3075,8 +3287,13 @@
       document.getElementById("trimOverstaffBtn").addEventListener("click", trimVisibleStoreOverstaffing);
       document.getElementById("csvBtn").addEventListener("click", exportCsv);
       document.getElementById("printBtn").addEventListener("click", () => window.print());
-      document.getElementById("finishedPrintBtn").addEventListener("click", () => window.print());
+      document.getElementById("finishedPrintBtn").addEventListener("click", printFinishedMonth);
+      document.getElementById("weeklyPrintBtn").addEventListener("click", printFinishedWeek);
       document.getElementById("finishedStore").addEventListener("change", renderFinished);
+      document.getElementById("finishedWeekStart").addEventListener("change", event => {
+        state.selectedWeekStart = event.target.value;
+        renderFinished();
+      });
       document.getElementById("shortageStore").addEventListener("change", renderShortage);
       document.getElementById("shortageRefresh").addEventListener("click", renderShortage);
       document.getElementById("fillFirstShortageBtn").addEventListener("click", () => {
