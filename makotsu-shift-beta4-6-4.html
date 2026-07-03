@@ -1,0 +1,3182 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Makotsu Shift beta4.6.4</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --panel-2: #f0f3f7;
+      --text: #1d2430;
+      --muted: #5e6878;
+      --line: #d7dde6;
+      --strong: #111827;
+      --accent: #0f766e;
+      --accent-2: #0b5f59;
+      --warn: #b45309;
+      --danger: #b42318;
+      --ok: #16703c;
+      --shadow: 0 12px 34px rgba(18, 28, 45, .08);
+      --radius: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .status-bar {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 10px;
+      margin-bottom: 12px;
+    }
+
+    .status-bar.ready {
+      color: var(--ok);
+      border-color: #b8dec6;
+      background: #f3fbf6;
+    }
+
+    .status-bar.fallback {
+      color: var(--warn);
+      border-color: #efd49d;
+      background: #fffbeb;
+    }
+
+    .brand {
+      min-width: 0;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.2;
+      color: var(--strong);
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .role-switch {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      border-radius: var(--radius);
+      min-height: 38px;
+      padding: 8px 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      border-color: #b9c2cf;
+      background: #f8fafc;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn.primary:hover {
+      background: var(--accent-2);
+      border-color: var(--accent-2);
+    }
+
+    .btn.ghost {
+      background: transparent;
+    }
+
+    .btn.small {
+      min-height: 31px;
+      padding: 5px 9px;
+      font-size: 13px;
+    }
+
+    .btn.active {
+      background: var(--strong);
+      border-color: var(--strong);
+      color: #fff;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 250px minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .sidebar,
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .sidebar {
+      padding: 12px;
+      position: sticky;
+      top: 12px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 7px;
+    }
+
+    .nav button {
+      width: 100%;
+      text-align: left;
+      justify-content: flex-start;
+    }
+
+    .nav .sub {
+      margin: 10px 0 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+
+    .main {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .panel {
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      color: var(--strong);
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .panel h3 {
+      margin: 0 0 8px;
+      color: var(--strong);
+      font-size: 15px;
+      letter-spacing: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      gap: 10px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+      padding: 12px;
+      min-width: 0;
+    }
+
+    .metric-label {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .metric-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--strong);
+      line-height: 1.2;
+    }
+
+    .metric-sub {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: end;
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: grid;
+      gap: 4px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    select,
+    input {
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 7px 9px;
+      background: #fff;
+      color: var(--text);
+      min-width: 120px;
+    }
+
+    input[type="number"] {
+      width: 78px;
+      min-width: 78px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 860px;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      border-right: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--panel-2);
+      color: var(--strong);
+      padding: 9px;
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    td {
+      background: #fff;
+      padding: 6px;
+      min-height: 70px;
+    }
+
+    th:last-child,
+    td:last-child {
+      border-right: 0;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .date-cell {
+      width: 86px;
+      min-width: 86px;
+      color: var(--strong);
+      font-weight: 700;
+      background: #fbfcfe;
+    }
+
+    .dow {
+      display: block;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .weekend {
+      color: var(--warn);
+    }
+
+    .slot-cell {
+      min-width: 150px;
+      cursor: pointer;
+    }
+
+    .slot-cell:hover {
+      outline: 2px solid rgba(15, 118, 110, .26);
+      outline-offset: -2px;
+    }
+
+    .slot-cell.selected {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+      background: #f0fdfa;
+    }
+
+    .cell-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      margin-bottom: 5px;
+    }
+
+    .need.bad {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    .need.ok {
+      color: var(--ok);
+      font-weight: 700;
+    }
+
+    .person {
+      display: flex;
+      justify-content: space-between;
+      gap: 5px;
+      align-items: center;
+      border: 1px solid #d9e4e2;
+      background: #f7fbfa;
+      border-radius: 6px;
+      padding: 4px 5px;
+      margin-top: 4px;
+      color: var(--strong);
+      word-break: keep-all;
+    }
+
+    .person .time {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .person.support {
+      border-color: #e7d7ad;
+      background: #fffbeb;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--muted);
+    }
+
+    .tag.bad {
+      color: var(--danger);
+      border-color: #f3b4ad;
+      background: #fff5f4;
+    }
+
+    .tag.ok {
+      color: var(--ok);
+      border-color: #b8dec6;
+      background: #f3fbf6;
+    }
+
+    .tag.warn {
+      color: var(--warn);
+      border-color: #efd49d;
+      background: #fffbeb;
+    }
+
+    .side-card {
+      display: grid;
+      gap: 10px;
+    }
+
+    .detail-box {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fbfcfe;
+      padding: 10px;
+    }
+
+    .candidate-list {
+      display: grid;
+      gap: 7px;
+    }
+
+    .candidate {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 6px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 8px;
+      background: #fff;
+    }
+
+    .candidate strong {
+      color: var(--strong);
+    }
+
+    .reason {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 2px;
+    }
+
+    .status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+      margin: 8px 0 0;
+    }
+
+    .requirements {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(78px, 1fr));
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .req-item {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 8px;
+      background: #fff;
+    }
+
+    .req-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .print-sheet {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .print-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      background: var(--panel-2);
+    }
+
+    .print-head strong {
+      color: var(--strong);
+      font-size: 16px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .panel:target {
+      display: block !important;
+      scroll-margin-top: 12px;
+    }
+
+    .no-js-fallback {
+      margin: 0 0 14px;
+    }
+
+    body.js-ready .no-js-fallback {
+      display: none;
+    }
+
+    .staff-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .today-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .owner-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 12px;
+      align-items: start;
+    }
+
+    .today-store {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 10px;
+      min-width: 0;
+    }
+
+    .today-store h3 {
+      margin-bottom: 10px;
+    }
+
+    .today-row {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr);
+      gap: 8px;
+      padding: 6px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .today-row:first-of-type {
+      border-top: 0;
+    }
+
+    .today-slot {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .availability-list {
+      display: grid;
+      gap: 6px;
+    }
+
+    .textarea {
+      min-height: 130px;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      resize: vertical;
+      background: #fff;
+      color: var(--text);
+      font: inherit;
+    }
+
+    .danger-row td {
+      background: #fff7f6;
+    }
+
+    .warn-row td {
+      background: #fffbeb;
+    }
+
+    .toolbar-right {
+      margin-left: auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .staff-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 10px;
+      background: #fff;
+    }
+
+    .staff-card strong {
+      color: var(--strong);
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: var(--strong);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 9px 12px;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease;
+      z-index: 20;
+      font-size: 13px;
+    }
+
+    .toast.show {
+      opacity: 1;
+    }
+
+    @media (max-width: 980px) {
+      .layout,
+      .split,
+      .owner-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .cards {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .staff-grid,
+      .today-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 620px) {
+      .app {
+        padding: 10px;
+      }
+
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .role-switch {
+        justify-content: flex-start;
+      }
+
+      .cards,
+      .staff-grid,
+      .today-grid,
+      .requirements {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        align-items: stretch;
+      }
+
+      .controls label,
+      .controls button,
+      select,
+      input {
+        width: 100%;
+      }
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .topbar,
+      .sidebar,
+      .controls,
+      .side-card,
+      .no-print {
+        display: none !important;
+      }
+
+      .app {
+        max-width: none;
+        padding: 0;
+      }
+
+      .layout,
+      .split {
+        display: block;
+      }
+
+      .panel {
+        border: 0;
+        box-shadow: none;
+        padding: 0;
+      }
+
+      .table-wrap {
+        overflow: visible;
+        border: 1px solid #999;
+      }
+
+      table {
+        min-width: 0;
+        font-size: 10px;
+      }
+
+      th,
+      td {
+        border-color: #999;
+        padding: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <h1>Makotsu Shift beta4.6.4</h1>
+        <p>スマホでJavaScriptが動かない環境でも、最低限の確認画面へ移動できる版</p>
+      </div>
+      <div class="role-switch" aria-label="表示モード">
+        <a class="btn active" id="managerMode" href="#monthlyView" data-jump="monthly">りえ用</a>
+        <a class="btn" id="ownerMode" href="#ownerView" data-jump="owner">まこつ。用</a>
+      </div>
+    </header>
+    <div class="status-bar fallback" id="jsStatus">スマホ簡易版。メニューリンクで移動できます</div>
+
+
+    <section class="panel no-js-fallback" id="fallbackStaffList">
+      <h2>スマホ確認用スタッフ一覧</h2>
+      <p class="muted">この一覧はJavaScriptなしでも表示されます。`操作準備中`のままなら、まずこの表でりえちゃん確認を進められます。</p>
+      <div class="table-wrap">
+        <table aria-label="スマホ確認用スタッフ一覧">
+          <thead>
+            <tr>
+              <th>名前</th>
+              <th>店舗</th>
+              <th>曜日</th>
+              <th>時間</th>
+              <th>条件・メモ</th>
+            </tr>
+          </thead>
+          <tbody>
+              <tr>
+                <td><strong>扇町 店長（齋藤）</strong></td>
+                <td>扇町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-15 / 9-18 / 13-22 / 16-25 / 22-6</td>
+                <td>店長、齋藤、店舗別店長、どの時間もOK、7日休み、1日8h</td>
+              </tr>
+              <tr>
+                <td><strong>赤瀬</strong></td>
+                <td>扇町</td>
+                <td>月・水・金</td>
+                <td>9-17</td>
+                <td>主婦、1h休憩、扇町責任者候補</td>
+              </tr>
+              <tr>
+                <td><strong>グルン</strong></td>
+                <td>扇町</td>
+                <td>月・火・木・金</td>
+                <td>9-13 / 9-17</td>
+                <td>主婦、月金9-13、火木9-17、45分休憩、扇町責任者候補</td>
+              </tr>
+              <tr>
+                <td><strong>下田</strong></td>
+                <td>扇町 / 東町 / 宮ノ下</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-15 / 9-15 / 17-22 / 18-24</td>
+                <td>基本:月火木金は東町、水土日は扇町9-15、扇町では9-17なし、扇町木曜17-22、宮下18-24のみ、人不足時6時からOK、45分休憩、東町責任者候補</td>
+              </tr>
+              <tr>
+                <td><strong>芳澤</strong></td>
+                <td>扇町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-9 / 9-17 / 17-22 / 22-6</td>
+                <td>フリーター、どの曜日時間OK、責任者同伴のみ、電話対応不可、クレーム対応不可、下田と組合せNG</td>
+              </tr>
+              <tr>
+                <td><strong>鈴木（久華）</strong></td>
+                <td>扇町</td>
+                <td>金・土</td>
+                <td>17-22</td>
+                <td>夕方、扇町鈴木</td>
+              </tr>
+              <tr>
+                <td><strong>植村</strong></td>
+                <td>扇町</td>
+                <td>水・木・金・土・日</td>
+                <td>6-9</td>
+                <td>朝、残業不可</td>
+              </tr>
+              <tr>
+                <td><strong>ミミ</strong></td>
+                <td>扇町 / 東町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-9 / 9-17 / 17-22 / 22-6</td>
+                <td>フリーター、どの曜日もOK、どの時間もOK、多く勤務希望、扇町東町</td>
+              </tr>
+              <tr>
+                <td><strong>中込</strong></td>
+                <td>扇町</td>
+                <td>金</td>
+                <td>22-6</td>
+                <td>主婦、夜勤のみ、扇町2-7ワンオペ可</td>
+              </tr>
+              <tr>
+                <td><strong>安彦</strong></td>
+                <td>扇町</td>
+                <td>火・木・土・日</td>
+                <td>6-9</td>
+                <td>フリーター、朝</td>
+              </tr>
+              <tr>
+                <td><strong>分部</strong></td>
+                <td>扇町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>21-24</td>
+                <td>主婦、週2-3回、希望提出型、副業登録</td>
+              </tr>
+              <tr>
+                <td><strong>斎藤ゆうな</strong></td>
+                <td>扇町</td>
+                <td>月</td>
+                <td>13-17</td>
+                <td>学生、月のみ要確認</td>
+              </tr>
+              <tr>
+                <td><strong>工藤</strong></td>
+                <td>扇町 / 東町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-9 / 9-17 / 17-22 / 22-6</td>
+                <td>主婦、どの曜日もOK、どの時間もOK、多く勤務希望、ミミさんと同じ、東町責任者候補、東町3-6ワンオペ可、扇町2-7ワンオペ可</td>
+              </tr>
+              <tr>
+                <td><strong>木村</strong></td>
+                <td>宮ノ下 / 東町 / 扇町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>22-7 / 24-9</td>
+                <td>主婦、社員、夜勤のみ、16日-翌15日、7日休み、9h拘束8h勤務</td>
+              </tr>
+              <tr>
+                <td><strong>塚用船</strong></td>
+                <td>東町 / 扇町</td>
+                <td>月・火・水・木・金</td>
+                <td>6-9</td>
+                <td>週2、東町扇町対応可、名前要確認</td>
+              </tr>
+              <tr>
+                <td><strong>富崎</strong></td>
+                <td>扇町</td>
+                <td>火・水</td>
+                <td>22-2</td>
+                <td>学生、夜勤短時間のみ</td>
+              </tr>
+              <tr>
+                <td><strong>加藤</strong></td>
+                <td>宮ノ下 / 東町 / 扇町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>22-7 / 24-9 / 21-6</td>
+                <td>社員、基本夜勤、全て対応OK、16日-翌15日、7日休み</td>
+              </tr>
+              <tr>
+                <td><strong>富田</strong></td>
+                <td>宮ノ下 / 東町 / 扇町</td>
+                <td>月・火・木・金・土・日</td>
+                <td>9-18 / 13-22 / 22-7 / 24-9</td>
+                <td>社員、15日-翌15日、7日休み、水曜固定休、木曜午後希望、9h拘束8h勤務</td>
+              </tr>
+              <tr>
+                <td><strong>東町 店長（小澤）</strong></td>
+                <td>東町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>9-18 / 13-22 / 22-7 / 24-9</td>
+                <td>社員、店長、小澤、店舗別店長、16日-翌15日、7日休み、9h拘束8h勤務、1h休憩</td>
+              </tr>
+              <tr>
+                <td><strong>高橋(東町)</strong></td>
+                <td>東町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>18-22</td>
+                <td>主婦、どの曜日もOK</td>
+              </tr>
+              <tr>
+                <td><strong>高木</strong></td>
+                <td>東町</td>
+                <td>火・木</td>
+                <td>18-22</td>
+                <td>学生、火木のみ</td>
+              </tr>
+              <tr>
+                <td><strong>大津</strong></td>
+                <td>東町</td>
+                <td>土・日</td>
+                <td>6-9 / 9-17 / 17-22 / 22-6</td>
+                <td>学生、土日どの時間もOK</td>
+              </tr>
+              <tr>
+                <td><strong>佐々木(絢)</strong></td>
+                <td>東町</td>
+                <td>土・日</td>
+                <td>6-9 / 9-17 / 17-22 / 22-6</td>
+                <td>学生、土日どの時間もOK</td>
+              </tr>
+              <tr>
+                <td><strong>石住井</strong></td>
+                <td>東町</td>
+                <td>月・火・水・木・金・日</td>
+                <td>22-2 / 24-6</td>
+                <td>フリーター、準夜勤、基本22-2、土曜以外OK、山梨と入る日のみ24-6、ワンオペ夜勤しばらくなし</td>
+              </tr>
+              <tr>
+                <td><strong>和田</strong></td>
+                <td>東町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>22-6</td>
+                <td>主婦、夜勤、どの曜日もOK、東町3-6ワンオペ可</td>
+              </tr>
+              <tr>
+                <td><strong>済藤</strong></td>
+                <td>東町</td>
+                <td>土・日</td>
+                <td>6-9</td>
+                <td>一般、土日のみ、6-9要確認</td>
+              </tr>
+              <tr>
+                <td><strong>多田</strong></td>
+                <td>東町</td>
+                <td>月・水・金</td>
+                <td>6-9</td>
+                <td>早朝のみ、残業不可</td>
+              </tr>
+              <tr>
+                <td><strong>佐々木（綾）</strong></td>
+                <td>東町</td>
+                <td>水</td>
+                <td>9-13</td>
+                <td>主婦、水のみ</td>
+              </tr>
+              <tr>
+                <td><strong>永井</strong></td>
+                <td>東町 / 扇町</td>
+                <td>火・水・木</td>
+                <td>9-16 / 9-17</td>
+                <td>火木9-16扇町固定、水9-16、扇町火木9-17、45分休憩、扇町責任者候補</td>
+              </tr>
+              <tr>
+                <td><strong>柳川</strong></td>
+                <td>東町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>13-17 / 17-23</td>
+                <td>東町のみ、週2-3回、どの曜日OK、最長6h、夕勤人不足ならOK</td>
+              </tr>
+              <tr>
+                <td><strong>守屋</strong></td>
+                <td>東町</td>
+                <td>月・金</td>
+                <td>13-17</td>
+                <td>固定</td>
+              </tr>
+              <tr>
+                <td><strong>ダハム</strong></td>
+                <td>東町</td>
+                <td>火・水・土</td>
+                <td>13-19 / 13-17</td>
+                <td>火水13-19固定、土13-17、外国留学生、それ以外不可</td>
+              </tr>
+              <tr>
+                <td><strong>キーズ</strong></td>
+                <td>東町</td>
+                <td>火・金・土・日</td>
+                <td>6-18 / 9-21 / 12-24</td>
+                <td>月水木以外、12hまで、週28hまで、副業あり、東町12hまで</td>
+              </tr>
+              <tr>
+                <td><strong>山梨</strong></td>
+                <td>東町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>22-6</td>
+                <td>一般、セブン副業、週1-2希望日、夜勤</td>
+              </tr>
+              <tr>
+                <td><strong>宮下 店長（小島）</strong></td>
+                <td>宮ノ下</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-15 / 9-18 / 13-22 / 16-25 / 22-6</td>
+                <td>店長、小島、店舗別店長、どの時間曜日もOK、7日休み、1日8h</td>
+              </tr>
+              <tr>
+                <td><strong>笹島</strong></td>
+                <td>宮ノ下</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>22-9</td>
+                <td>フリーター、1h休憩、宮下24時以降ワンオペ可</td>
+              </tr>
+              <tr>
+                <td><strong>幸本</strong></td>
+                <td>宮ノ下</td>
+                <td>月・水</td>
+                <td>9-13</td>
+                <td>主婦</td>
+              </tr>
+              <tr>
+                <td><strong>古屋</strong></td>
+                <td>宮ノ下</td>
+                <td>月・火・土</td>
+                <td>12-17 / 9-13</td>
+                <td>主婦、月12-17、火9-13、土12-17</td>
+              </tr>
+              <tr>
+                <td><strong>西村</strong></td>
+                <td>宮ノ下</td>
+                <td>月・火・水・木・金</td>
+                <td>9-17</td>
+                <td>主婦、1人親世帯、土日不可</td>
+              </tr>
+              <tr>
+                <td><strong>高橋(宮下)</strong></td>
+                <td>宮ノ下</td>
+                <td>火・水・木</td>
+                <td>13-17 / 9-17</td>
+                <td>主婦、火水13-17、木9-17、宮下責任者候補</td>
+              </tr>
+              <tr>
+                <td><strong>山崎</strong></td>
+                <td>宮ノ下</td>
+                <td>月・火・木・金・土・日</td>
+                <td>6-9 / 9-17 / 17-22 / 22-6</td>
+                <td>主婦、水不可、月火木金土日フリー、宮下責任者候補</td>
+              </tr>
+              <tr>
+                <td><strong>松本</strong></td>
+                <td>宮ノ下</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-9 / 9-17 / 17-22 / 22-6</td>
+                <td>フリーター、夜勤OK、全てOK</td>
+              </tr>
+              <tr>
+                <td><strong>鈴木（たいせい）</strong></td>
+                <td>宮ノ下</td>
+                <td>月・金</td>
+                <td>16-20 / 9-13</td>
+                <td>学生、宮ノ下鈴木、月金16-20、月9-13要確認</td>
+              </tr>
+              <tr>
+                <td><strong>柴田まちこ</strong></td>
+                <td>宮ノ下</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-9</td>
+                <td>主婦、6-9のみ、日曜フリー要確認、宮下24時以降ワンオペ可</td>
+              </tr>
+              <tr>
+                <td><strong>かずや</strong></td>
+                <td>宮ノ下</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-22</td>
+                <td>フリー</td>
+              </tr>
+              <tr>
+                <td><strong>かずき</strong></td>
+                <td>宮ノ下</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-22</td>
+                <td>フリーター、フリー</td>
+              </tr>
+              <tr>
+                <td><strong>金子</strong></td>
+                <td>宮ノ下</td>
+                <td>月・水・日</td>
+                <td>17-22</td>
+                <td>学生、月水日17-22のみ</td>
+              </tr>
+              <tr>
+                <td><strong>まこつ。</strong></td>
+                <td>宮ノ下 / 東町 / 扇町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-9 / 9-18 / 13-22 / 17-22 / 22-6</td>
+                <td>オーナー、応援マルチ</td>
+              </tr>
+              <tr>
+                <td><strong>りえ</strong></td>
+                <td>宮ノ下 / 東町 / 扇町</td>
+                <td>月・火・水・木・金・土・日</td>
+                <td>6-9 / 9-18 / 13-22 / 17-22 / 22-6</td>
+                <td>マネージャー、応援マルチ</td>
+              </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="layout">
+      <aside class="sidebar">
+        <nav class="nav" aria-label="メニュー">
+          <a class="btn active" href="#dashboardView" data-view="dashboard">ホーム</a>
+          <a class="btn" href="#todayView" data-view="today">今日のシフト</a>
+          <a class="btn" href="#ownerView" data-view="owner">まこつ。ダッシュボード</a>
+          <a class="btn" href="#monthlyView" data-view="monthly">月間シフト作成</a>
+          <a class="btn" href="#finishedView" data-view="finished">完成シフト</a>
+          <a class="btn" href="#shortageView" data-view="shortage">不足チェック</a>
+          <a class="btn" href="#issuesView" data-view="issues">危険チェック</a>
+          <a class="btn" href="#availabilityView" data-view="availability">希望休</a>
+          <a class="btn" href="#staffView" data-view="staff">スタッフ</a>
+          <a class="btn" href="#dataView" data-view="data">保存/出力</a>
+          <div class="sub">beta4.6の軸</div>
+          <div class="muted">手書きメモの条件に加えて、過剰配置・前後勤務・本人希望を見ながら自動作成する。</div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <section class="panel" id="dashboardView">
+          <h2>ホーム</h2>
+          <div class="controls">
+            <label>対象月
+              <input id="homeMonth" type="month" value="2026-07">
+            </label>
+            <label>締め開始日
+              <select id="homeStartDay">
+                <option value="1">1日</option>
+                <option value="16" selected>16日</option>
+              </select>
+            </label>
+            <button class="btn primary" id="homeApply" type="button">期間を反映</button>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <div class="metric-label">作成期間</div>
+              <div class="metric-value" id="metricPeriod">-</div>
+              <div class="metric-sub">締め期間で月間表を生成</div>
+            </div>
+            <div class="card">
+              <div class="metric-label">不足枠</div>
+              <div class="metric-value" id="metricShortage">-</div>
+              <div class="metric-sub">配置不足の時間帯</div>
+            </div>
+            <div class="card">
+              <div class="metric-label">応援候補</div>
+              <div class="metric-value">2</div>
+              <div class="metric-sub">まこつ。 / りえ</div>
+            </div>
+            <div class="card">
+              <div class="metric-label">反映スタッフ</div>
+              <div class="metric-value" id="metricStaff">-</div>
+              <div class="metric-sub">手書きメモ + 応援マルチ</div>
+            </div>
+          </div>
+          <div class="status-row">
+            <a class="btn" href="#todayView" data-jump="today">今日のシフトを見る</a>
+            <a class="btn" href="#ownerView" data-jump="owner">全店舗を見る</a>
+            <a class="btn primary" href="#monthlyView" data-jump="monthly">月間シフトを作る</a>
+            <a class="btn" href="#finishedView" data-jump="finished">完成シフトを見る</a>
+            <a class="btn" href="#shortageView" data-jump="shortage">不足だけ見る</a>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="todayView">
+          <h2>今日のシフト</h2>
+          <div class="controls">
+            <label>表示日
+              <input id="todayInput" type="date" value="2026-07-16">
+            </label>
+            <button class="btn" id="prevDayBtn" type="button">前日</button>
+            <button class="btn" id="nextDayBtn" type="button">翌日</button>
+          </div>
+          <div class="today-grid" id="todayGrid"></div>
+        </section>
+
+        <section class="panel hidden" id="ownerView">
+          <h2>まこつ。ダッシュボード</h2>
+          <div class="owner-grid">
+            <div class="grid">
+              <div class="cards">
+                <div class="card">
+                  <div class="metric-label">全店舗不足</div>
+                  <div class="metric-value" id="ownerShortage">-</div>
+                  <div class="metric-sub">月間の不足枠</div>
+                </div>
+                <div class="card">
+                  <div class="metric-label">危険チェック</div>
+                  <div class="metric-value" id="ownerIssues">-</div>
+                  <div class="metric-sub">希望休・重複・過剰など</div>
+                </div>
+                <div class="card">
+                  <div class="metric-label">応援投入</div>
+                  <div class="metric-value" id="ownerSupport">-</div>
+                  <div class="metric-sub">まこつ。/りえの配置数</div>
+                </div>
+                <div class="card">
+                  <div class="metric-label">概算人件費</div>
+                  <div class="metric-value" id="ownerLabor">-</div>
+                  <div class="metric-sub">仮時給で概算</div>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table aria-label="店舗別状況">
+                  <thead>
+                    <tr>
+                      <th>店舗</th>
+                      <th>不足</th>
+                      <th>危険</th>
+                      <th>応援投入</th>
+                      <th>概算人件費</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ownerStoreBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <aside class="side-card">
+              <div class="detail-box">
+                <h3>優先対応</h3>
+                <div id="ownerPriority"></div>
+              </div>
+              <div class="detail-box">
+                <h3>判断ボタン</h3>
+                <div class="status-row">
+                  <button class="btn primary" id="fillAllBtn" type="button">全店舗を仮作成</button>
+                  <a class="btn" href="#issuesView" data-jump="issues">危険チェックへ</a>
+                  <a class="btn" href="#shortageView" data-jump="shortage">不足へ</a>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="monthlyView">
+          <h2>月間シフト作成</h2>
+          <div class="controls">
+            <label>対象月
+              <input id="monthInput" type="month" value="2026-07">
+            </label>
+            <label>締め開始日
+              <select id="startDayInput">
+                <option value="1">1日</option>
+                <option value="16" selected>16日</option>
+              </select>
+            </label>
+            <label>店舗
+              <select id="storeInput">
+                <option value="miyanoshita">宮ノ下</option>
+                <option value="higashicho">東町</option>
+                <option value="ougicho">扇町</option>
+              </select>
+            </label>
+            <button class="btn primary" id="generateBtn" type="button">1か月分を仮作成</button>
+            <button class="btn" id="clearStoreBtn" type="button">表示店舗を空にする</button>
+            <div class="toolbar-right">
+              <button class="btn" id="autoFillShortageBtn" type="button">表示店舗の不足を補充</button>
+              <button class="btn" id="trimOverstaffBtn" type="button">表示店舗の余剰を整理</button>
+            </div>
+          </div>
+
+          <div class="requirements" id="requirements"></div>
+
+          <div class="split">
+            <div class="table-wrap">
+              <table aria-label="月間シフト作成表">
+                <thead id="monthlyHead"></thead>
+                <tbody id="monthlyBody"></tbody>
+              </table>
+            </div>
+
+            <aside class="side-card no-print">
+              <div class="detail-box">
+                <h3>選択中の枠</h3>
+                <div id="selectedDetail" class="muted">不足セル、または編集したい枠を押す。</div>
+              </div>
+              <div class="detail-box">
+                <h3>候補</h3>
+                <div id="candidateList" class="candidate-list">
+                  <div class="muted">枠を選ぶと候補が出る。</div>
+                </div>
+              </div>
+              <div class="detail-box">
+                <h3>出力</h3>
+                <div class="status-row">
+                  <button class="btn" id="csvBtn" type="button">CSV出力</button>
+                  <button class="btn" id="printBtn" type="button">印刷</button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="finishedView">
+          <h2>完成シフト</h2>
+          <div class="controls">
+            <label>店舗
+              <select id="finishedStore">
+                <option value="miyanoshita">宮ノ下</option>
+                <option value="higashicho">東町</option>
+                <option value="ougicho">扇町</option>
+              </select>
+            </label>
+            <button class="btn" id="finishedPrintBtn" type="button">印刷</button>
+          </div>
+          <div class="print-sheet">
+            <div class="print-head">
+              <strong id="finishedTitle">完成シフト</strong>
+              <span class="muted" id="finishedPeriod">-</span>
+            </div>
+            <div class="table-wrap">
+              <table aria-label="完成シフト表">
+                <thead id="finishedHead"></thead>
+                <tbody id="finishedBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="shortageView">
+          <h2>不足チェック</h2>
+          <div class="controls">
+            <label>店舗
+              <select id="shortageStore">
+                <option value="all">全店舗</option>
+                <option value="miyanoshita">宮ノ下</option>
+                <option value="higashicho">東町</option>
+                <option value="ougicho">扇町</option>
+              </select>
+            </label>
+            <button class="btn" id="shortageRefresh" type="button">更新</button>
+            <button class="btn primary" id="fillFirstShortageBtn" type="button">先頭の不足を候補で埋める</button>
+          </div>
+          <div class="detail-box">
+            <h3>LINE文面</h3>
+            <textarea id="lineMessage" class="textarea" readonly></textarea>
+            <div class="status-row">
+              <button class="btn" id="copyLineBtn" type="button">文面をコピー</button>
+              <button class="btn" id="refreshLineBtn" type="button">文面更新</button>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table aria-label="不足一覧">
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>店舗</th>
+                  <th>時間帯</th>
+                  <th>必要</th>
+                  <th>配置</th>
+                  <th>不足</th>
+                  <th>候補</th>
+                </tr>
+              </thead>
+              <tbody id="shortageBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="issuesView">
+          <h2>危険チェック</h2>
+          <div class="controls">
+            <label>店舗
+              <select id="issuesStore">
+                <option value="all">全店舗</option>
+                <option value="miyanoshita">宮ノ下</option>
+                <option value="higashicho">東町</option>
+                <option value="ougicho">扇町</option>
+              </select>
+            </label>
+            <button class="btn" id="issuesRefresh" type="button">更新</button>
+          </div>
+          <div class="table-wrap">
+            <table aria-label="危険チェック一覧">
+              <thead>
+                <tr>
+                  <th>重要度</th>
+                  <th>日付</th>
+                  <th>店舗</th>
+                  <th>対象</th>
+                  <th>内容</th>
+                </tr>
+              </thead>
+              <tbody id="issuesBody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="availabilityView">
+          <h2>希望休</h2>
+          <div class="controls">
+            <label>スタッフ
+              <select id="availabilityStaff"></select>
+            </label>
+            <label>休み日
+              <input id="availabilityDate" type="date" value="2026-07-20">
+            </label>
+            <button class="btn primary" id="addAvailabilityBtn" type="button">希望休を追加</button>
+          </div>
+          <div class="availability-list" id="availabilityList"></div>
+        </section>
+
+        <section class="panel hidden" id="staffView">
+          <h2>スタッフ</h2>
+          <div class="detail-box">
+            <h3>スタッフ追加</h3>
+            <div class="controls">
+              <label>名前
+                <input id="newStaffName" type="text" placeholder="例: 田中">
+              </label>
+              <label>店舗
+                <input id="newStaffStores" type="text" placeholder="例: 宮ノ下/東町">
+              </label>
+              <label>曜日
+                <input id="newStaffDays" type="text" placeholder="例: 月/水/金 または 全曜日">
+              </label>
+              <label>対応時間
+                <input id="newStaffTimes" type="text" placeholder="例: 9-18/17-22">
+              </label>
+              <label>タグ
+                <input id="newStaffTags" type="text" placeholder="例: 昼/応援可">
+              </label>
+              <label>応援マルチ
+                <select id="newStaffSupport">
+                  <option value="false">通常</option>
+                  <option value="true">応援マルチ</option>
+                </select>
+              </label>
+              <button class="btn primary" id="addStaffBtn" type="button">追加/更新</button>
+            </div>
+          </div>
+          <div class="detail-box">
+            <h3>一括取り込み</h3>
+            <textarea id="staffBulkBox" class="textarea" placeholder="名前,店舗,曜日,対応時間,タグ,応援&#10;田中,宮ノ下/東町,月/水/金,9-18/17-22,昼/応援可,0&#10;佐藤,全店舗,全曜日,22-6,夜勤/応援可,0"></textarea>
+            <div class="status-row">
+              <button class="btn" id="bulkImportStaffBtn" type="button">一括取り込み</button>
+              <button class="btn" id="exportStaffBtn" type="button">スタッフを書き出し</button>
+            </div>
+          </div>
+          <div class="controls">
+            <label>検索
+              <input id="staffSearch" type="search" placeholder="名前・タグ">
+            </label>
+            <label>店舗
+              <select id="staffStoreFilter">
+                <option value="all">全店舗</option>
+                <option value="miyanoshita">宮ノ下</option>
+                <option value="higashicho">東町</option>
+                <option value="ougicho">扇町</option>
+              </select>
+            </label>
+            <label>条件
+              <select id="staffTagFilter">
+                <option value="all">すべて</option>
+                <option value="夜勤">夜勤</option>
+                <option value="応援可">応援可</option>
+                <option value="応援マルチ">応援マルチ</option>
+                <option value="社員">社員</option>
+                <option value="責任者">責任者</option>
+                <option value="ワンオペ">ワンオペ</option>
+                <option value="要確認">要確認</option>
+                <option value="朝">朝</option>
+                <option value="昼">昼</option>
+                <option value="夕方">夕方</option>
+              </select>
+            </label>
+          </div>
+          <div class="staff-grid" id="staffGrid"></div>
+        </section>
+
+        <section class="panel hidden" id="dataView">
+          <h2>保存/出力</h2>
+          <div class="grid">
+            <div class="detail-box">
+              <h3>自動保存</h3>
+              <p class="muted">このブラウザ内に自動保存。ページを開き直しても、直前の作業状態を復元する。</p>
+              <div class="status-row">
+                <button class="btn primary" id="saveNowBtn" type="button">今すぐ保存</button>
+                <button class="btn" id="loadNowBtn" type="button">保存データを読み込み</button>
+                <button class="btn" id="resetSampleBtn" type="button">サンプルに戻す</button>
+              </div>
+            </div>
+            <div class="detail-box">
+              <h3>JSON出力/取り込み</h3>
+              <textarea id="jsonBox" class="textarea" placeholder="ここにJSONを出力、または貼り付け"></textarea>
+              <div class="status-row">
+                <button class="btn" id="exportJsonBtn" type="button">JSON出力</button>
+                <button class="btn" id="importJsonBtn" type="button">JSON取り込み</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      function byId(id) {
+        return document.getElementById(id);
+      }
+
+      function findActionButton(target) {
+        while (target && target !== document.body) {
+          if (target.getAttribute && (target.getAttribute("data-view") || target.getAttribute("data-jump") || target.id === "managerMode" || target.id === "ownerMode")) {
+            return target;
+          }
+          target = target.parentNode;
+        }
+        return null;
+      }
+
+      function setStatus(text, className) {
+        var status = byId("jsStatus");
+        if (!status) return;
+        status.className = "status-bar " + (className || "");
+        status.textContent = text;
+      }
+
+      function switchPanel(view) {
+        var ids = {
+          dashboard: "dashboardView",
+          today: "todayView",
+          owner: "ownerView",
+          monthly: "monthlyView",
+          finished: "finishedView",
+          shortage: "shortageView",
+          issues: "issuesView",
+          availability: "availabilityView",
+          staff: "staffView",
+          data: "dataView"
+        };
+        var key;
+        for (key in ids) {
+          if (Object.prototype.hasOwnProperty.call(ids, key)) {
+            var panel = byId(ids[key]);
+            if (panel) {
+              if (key === view) panel.className = panel.className.replace(/\s*hidden/g, "");
+              else if (panel.className.indexOf("hidden") === -1) panel.className += " hidden";
+            }
+          }
+        }
+        var buttons = document.querySelectorAll ? document.querySelectorAll("[data-view]") : [];
+        for (var i = 0; i < buttons.length; i += 1) {
+          var button = buttons[i];
+          button.className = button.className.replace(/\s*active/g, "");
+          if (button.getAttribute("data-view") === view) button.className += " active";
+        }
+        setStatus("簡易操作OK。ボタンで画面移動できます", "fallback");
+      }
+
+      function handleTap(event) {
+        var button = findActionButton(event.target);
+        if (!button) return;
+        var view = button.getAttribute("data-view") || button.getAttribute("data-jump");
+        if (button.id === "managerMode") view = "monthly";
+        if (button.id === "ownerMode") view = "owner";
+        if (!view) return;
+        switchPanel(view);
+      }
+
+      window.makotsuLegacySwitchView = switchPanel;
+      if (document.addEventListener) {
+        document.addEventListener("click", handleTap, false);
+        document.addEventListener("touchend", handleTap, false);
+        document.addEventListener("DOMContentLoaded", function () {
+          document.body.className += " js-ready";
+          setStatus("簡易操作OK。読み込み中でも画面移動できます", "fallback");
+        }, false);
+      }
+    }());
+  </script>
+  <script>
+    const slots = ["6-9", "9-13", "13-17", "17-22", "22-6"];
+    const storeOrder = ["miyanoshita", "higashicho", "ougicho"];
+    const stores = {
+      miyanoshita: {
+        name: "宮ノ下",
+        requirements: { "6-9": 2, "9-13": 2, "13-17": 2, "17-22": 3, "22-6": 2 }
+      },
+      higashicho: {
+        name: "東町",
+        requirements: { "6-9": 2, "9-13": 2, "13-17": 2, "17-22": 2, "22-6": 2 }
+      },
+      ougicho: {
+        name: "扇町",
+        requirements: { "6-9": 1, "9-13": 2, "13-17": 2, "17-22": 2, "22-6": 2 }
+      }
+    };
+
+    const staff = [
+      { name: "扇町 店長（齋藤）", stores: ["ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-15", "9-18", "13-22", "16-25", "22-6"], tags: ["店長", "齋藤", "店舗別店長", "どの時間もOK", "7日休み", "1日8h"], support: false },
+      { name: "赤瀬", stores: ["ougicho"], days: ["月", "水", "金"], slots: [], times: ["9-17"], tags: ["主婦", "1h休憩", "扇町責任者候補"], support: false },
+      { name: "グルン", stores: ["ougicho"], days: ["月", "火", "木", "金"], slots: [], times: ["9-13", "9-17"], tags: ["主婦", "月金9-13", "火木9-17", "45分休憩", "扇町責任者候補"], support: false },
+      { name: "下田", stores: ["ougicho", "higashicho", "miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-15", "9-15", "17-22", "18-24"], tags: ["基本:月火木金は東町", "水土日は扇町9-15", "扇町では9-17なし", "扇町木曜17-22", "宮下18-24のみ", "人不足時6時からOK", "45分休憩", "東町責任者候補"], support: false },
+      { name: "芳澤", stores: ["ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["フリーター", "どの曜日時間OK", "責任者同伴のみ", "電話対応不可", "クレーム対応不可", "下田と組合せNG"], support: false },
+      { name: "鈴木（久華）", stores: ["ougicho"], days: ["金", "土"], slots: [], times: ["17-22"], tags: ["夕方", "扇町鈴木"], support: false },
+      { name: "植村", stores: ["ougicho"], days: ["水", "木", "金", "土", "日"], slots: [], times: ["6-9"], tags: ["朝", "残業不可"], support: false },
+      { name: "ミミ", stores: ["ougicho", "higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["フリーター", "どの曜日もOK", "どの時間もOK", "多く勤務希望", "扇町東町"], support: false },
+      { name: "中込", stores: ["ougicho"], days: ["金"], slots: [], times: ["22-6"], tags: ["主婦", "夜勤のみ", "扇町2-7ワンオペ可"], support: false },
+      { name: "安彦", stores: ["ougicho"], days: ["火", "木", "土", "日"], slots: [], times: ["6-9"], tags: ["フリーター", "朝"], support: false },
+      { name: "分部", stores: ["ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["21-24"], tags: ["主婦", "週2-3回", "希望提出型", "副業登録"], support: false },
+      { name: "斎藤ゆうな", stores: ["ougicho"], days: ["月"], slots: [], times: ["13-17"], tags: ["学生", "月のみ要確認"], support: false },
+      { name: "工藤", stores: ["ougicho", "higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["主婦", "どの曜日もOK", "どの時間もOK", "多く勤務希望", "ミミさんと同じ", "東町責任者候補", "東町3-6ワンオペ可", "扇町2-7ワンオペ可"], support: false },
+      { name: "木村", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-7", "24-9"], tags: ["主婦", "社員", "夜勤のみ", "16日-翌15日", "7日休み", "9h拘束8h勤務"], support: false },
+      { name: "塚用船", stores: ["higashicho", "ougicho"], days: ["月", "火", "水", "木", "金"], slots: [], times: ["6-9"], tags: ["週2", "東町扇町対応可", "名前要確認"], support: false },
+      { name: "富崎", stores: ["ougicho"], days: ["火", "水"], slots: [], times: ["22-2"], tags: ["学生", "夜勤短時間のみ"], support: false },
+      { name: "加藤", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-7", "24-9", "21-6"], tags: ["社員", "基本夜勤", "全て対応OK", "16日-翌15日", "7日休み"], support: false },
+      { name: "富田", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "木", "金", "土", "日"], slots: [], times: ["9-18", "13-22", "22-7", "24-9"], tags: ["社員", "15日-翌15日", "7日休み", "水曜固定休", "木曜午後希望", "9h拘束8h勤務"], support: false },
+      { name: "東町 店長（小澤）", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["9-18", "13-22", "22-7", "24-9"], tags: ["社員", "店長", "小澤", "店舗別店長", "16日-翌15日", "7日休み", "9h拘束8h勤務", "1h休憩"], support: false },
+
+      { name: "高橋(東町)", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["18-22"], tags: ["主婦", "どの曜日もOK"], support: false },
+      { name: "高木", stores: ["higashicho"], days: ["火", "木"], slots: [], times: ["18-22"], tags: ["学生", "火木のみ"], support: false },
+      { name: "大津", stores: ["higashicho"], days: ["土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["学生", "土日どの時間もOK"], support: false },
+      { name: "佐々木(絢)", stores: ["higashicho"], days: ["土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["学生", "土日どの時間もOK"], support: false },
+      { name: "石住井", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "日"], slots: [], times: ["22-2", "24-6"], tags: ["フリーター", "準夜勤", "基本22-2", "土曜以外OK", "山梨と入る日のみ24-6", "ワンオペ夜勤しばらくなし"], support: false },
+      { name: "和田", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-6"], tags: ["主婦", "夜勤", "どの曜日もOK", "東町3-6ワンオペ可"], support: false },
+      { name: "済藤", stores: ["higashicho"], days: ["土", "日"], slots: [], times: ["6-9"], tags: ["一般", "土日のみ", "6-9要確認"], support: false },
+      { name: "多田", stores: ["higashicho"], days: ["月", "水", "金"], slots: [], times: ["6-9"], tags: ["早朝のみ", "残業不可"], support: false },
+      { name: "佐々木（綾）", stores: ["higashicho"], days: ["水"], slots: [], times: ["9-13"], tags: ["主婦", "水のみ"], support: false },
+      { name: "永井", stores: ["higashicho", "ougicho"], days: ["火", "水", "木"], slots: [], times: ["9-16", "9-17"], tags: ["火木9-16扇町固定", "水9-16", "扇町火木9-17", "45分休憩", "扇町責任者候補"], support: false },
+      { name: "柳川", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["13-17", "17-23"], tags: ["東町のみ", "週2-3回", "どの曜日OK", "最長6h", "夕勤人不足ならOK"], support: false },
+      { name: "守屋", stores: ["higashicho"], days: ["月", "金"], slots: [], times: ["13-17"], tags: ["固定"], support: false },
+      { name: "ダハム", stores: ["higashicho"], days: ["火", "水", "土"], slots: [], times: ["13-19", "13-17"], tags: ["火水13-19固定", "土13-17", "外国留学生", "それ以外不可"], support: false },
+      { name: "キーズ", stores: ["higashicho"], days: ["火", "金", "土", "日"], slots: [], times: ["6-18", "9-21", "12-24"], tags: ["月水木以外", "12hまで", "週28hまで", "副業あり", "東町12hまで"], support: false },
+      { name: "山梨", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-6"], tags: ["一般", "セブン副業", "週1-2希望日", "夜勤"], support: false },
+
+      { name: "宮下 店長（小島）", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-15", "9-18", "13-22", "16-25", "22-6"], tags: ["店長", "小島", "店舗別店長", "どの時間曜日もOK", "7日休み", "1日8h"], support: false },
+      { name: "笹島", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-9"], tags: ["フリーター", "1h休憩", "宮下24時以降ワンオペ可"], support: false },
+      { name: "幸本", stores: ["miyanoshita"], days: ["月", "水"], slots: [], times: ["9-13"], tags: ["主婦"], support: false },
+      { name: "古屋", stores: ["miyanoshita"], days: ["月", "火", "土"], slots: [], times: ["12-17", "9-13"], tags: ["主婦", "月12-17", "火9-13", "土12-17"], support: false },
+      { name: "西村", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金"], slots: [], times: ["9-17"], tags: ["主婦", "1人親世帯", "土日不可"], support: false },
+      { name: "高橋(宮下)", stores: ["miyanoshita"], days: ["火", "水", "木"], slots: [], times: ["13-17", "9-17"], tags: ["主婦", "火水13-17", "木9-17", "宮下責任者候補"], support: false },
+      { name: "山崎", stores: ["miyanoshita"], days: ["月", "火", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["主婦", "水不可", "月火木金土日フリー", "宮下責任者候補"], support: false },
+      { name: "松本", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["フリーター", "夜勤OK", "全てOK"], support: false },
+      { name: "鈴木（たいせい）", stores: ["miyanoshita"], days: ["月", "金"], slots: [], times: ["16-20", "9-13"], tags: ["学生", "宮ノ下鈴木", "月金16-20", "月9-13要確認"], support: false },
+      { name: "柴田まちこ", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9"], tags: ["主婦", "6-9のみ", "日曜フリー要確認", "宮下24時以降ワンオペ可"], support: false },
+      { name: "かずや", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-22"], tags: ["フリー"], support: false },
+      { name: "かずき", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-22"], tags: ["フリーター", "フリー"], support: false },
+      { name: "金子", stores: ["miyanoshita"], days: ["月", "水", "日"], slots: [], times: ["17-22"], tags: ["学生", "月水日17-22のみ"], support: false },
+
+      { name: "まこつ。", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-18", "13-22", "17-22", "22-6"], tags: ["オーナー", "応援マルチ"], support: true },
+      { name: "りえ", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-18", "13-22", "17-22", "22-6"], tags: ["マネージャー", "応援マルチ"], support: true }
+    ];
+
+    const availability = staff.reduce((map, person) => {
+      map[person.name] = [];
+      return map;
+    }, {});
+    const incompatiblePairs = [
+      ["芳澤", "下田"],
+      ["和田", "工藤"],
+      ["和田", "守屋"],
+      ["和田", "石住井"],
+      ["和田", "山梨"]
+    ];
+
+    const state = {
+      month: "2026-07",
+      startDay: 16,
+      today: "2026-07-16",
+      selectedStore: "miyanoshita",
+      selected: null,
+      schedule: {},
+      ready: false,
+      bulkGenerating: false
+    };
+
+    const dom = {
+      views: {
+        dashboard: document.getElementById("dashboardView"),
+        today: document.getElementById("todayView"),
+        owner: document.getElementById("ownerView"),
+        monthly: document.getElementById("monthlyView"),
+        finished: document.getElementById("finishedView"),
+        shortage: document.getElementById("shortageView"),
+        issues: document.getElementById("issuesView"),
+        availability: document.getElementById("availabilityView"),
+        staff: document.getElementById("staffView"),
+        data: document.getElementById("dataView")
+      },
+      toast: document.getElementById("toast")
+    };
+
+    function pad(n) {
+      return String(n).padStart(2, "0");
+    }
+
+    function iso(date) {
+      return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    }
+
+    function parseMonth(value) {
+      const [year, month] = value.split("-").map(Number);
+      return { year, month };
+    }
+
+    function addDays(date, days) {
+      const copy = new Date(date);
+      copy.setDate(copy.getDate() + days);
+      return copy;
+    }
+
+    function periodDates() {
+      const { year, month } = parseMonth(state.month);
+      const start = new Date(year, month - 1, state.startDay);
+      const end = state.startDay === 1
+        ? new Date(year, month, 0)
+        : new Date(year, month, state.startDay - 1);
+      const dates = [];
+      for (let d = new Date(start); d <= end; d = addDays(d, 1)) {
+        dates.push(new Date(d));
+      }
+      return dates;
+    }
+
+    function dateLabel(date) {
+      return `${date.getMonth() + 1}/${date.getDate()}`;
+    }
+
+    function dowLabel(date) {
+      return ["日", "月", "火", "水", "木", "金", "土"][date.getDay()];
+    }
+
+    function periodLabel() {
+      const dates = periodDates();
+      if (!dates.length) return "-";
+      return `${dateLabel(dates[0])}〜${dateLabel(dates[dates.length - 1])}`;
+    }
+
+    function ensureCell(dateIso, storeKey, slot) {
+      if (!state.schedule[dateIso]) state.schedule[dateIso] = {};
+      if (!state.schedule[dateIso][storeKey]) state.schedule[dateIso][storeKey] = {};
+      if (!state.schedule[dateIso][storeKey][slot]) state.schedule[dateIso][storeKey][slot] = [];
+      return state.schedule[dateIso][storeKey][slot];
+    }
+
+    function requirement(storeKey, slot) {
+      return stores[storeKey] && stores[storeKey].requirements[slot] ? stores[storeKey].requirements[slot] : 0;
+    }
+
+    function setRequirement(slot, value) {
+      stores[state.selectedStore].requirements[slot] = Math.max(0, Number(value) || 0);
+      renderAll();
+    }
+
+    function isUnavailable(personName, dateIso) {
+      return (availability[personName] || []).includes(dateIso);
+    }
+
+    function findStaff(name) {
+      return staff.find(person => person.name === name);
+    }
+
+    function hasTag(person, text) {
+      return Boolean(person && person.tags && person.tags.some(tag => tag.includes(text)));
+    }
+
+    function matchesDay(person, dateIso) {
+      if (!person.days || !person.days.length) return true;
+      const date = new Date(`${dateIso}T00:00:00`);
+      return person.days.includes(dowLabel(date));
+    }
+
+    function areIncompatible(nameA, nameB) {
+      return incompatiblePairs.some(([a, b]) => (
+        (a === nameA && b === nameB) || (a === nameB && b === nameA)
+      ));
+    }
+
+    function hasIncompatiblePerson(dateIso, storeKey, personName) {
+      return slots.some(slot => ensureCell(dateIso, storeKey, slot).some(item => areIncompatible(item.name, personName)));
+    }
+
+    function hasResponsiblePerson(people) {
+      return people.some(item => {
+        const person = findStaff(item.name);
+        return hasTag(person, "責任者候補") || hasTag(person, "社員") || hasTag(person, "店長");
+      });
+    }
+
+    function isAssignedAnywhere(dateIso, personName) {
+      return storeOrder.some(storeKey => (
+        slots.some(slot => ensureCell(dateIso, storeKey, slot).some(x => x.name === personName))
+      ));
+    }
+
+    function assignmentKey(assignment) {
+      return `${assignment.name}|${assignment.time}`;
+    }
+
+    function uniqueAssignments(dateIso, storeKey) {
+      const map = new Map();
+      slots.forEach(slot => {
+        ensureCell(dateIso, storeKey, slot).forEach(assignment => {
+          map.set(assignmentKey(assignment), assignment);
+        });
+      });
+      return [...map.values()];
+    }
+
+    function wageOf(name) {
+      if (name === "まこつ。" || name === "りえ") return 0;
+      if (["工藤", "ミミ", "山梨"].includes(name)) return 1500;
+      return 1200;
+    }
+
+    function assignmentHours(assignment) {
+      const [start, end] = parseRange(assignment.time);
+      return Math.max(0, end - start);
+    }
+
+    function storeLabor(storeKey) {
+      let total = 0;
+      periodDates().forEach(date => {
+        const dateIso = iso(date);
+        uniqueAssignments(dateIso, storeKey).forEach(assignment => {
+          total += assignmentHours(assignment) * wageOf(assignment.name);
+        });
+      });
+      return total;
+    }
+
+    function supportCount(storeKey = "all") {
+      let count = 0;
+      periodDates().forEach(date => {
+        const dateIso = iso(date);
+        storeOrder.forEach(key => {
+          if (storeKey !== "all" && storeKey !== key) return;
+          uniqueAssignments(dateIso, key).forEach(assignment => {
+            if (assignment.support) count += 1;
+          });
+        });
+      });
+      return count;
+    }
+
+    function coveredSlots(time) {
+      return slots.filter(slot => coversSlot(time, slot));
+    }
+
+    function assignmentExists(cell, assignment) {
+      return cell.some(existing => assignmentKey(existing) === assignmentKey(assignment));
+    }
+
+    function canPlaceShift(dateIso, storeKey, person, time, options = {}) {
+      if (!person || !time) return false;
+      if (isUnavailable(person.name, dateIso)) return false;
+      if (!matchesDay(person, dateIso)) return false;
+      if (hasIncompatiblePerson(dateIso, storeKey, person.name)) return false;
+      const assignment = { name: person.name, time, support: person.support };
+      const targets = coveredSlots(time);
+      if (!targets.length) return false;
+      const alreadyAssigned = isAssignedAnywhere(dateIso, person.name);
+      const sameAssignmentAlready = targets.every(slot => {
+        const cell = ensureCell(dateIso, storeKey, slot);
+        return assignmentExists(cell, assignment);
+      });
+      if (options.preventDoubleBooking && alreadyAssigned && !sameAssignmentAlready) return false;
+      if (options.respectCapacity) {
+        return targets.every(slot => {
+          const req = requirement(storeKey, slot);
+          if (req <= 0) return false;
+          const cell = ensureCell(dateIso, storeKey, slot);
+          return assignmentExists(cell, assignment) || cell.length < req;
+        });
+      }
+      return true;
+    }
+
+    function addShiftToDay(dateIso, storeKey, person, time, options = {}) {
+      if (!canPlaceShift(dateIso, storeKey, person, time, options)) return false;
+      const assignment = { name: person.name, time, support: person.support };
+      slots.forEach(slot => {
+        if (!coversSlot(time, slot)) return;
+        const cell = ensureCell(dateIso, storeKey, slot);
+        if (options.respectCapacity && cell.length >= requirement(storeKey, slot) && !assignmentExists(cell, assignment)) return;
+        if (!assignmentExists(cell, assignment)) {
+          cell.push(assignment);
+        }
+      });
+      return true;
+    }
+
+    function removeShiftFromDay(dateIso, storeKey, assignment) {
+      slots.forEach(slot => {
+        const cell = ensureCell(dateIso, storeKey, slot);
+        const index = cell.findIndex(existing => assignmentKey(existing) === assignmentKey(assignment));
+        if (index >= 0) cell.splice(index, 1);
+      });
+    }
+
+    function personAssignmentsForDay(dateIso, personName) {
+      const assignments = [];
+      storeOrder.forEach(storeKey => {
+        uniqueAssignments(dateIso, storeKey).forEach(assignment => {
+          if (assignment.name === personName) assignments.push({ ...assignment, storeKey });
+        });
+      });
+      return assignments;
+    }
+
+    function personAssignedDaysInPeriod(personName) {
+      return periodDates().filter(date => (
+        isAssignedAnywhere(iso(date), personName)
+      )).length;
+    }
+
+    function buildLoadMap() {
+      return new Map(staff.map(person => [person.name, personAssignedDaysInPeriod(person.name)]));
+    }
+
+    function hasLateShift(dateIso, personName) {
+      return personAssignmentsForDay(dateIso, personName).some(assignment => parseRange(assignment.time)[1] > 24);
+    }
+
+    function hasEarlyShift(dateIso, personName) {
+      return personAssignmentsForDay(dateIso, personName).some(assignment => parseRange(assignment.time)[0] < 9);
+    }
+
+    function restScore(person, slot, dateIso) {
+      const date = new Date(`${dateIso}T00:00:00`);
+      const previousIso = iso(addDays(date, -1));
+      const nextIso = iso(addDays(date, 1));
+      const [slotStart] = parseRange(slot);
+      let score = 0;
+      if (slotStart < 13 && hasLateShift(previousIso, person.name)) score -= 140;
+      if (slotStart >= 22 && hasEarlyShift(nextIso, person.name)) score -= 100;
+      if (personAssignmentsForDay(dateIso, person.name).length) score -= 90;
+      return score;
+    }
+
+    function timeFitScore(person, time, slot) {
+      const [start, end] = parseRange(time);
+      const hours = Math.max(1, end - start);
+      let score = 0;
+      if (time === slot) score += 35;
+      if (hours <= 4) score += 18;
+      if (hours >= 9) score -= 12;
+      if (hours >= 12) score -= 30;
+      if (hasTag(person, "固定")) score += 8;
+      if (hasTag(person, "希望提出型")) score -= 20;
+      return score;
+    }
+
+    function bestTimeFor(person, storeKey, slot, dateIso, options = {}) {
+      const best = person.times
+        .filter(time => coversSlot(time, slot))
+        .map(time => {
+          const feasible = canPlaceShift(dateIso, storeKey, person, time, options);
+          return { time, feasible, score: timeFitScore(person, time, slot) };
+        })
+        .filter(item => item.feasible || !options.respectCapacity)
+        .sort((a, b) => b.score - a.score)[0];
+      return best ? best.time : null;
+    }
+
+    function scoreCandidate(person, storeKey, slot, dateIso, options = {}) {
+      let score = 0;
+      if (person.stores.includes(storeKey)) score += 40;
+      if (person.slots.includes(slot) || person.times.some(time => coversSlot(time, slot))) score += 40;
+      const time = bestTimeFor(person, storeKey, slot, dateIso, options);
+      if (!time) score -= 1000;
+      else score += timeFitScore(person, time, slot);
+      if (person.support) score += options.allowSupport ? 4 : -35;
+      if (isUnavailable(person.name, dateIso)) score -= 1000;
+      if (!matchesDay(person, dateIso)) score -= 1000;
+      if (hasIncompatiblePerson(dateIso, storeKey, person.name)) score -= 500;
+      if (options.respectCapacity && time && !canPlaceShift(dateIso, storeKey, person, time, options)) score -= 1000;
+      const already = isAssignedAnywhere(dateIso, person.name);
+      if (already) score -= 70;
+      score += restScore(person, slot, dateIso);
+      score -= (options.loadMap ? (options.loadMap.get(person.name) || 0) : 0) * 2;
+      return score;
+    }
+
+    function candidatesFor(storeKey, slot, dateIso, options = {}) {
+      return staff
+        .map(person => {
+          const time = bestTimeFor(person, storeKey, slot, dateIso, options);
+          return { person, time, score: scoreCandidate(person, storeKey, slot, dateIso, options) };
+        })
+        .filter(item => item.score > 20)
+        .sort((a, b) => b.score - a.score || Number(a.person.support) - Number(b.person.support))
+        .slice(0, 7);
+    }
+
+    function pickTime(person, slot, dateIso = null, storeKey = null, options = {}) {
+      if (dateIso && storeKey) {
+        const best = bestTimeFor(person, storeKey, slot, dateIso, options);
+        if (best) return best;
+      }
+      const direct = person.times.find(time => time === slot);
+      if (direct) return direct;
+      const covering = person.times.find(time => coversSlot(time, slot));
+      return covering || person.times[0] || slot;
+    }
+
+    function coversSlot(time, slot) {
+      const [start, end] = parseRange(time);
+      let [slotStart, slotEnd] = parseRange(slot);
+      if (end > 24 && slotStart < start) {
+        slotStart += 24;
+        slotEnd += 24;
+      }
+      return start <= slotStart && end >= slotEnd;
+    }
+
+    function parseRange(label) {
+      const [startRaw, endRaw] = label.split("-").map(Number);
+      const start = startRaw;
+      let end = endRaw;
+      if (Number.isNaN(end)) end = 24;
+      if (end <= start) end += 24;
+      return [start, end];
+    }
+
+    function canRemoveWithoutShortage(dateIso, storeKey, assignment) {
+      return coveredSlots(assignment.time).every(slot => {
+        const cell = ensureCell(dateIso, storeKey, slot);
+        return cell.length - 1 >= requirement(storeKey, slot);
+      });
+    }
+
+    function overstaffRemovalScore(dateIso, storeKey, slot, assignment) {
+      const person = findStaff(assignment.name);
+      if (!person) return 0;
+      let score = scoreCandidate(person, storeKey, slot, dateIso);
+      if (person.support) score -= 40;
+      if (hasTag(person, "応援マルチ")) score -= 35;
+      return score;
+    }
+
+    function trimOverstaffing(storeFilter = "all") {
+      let removed = 0;
+      periodDates().forEach(date => {
+        const dateIso = iso(date);
+        storeOrder.forEach(storeKey => {
+          if (storeFilter !== "all" && storeFilter !== storeKey) return;
+          slots.forEach(slot => {
+            let cell = ensureCell(dateIso, storeKey, slot);
+            let guard = 0;
+            while (cell.length > requirement(storeKey, slot) && guard < 10) {
+              const removable = [...cell]
+                .filter(assignment => canRemoveWithoutShortage(dateIso, storeKey, assignment))
+                .sort((a, b) => overstaffRemovalScore(dateIso, storeKey, slot, a) - overstaffRemovalScore(dateIso, storeKey, slot, b))[0];
+              if (!removable) break;
+              removeShiftFromDay(dateIso, storeKey, removable);
+              removed += 1;
+              cell = ensureCell(dateIso, storeKey, slot);
+              guard += 1;
+            }
+          });
+        });
+      });
+      return removed;
+    }
+
+    function generateMonth() {
+      const dates = periodDates();
+      const storeKey = state.selectedStore;
+      const options = { respectCapacity: true, preventDoubleBooking: true, loadMap: buildLoadMap() };
+      dates.forEach((date, dateIndex) => {
+        const dateIso = iso(date);
+        slots.forEach(slot => {
+          const cell = ensureCell(dateIso, storeKey, slot);
+          cell.length = 0;
+        });
+        for (let pass = 0; pass < 8; pass += 1) {
+          let changed = false;
+          slots.forEach(slot => {
+            const cell = ensureCell(dateIso, storeKey, slot);
+            const req = requirement(storeKey, slot);
+            if (cell.length >= req) return;
+            const pool = candidatesFor(storeKey, slot, dateIso, options)
+              .filter(item => !item.person.support && !isUnavailable(item.person.name, dateIso));
+            const picked = pool[(dateIndex + pass + slots.indexOf(slot)) % Math.max(pool.length, 1)];
+            if (picked) {
+              const wasAssigned = isAssignedAnywhere(dateIso, picked.person.name);
+              const added = addShiftToDay(dateIso, storeKey, picked.person, picked.time, options);
+              if (added && !wasAssigned) {
+                options.loadMap.set(picked.person.name, (options.loadMap.get(picked.person.name) || 0) + 1);
+              }
+              changed = added || changed;
+            }
+          });
+          if (!changed) return;
+        }
+      });
+      trimOverstaffing(storeKey);
+      if (!state.bulkGenerating) {
+        showToast(`${stores[storeKey].name}の1か月分を仮作成した`);
+        renderAll();
+      }
+    }
+
+    function clearStore() {
+      const storeKey = state.selectedStore;
+      periodDates().forEach(date => {
+        const dateIso = iso(date);
+        if (state.schedule[dateIso] && state.schedule[dateIso][storeKey]) {
+          state.schedule[dateIso][storeKey] = {};
+        }
+      });
+      state.selected = null;
+      renderAll();
+      showToast(`${stores[storeKey].name}を空にした`);
+    }
+
+    function generateAllStores() {
+      const original = state.selectedStore;
+      state.bulkGenerating = true;
+      storeOrder.forEach(storeKey => {
+        state.selectedStore = storeKey;
+        generateMonth();
+      });
+      state.bulkGenerating = false;
+      state.selectedStore = original;
+      renderAll();
+      showToast("全店舗を仮作成した");
+    }
+
+    function fillFirstShortage(storeFilter = "all") {
+      const row = collectShortages(storeFilter)[0];
+      if (!row) {
+        showToast("不足はない");
+        return false;
+      }
+      const options = { respectCapacity: true, preventDoubleBooking: true, allowSupport: true, loadMap: buildLoadMap() };
+      const candidate = candidatesFor(row.storeKey, row.slot, row.dateIso, options)[0];
+      if (!candidate) {
+        showToast("候補が見つからない");
+        return false;
+      }
+      if (!addShiftToDay(row.dateIso, row.storeKey, candidate.person, candidate.time, options)) {
+        showToast("過剰なしで入れられる候補がない");
+        return false;
+      }
+      state.selected = { dateIso: row.dateIso, storeKey: row.storeKey, slot: row.slot };
+      renderAll();
+      showToast(`${stores[row.storeKey].name} ${row.slot} に ${candidate.person.name} を追加`);
+      return true;
+    }
+
+    function fillVisibleStoreShortages() {
+      let guard = 0;
+      while (collectShortages(state.selectedStore).length && guard < 80) {
+        if (!fillFirstShortage(state.selectedStore)) break;
+        guard += 1;
+      }
+      renderAll();
+      showToast(`${stores[state.selectedStore].name}の不足補充を試行した`);
+    }
+
+    function trimVisibleStoreOverstaffing() {
+      const removed = trimOverstaffing(state.selectedStore);
+      renderAll();
+      showToast(removed ? `${stores[state.selectedStore].name}の余剰を${removed}件整理した` : "整理できる余剰はない");
+    }
+
+    function renderRequirements() {
+      const wrap = document.getElementById("requirements");
+      wrap.innerHTML = slots.map(slot => `
+        <label class="req-item">
+          <span>${slot} 必要人数</span>
+          <input type="number" min="0" value="${requirement(state.selectedStore, slot)}" data-req-slot="${slot}">
+        </label>
+      `).join("");
+      wrap.querySelectorAll("[data-req-slot]").forEach(input => {
+        input.addEventListener("change", () => setRequirement(input.dataset.reqSlot, input.value));
+      });
+    }
+
+    function renderHead(targetId) {
+      const head = document.getElementById(targetId);
+      head.innerHTML = `
+        <tr>
+          <th>日付</th>
+          ${slots.map(slot => `<th>${slot}<br><span class="muted">必要 ${requirement(getActiveStoreForHead(targetId), slot)}</span></th>`).join("")}
+        </tr>
+      `;
+    }
+
+    function getActiveStoreForHead(targetId) {
+      if (targetId === "finishedHead") return document.getElementById("finishedStore").value;
+      return state.selectedStore;
+    }
+
+    function renderMonthlyTable() {
+      renderHead("monthlyHead");
+      const body = document.getElementById("monthlyBody");
+      body.innerHTML = periodDates().map(date => {
+        const dateIso = iso(date);
+        const weekend = date.getDay() === 0 || date.getDay() === 6;
+        return `
+          <tr>
+            <td class="date-cell ${weekend ? "weekend" : ""}">
+              ${dateLabel(date)}
+              <span class="dow">${dowLabel(date)}</span>
+            </td>
+            ${slots.map(slot => renderSlotCell(dateIso, state.selectedStore, slot)).join("")}
+          </tr>
+        `;
+      }).join("");
+      body.querySelectorAll(".slot-cell").forEach(cell => {
+        cell.addEventListener("click", () => {
+          state.selected = {
+            dateIso: cell.dataset.date,
+            storeKey: cell.dataset.store,
+            slot: cell.dataset.slot
+          };
+          renderAll();
+        });
+      });
+    }
+
+    function renderSlotCell(dateIso, storeKey, slot) {
+      const people = ensureCell(dateIso, storeKey, slot);
+      const req = requirement(storeKey, slot);
+      const diff = req - people.length;
+      const selected = state.selected
+        && state.selected.dateIso === dateIso
+        && state.selected.storeKey === storeKey
+        && state.selected.slot === slot;
+      const status = diff > 0
+        ? `<span class="need bad">不足 ${diff}</span>`
+        : diff < 0
+          ? `<span class="need bad">過剰 ${Math.abs(diff)}</span>`
+          : `<span class="need ok">OK</span>`;
+      return `
+        <td class="slot-cell ${selected ? "selected" : ""}" data-date="${dateIso}" data-store="${storeKey}" data-slot="${slot}">
+          <div class="cell-top"><span>${people.length}/${req}</span>${status}</div>
+          ${people.map(person => `
+            <div class="person ${person.support ? "support" : ""}">
+              <span>${person.name}</span>
+              <span class="time">${person.time}</span>
+            </div>
+          `).join("")}
+        </td>
+      `;
+    }
+
+    function renderSelectedDetail() {
+      const detail = document.getElementById("selectedDetail");
+      const list = document.getElementById("candidateList");
+      if (!state.selected) {
+        detail.innerHTML = `<span class="muted">不足セル、または編集したい枠を押す。</span>`;
+        list.innerHTML = `<div class="muted">枠を選ぶと候補が出る。</div>`;
+        return;
+      }
+
+      const { dateIso, storeKey, slot } = state.selected;
+      const people = ensureCell(dateIso, storeKey, slot);
+      const req = requirement(storeKey, slot);
+      const shortage = Math.max(0, req - people.length);
+      detail.innerHTML = `
+        <strong>${dateIso} ${stores[storeKey].name} ${slot}</strong>
+        <div class="status-row">
+          <span class="tag">必要 ${req}</span>
+          <span class="tag">配置 ${people.length}</span>
+          <span class="tag ${shortage ? "bad" : "ok"}">不足 ${shortage}</span>
+        </div>
+        <div class="status-row">
+          ${people.map((person, index) => `
+            <button class="btn small" type="button" data-remove="${index}">${person.name}を外す</button>
+          `).join("") || `<span class="muted">まだ配置なし</span>`}
+        </div>
+      `;
+      detail.querySelectorAll("[data-remove]").forEach(btn => {
+        btn.addEventListener("click", event => {
+          event.stopPropagation();
+          removeShiftFromDay(dateIso, storeKey, people[Number(btn.dataset.remove)]);
+          renderAll();
+        });
+      });
+
+      const candidates = candidatesFor(storeKey, slot, dateIso);
+      list.innerHTML = candidates.map(({ person, score, time }) => `
+        <div class="candidate">
+          <div>
+            <strong>${person.name}</strong>
+            <div class="reason">${person.tags.join(" / ")}、${time || pickTime(person, slot)}で配置候補。適合 ${score}</div>
+          </div>
+          <button class="btn small ${person.support ? "" : "primary"}" data-add="${person.name}" type="button">入れる</button>
+        </div>
+      `).join("");
+      list.querySelectorAll("[data-add]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const person = staff.find(item => item.name === btn.dataset.add);
+          if (!person) return;
+          addShiftToDay(dateIso, storeKey, person, pickTime(person, slot, dateIso, storeKey));
+          renderAll();
+        });
+      });
+    }
+
+    function renderToday() {
+      const todayIso = state.today;
+      const date = new Date(`${todayIso}T00:00:00`);
+      document.getElementById("todayInput").value = todayIso;
+      const grid = document.getElementById("todayGrid");
+      grid.innerHTML = storeOrder.map(storeKey => `
+        <section class="today-store">
+          <h3>${stores[storeKey].name} ${dateLabel(date)}(${dowLabel(date)})</h3>
+          ${slots.map(slot => {
+            const people = ensureCell(todayIso, storeKey, slot);
+            const req = requirement(storeKey, slot);
+            const shortage = Math.max(0, req - people.length);
+            return `
+              <div class="today-row">
+                <div class="today-slot">${slot}</div>
+                <div>
+                  ${people.map(person => `<span class="tag ${person.support ? "warn" : ""}">${person.name} ${person.time}</span>`).join(" ") || `<span class="muted">未配置</span>`}
+                  ${shortage ? `<span class="tag bad">不足 ${shortage}</span>` : `<span class="tag ok">OK</span>`}
+                </div>
+              </div>
+            `;
+          }).join("")}
+        </section>
+      `).join("");
+    }
+
+    function renderFinished() {
+      const storeKey = document.getElementById("finishedStore").value;
+      renderHead("finishedHead");
+      document.getElementById("finishedTitle").textContent = `${stores[storeKey].name} 完成シフト`;
+      document.getElementById("finishedPeriod").textContent = periodLabel();
+      const body = document.getElementById("finishedBody");
+      body.innerHTML = periodDates().map(date => {
+        const dateIso = iso(date);
+        const weekend = date.getDay() === 0 || date.getDay() === 6;
+        return `
+          <tr>
+            <td class="date-cell ${weekend ? "weekend" : ""}">
+              ${dateLabel(date)}
+              <span class="dow">${dowLabel(date)}</span>
+            </td>
+            ${slots.map(slot => {
+              const people = ensureCell(dateIso, storeKey, slot);
+              return `
+                <td>
+                  ${people.map(person => `
+                    <div class="person ${person.support ? "support" : ""}">
+                      <span>${person.name}</span>
+                      <span class="time">${person.time}</span>
+                    </div>
+                  `).join("") || `<span class="muted">-</span>`}
+                </td>
+              `;
+            }).join("")}
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function collectShortages(storeFilter = "all") {
+      const rows = [];
+      periodDates().forEach(date => {
+        const dateIso = iso(date);
+        storeOrder.forEach(storeKey => {
+          if (storeFilter !== "all" && storeFilter !== storeKey) return;
+          slots.forEach(slot => {
+            const people = ensureCell(dateIso, storeKey, slot);
+            const req = requirement(storeKey, slot);
+            const shortage = req - people.length;
+            if (shortage > 0) {
+              rows.push({ date, dateIso, storeKey, slot, req, count: people.length, shortage });
+            }
+          });
+        });
+      });
+      return rows;
+    }
+
+    function renderShortage() {
+      const filter = document.getElementById("shortageStore").value;
+      const rows = collectShortages(filter);
+      const body = document.getElementById("shortageBody");
+      body.innerHTML = rows.map(row => {
+        const candidates = candidatesFor(row.storeKey, row.slot, row.dateIso).slice(0, 3).map(item => item.person.name).join("、");
+        return `
+          <tr>
+            <td>${dateLabel(row.date)}(${dowLabel(row.date)})</td>
+            <td>${stores[row.storeKey].name}</td>
+            <td>${row.slot}</td>
+            <td>${row.req}</td>
+            <td>${row.count}</td>
+            <td><span class="tag bad">${row.shortage}</span></td>
+            <td>${candidates || "-"}</td>
+          </tr>
+        `;
+      }).join("") || `
+        <tr>
+          <td colspan="7"><span class="tag ok">不足なし</span></td>
+        </tr>
+      `;
+      renderLineMessage();
+    }
+
+    function collectIssues(storeFilter = "all") {
+      const issues = [];
+      periodDates().forEach(date => {
+        const dateIso = iso(date);
+        storeOrder.forEach(storeKey => {
+          if (storeFilter !== "all" && storeFilter !== storeKey) return;
+          slots.forEach(slot => {
+            const people = ensureCell(dateIso, storeKey, slot);
+            const req = requirement(storeKey, slot);
+            if (people.length > req) {
+              issues.push({
+                level: "注意",
+                severity: 2,
+                date,
+                storeKey,
+                target: slot,
+                message: `必要${req}人に対して${people.length}人。過剰配置の可能性`
+              });
+            }
+            people.forEach(person => {
+              const master = findStaff(person.name);
+              if (master && !master.stores.includes(storeKey)) {
+                issues.push({
+                  level: "注意",
+                  severity: 2,
+                  date,
+                  storeKey,
+                  target: person.name,
+                  message: `対応店舗外の可能性: ${stores[storeKey].name}`
+                });
+              }
+              if (master && !matchesDay(master, dateIso)) {
+                issues.push({
+                  level: "危険",
+                  severity: 3,
+                  date,
+                  storeKey,
+                  target: person.name,
+                  message: `対応曜日外の可能性: ${dowLabel(date)}曜`
+                });
+              }
+              if (isUnavailable(person.name, dateIso)) {
+                issues.push({
+                  level: "危険",
+                  severity: 3,
+                  date,
+                  storeKey,
+                  target: person.name,
+                  message: `希望休なのに${slot}へ配置`
+                });
+              }
+            });
+            people.forEach((person, index) => {
+              people.slice(index + 1).forEach(other => {
+                if (areIncompatible(person.name, other.name)) {
+                  issues.push({
+                    level: "危険",
+                    severity: 3,
+                    date,
+                    storeKey,
+                    target: `${person.name} / ${other.name}`,
+                    message: "手書きメモの組み合わせNG"
+                  });
+                }
+              });
+            });
+            if (people.some(person => person.name === "芳澤") && !hasResponsiblePerson(people)) {
+              issues.push({
+                level: "危険",
+                severity: 3,
+                date,
+                storeKey,
+                target: "芳澤",
+                message: "責任者と一緒のシフトのみ"
+              });
+            }
+          });
+        });
+
+        staff.forEach(person => {
+          const assignedStores = storeOrder.filter(storeKey => (
+            slots.some(slot => ensureCell(dateIso, storeKey, slot).some(item => item.name === person.name))
+          ));
+          if (assignedStores.length > 1) {
+            issues.push({
+              level: "危険",
+              severity: 3,
+              date,
+              storeKey: assignedStores[0],
+              target: person.name,
+              message: `同日に複数店舗配置: ${assignedStores.map(key => stores[key].name).join("、")}`
+            });
+          }
+          const previousIso = iso(addDays(date, -1));
+          if (hasLateShift(previousIso, person.name) && hasEarlyShift(dateIso, person.name)) {
+            issues.push({
+              level: "危険",
+              severity: 3,
+              date,
+              storeKey: assignedStores[0] || "miyanoshita",
+              target: person.name,
+              message: "前日夜勤明けの翌朝勤務"
+            });
+          }
+        });
+      });
+
+      staff.forEach(person => {
+        let streak = 0;
+        periodDates().forEach(date => {
+          const dateIso = iso(date);
+          const assigned = storeOrder.some(storeKey => (
+            slots.some(slot => ensureCell(dateIso, storeKey, slot).some(item => item.name === person.name))
+          ));
+          streak = assigned ? streak + 1 : 0;
+          if (streak >= 6) {
+            issues.push({
+              level: "注意",
+              severity: 2,
+              date,
+              storeKey: "miyanoshita",
+              target: person.name,
+              message: `${streak}連勤の可能性`
+            });
+          }
+        });
+      });
+
+      return issues.sort((a, b) => b.severity - a.severity || a.date - b.date);
+    }
+
+    function renderIssues() {
+      const filter = document.getElementById("issuesStore").value;
+      const rows = collectIssues(filter);
+      const body = document.getElementById("issuesBody");
+      body.innerHTML = rows.map(issue => `
+        <tr class="${issue.severity >= 3 ? "danger-row" : "warn-row"}">
+          <td><span class="tag ${issue.severity >= 3 ? "bad" : "warn"}">${issue.level}</span></td>
+          <td>${dateLabel(issue.date)}(${dowLabel(issue.date)})</td>
+          <td>${stores[issue.storeKey] ? stores[issue.storeKey].name : "-"}</td>
+          <td>${issue.target}</td>
+          <td>${issue.message}</td>
+        </tr>
+      `).join("") || `
+        <tr>
+          <td colspan="5"><span class="tag ok">危険なし</span></td>
+        </tr>
+      `;
+    }
+
+    function renderLineMessage() {
+      const box = document.getElementById("lineMessage");
+      if (!box) return;
+      const filter = document.getElementById("shortageStore").value;
+      const first = collectShortages(filter)[0];
+      if (!first) {
+        box.value = "不足枠はありません。";
+        return;
+      }
+      const candidates = candidatesFor(first.storeKey, first.slot, first.dateIso)
+        .slice(0, 3)
+        .map(item => item.person.name);
+      box.value = [
+        "お疲れさまです。",
+        `${dateLabel(first.date)}(${dowLabel(first.date)}) ${stores[first.storeKey].name} ${first.slot} が${first.shortage}名不足しています。`,
+        candidates.length ? `候補: ${candidates.join("、")}` : "候補が見つかっていません。",
+        "入れる方がいれば教えてください。"
+      ].join("\n");
+    }
+
+    function renderOwnerDashboard() {
+      const shortages = collectShortages("all");
+      const issues = collectIssues("all");
+      const totalLabor = storeOrder.reduce((sum, storeKey) => sum + storeLabor(storeKey), 0);
+      document.getElementById("ownerShortage").textContent = String(shortages.length);
+      document.getElementById("ownerIssues").textContent = String(issues.length);
+      document.getElementById("ownerSupport").textContent = String(supportCount("all"));
+      document.getElementById("ownerLabor").textContent = `¥${totalLabor.toLocaleString()}`;
+
+      document.getElementById("ownerStoreBody").innerHTML = storeOrder.map(storeKey => {
+        const storeShortages = collectShortages(storeKey).length;
+        const storeIssues = collectIssues(storeKey).length;
+        return `
+          <tr class="${storeShortages || storeIssues ? "warn-row" : ""}">
+            <td>${stores[storeKey].name}</td>
+            <td><span class="tag ${storeShortages ? "bad" : "ok"}">${storeShortages}</span></td>
+            <td><span class="tag ${storeIssues ? "warn" : "ok"}">${storeIssues}</span></td>
+            <td>${supportCount(storeKey)}</td>
+            <td>¥${storeLabor(storeKey).toLocaleString()}</td>
+          </tr>
+        `;
+      }).join("");
+
+      const priority = [
+        ...shortages.slice(0, 3).map(row => `${dateLabel(row.date)} ${stores[row.storeKey].name} ${row.slot} 不足${row.shortage}`),
+        ...issues.slice(0, 2).map(issue => `${dateLabel(issue.date)} ${issue.target}: ${issue.message}`)
+      ];
+      document.getElementById("ownerPriority").innerHTML = priority.length
+        ? priority.map(item => `<div class="person"><span>${item}</span></div>`).join("")
+        : `<span class="tag ok">優先対応なし</span>`;
+    }
+
+    function renderStaff() {
+      const grid = document.getElementById("staffGrid");
+      const staffSearch = document.getElementById("staffSearch");
+      const staffStoreFilter = document.getElementById("staffStoreFilter");
+      const staffTagFilter = document.getElementById("staffTagFilter");
+      const query = ((staffSearch && staffSearch.value) || "").trim().toLowerCase();
+      const storeFilter = (staffStoreFilter && staffStoreFilter.value) || "all";
+      const tagFilter = (staffTagFilter && staffTagFilter.value) || "all";
+      const filtered = staff.filter(person => {
+        const text = `${person.name} ${person.tags.join(" ")} ${person.times.join(" ")}`.toLowerCase();
+        if (query && !text.includes(query)) return false;
+        if (storeFilter !== "all" && !person.stores.includes(storeFilter)) return false;
+        if (tagFilter !== "all" && !person.tags.some(tag => tag.includes(tagFilter))) return false;
+        return true;
+      });
+      grid.innerHTML = filtered.map(person => `
+        <div class="staff-card">
+          <strong>${person.name}</strong>
+          <div class="muted">${person.stores.map(key => stores[key].name).join(" / ")}</div>
+          <div class="pill-row">
+            ${person.tags.map(tag => `<span class="tag ${person.support ? "warn" : ""}">${tag}</span>`).join("")}
+          </div>
+          <div class="reason">曜日: ${(person.days || []).join("、") || "全曜日"}</div>
+          <div class="reason">対応時間: ${person.times.join("、")}</div>
+          <div class="reason">希望休: ${(availability[person.name] || []).join("、") || "なし"}</div>
+          <div class="status-row">
+            <button class="btn small" type="button" data-edit-staff="${person.name}">編集</button>
+            <button class="btn small" type="button" data-remove-staff="${person.name}">削除</button>
+          </div>
+        </div>
+      `).join("") || `<div class="muted">該当スタッフなし</div>`;
+      grid.querySelectorAll("[data-edit-staff]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const person = staff.find(item => item.name === btn.dataset.editStaff);
+          if (!person) return;
+          document.getElementById("newStaffName").value = person.name;
+          document.getElementById("newStaffStores").value = person.stores.map(key => stores[key].name).join("/");
+          document.getElementById("newStaffDays").value = person.days && person.days.length ? person.days.join("/") : "全曜日";
+          document.getElementById("newStaffTimes").value = person.times.join("/");
+          document.getElementById("newStaffTags").value = person.tags.join("/");
+          document.getElementById("newStaffSupport").value = String(Boolean(person.support));
+        });
+      });
+      grid.querySelectorAll("[data-remove-staff]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const name = btn.dataset.removeStaff;
+          const index = staff.findIndex(item => item.name === name);
+          if (index >= 0) staff.splice(index, 1);
+          delete availability[name];
+          removeStaffFromSchedule(name);
+          renderAll();
+          showToast(`${name}を削除した`);
+        });
+      });
+    }
+
+    function renderAvailability() {
+      const select = document.getElementById("availabilityStaff");
+      const current = select.value;
+      select.innerHTML = staff.map(person => `<option value="${person.name}">${person.name}</option>`).join("");
+      if (staff.some(person => person.name === current)) select.value = current;
+      const list = document.getElementById("availabilityList");
+      list.innerHTML = staff.map(person => `
+        <div class="staff-card">
+          <strong>${person.name}</strong>
+          <div class="pill-row">
+            ${(availability[person.name] || []).map(dateIso => `
+              <button class="btn small" type="button" data-remove-availability="${person.name}|${dateIso}">${dateIso} を削除</button>
+            `).join("") || `<span class="muted">希望休なし</span>`}
+          </div>
+        </div>
+      `).join("");
+      list.querySelectorAll("[data-remove-availability]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const [name, dateIso] = btn.dataset.removeAvailability.split("|");
+          availability[name] = (availability[name] || []).filter(item => item !== dateIso);
+          renderAll();
+        });
+      });
+    }
+
+    function renderMetrics() {
+      document.getElementById("metricPeriod").textContent = periodLabel();
+      document.getElementById("metricShortage").textContent = String(collectShortages("all").length);
+      document.getElementById("metricStaff").textContent = String(staff.length);
+    }
+
+    function renderAll() {
+      renderRequirements();
+      renderMonthlyTable();
+      renderSelectedDetail();
+      renderToday();
+      renderOwnerDashboard();
+      renderFinished();
+      renderShortage();
+      renderIssues();
+      renderStaff();
+      renderAvailability();
+      renderMetrics();
+      persistState();
+    }
+
+    function switchView(view) {
+      Object.keys(dom.views).forEach(key => {
+        const element = dom.views[key];
+        if (element) element.classList.toggle("hidden", key !== view);
+      });
+      document.querySelectorAll("[data-view]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.view === view);
+      });
+      if (view === "finished") renderFinished();
+      if (view === "shortage") renderShortage();
+      if (view === "today") renderToday();
+      if (view === "owner") renderOwnerDashboard();
+      if (view === "issues") renderIssues();
+      if (view === "availability") renderAvailability();
+      if (view === "data") renderDataBox();
+    }
+
+    function syncPeriodFromHome() {
+      state.month = document.getElementById("homeMonth").value;
+      state.startDay = Number(document.getElementById("homeStartDay").value);
+      document.getElementById("monthInput").value = state.month;
+      document.getElementById("startDayInput").value = String(state.startDay);
+      renderAll();
+    }
+
+    function syncPeriodFromMonthly() {
+      state.month = document.getElementById("monthInput").value;
+      state.startDay = Number(document.getElementById("startDayInput").value);
+      document.getElementById("homeMonth").value = state.month;
+      document.getElementById("homeStartDay").value = String(state.startDay);
+      renderAll();
+    }
+
+    function exportCsv() {
+      const storeKey = state.selectedStore;
+      const rows = [["date", "dow", "store", "slot", "required", "assigned", "shortage"]];
+      periodDates().forEach(date => {
+        const dateIso = iso(date);
+        slots.forEach(slot => {
+          const people = ensureCell(dateIso, storeKey, slot);
+          const req = requirement(storeKey, slot);
+          rows.push([
+            dateIso,
+            dowLabel(date),
+            stores[storeKey].name,
+            slot,
+            req,
+            people.map(person => `${person.name} ${person.time}`).join(" / "),
+            Math.max(0, req - people.length)
+          ]);
+        });
+      });
+      const csv = rows.map(row => row.map(value => `"${String(value).split('"').join('""')}"`).join(",")).join("\n");
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `makotsu-shift-${stores[storeKey].name}-${state.month}.csv`;
+      link.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function showToast(message) {
+      dom.toast.textContent = message;
+      dom.toast.classList.add("show");
+      window.setTimeout(() => dom.toast.classList.remove("show"), 1800);
+    }
+
+    function normalizeStore(value) {
+      const text = value.trim();
+      if (!text) return null;
+      if (["全店舗", "全部", "all"].includes(text)) return "all";
+      const hit = Object.entries(stores).find(([key, store]) => (
+        key === text || store.name === text || store.name.replace("ノ", "の") === text.replace("ノ", "の")
+      ));
+      return hit ? hit[0] : null;
+    }
+
+    function splitValues(value) {
+      return String(value || "")
+        .split(/[、,/／\\s]+/)
+        .map(item => item.trim())
+        .filter(Boolean);
+    }
+
+    function parseStores(value) {
+      const parsed = splitValues(value).map(normalizeStore).filter(Boolean);
+      if (parsed.includes("all") || !parsed.length) return [...storeOrder];
+      return [...new Set(parsed)];
+    }
+
+    function parseDays(value) {
+      const values = splitValues(value);
+      if (!values.length || values.some(item => ["全曜日", "毎日", "all"].includes(item))) {
+        return ["月", "火", "水", "木", "金", "土", "日"];
+      }
+      const map = {
+        月曜: "月", 火曜: "火", 水曜: "水", 木曜: "木", 金曜: "金", 土曜: "土", 日曜: "日",
+        月曜日: "月", 火曜日: "火", 水曜日: "水", 木曜日: "木", 金曜日: "金", 土曜日: "土", 日曜日: "日"
+      };
+      return [...new Set(values.map(item => map[item] || item).filter(item => ["月", "火", "水", "木", "金", "土", "日"].includes(item)))];
+    }
+
+    function slotsFromTimes(times) {
+      return [...new Set(slots.filter(slot => times.some(time => coversSlot(time, slot))))];
+    }
+
+    function upsertStaff(person) {
+      if (!person.name) return false;
+      const clean = {
+        name: person.name.trim(),
+        stores: person.stores && person.stores.length ? person.stores : [...storeOrder],
+        days: person.days && person.days.length ? person.days : ["月", "火", "水", "木", "金", "土", "日"],
+        times: person.times && person.times.length ? person.times : ["9-18"],
+        tags: person.tags && person.tags.length ? person.tags : ["未分類"],
+        support: Boolean(person.support)
+      };
+      clean.slots = slotsFromTimes(clean.times);
+      if (!clean.slots.length) clean.slots = [...slots];
+      const index = staff.findIndex(item => item.name === clean.name);
+      if (index >= 0) staff[index] = clean;
+      else staff.push(clean);
+      if (!availability[clean.name]) availability[clean.name] = [];
+      return true;
+    }
+
+    function addStaffFromForm() {
+      const name = document.getElementById("newStaffName").value.trim();
+      const storesValue = document.getElementById("newStaffStores").value;
+      const daysValue = document.getElementById("newStaffDays").value;
+      const times = splitValues(document.getElementById("newStaffTimes").value);
+      const tags = splitValues(document.getElementById("newStaffTags").value);
+      const support = document.getElementById("newStaffSupport").value === "true";
+      if (!name) {
+        showToast("名前が必要");
+        return;
+      }
+      upsertStaff({ name, stores: parseStores(storesValue), days: parseDays(daysValue), times, tags, support });
+      ["newStaffName", "newStaffStores", "newStaffDays", "newStaffTimes", "newStaffTags"].forEach(id => {
+        document.getElementById(id).value = "";
+      });
+      document.getElementById("newStaffSupport").value = "false";
+      renderAll();
+      showToast(`${name}を追加/更新した`);
+    }
+
+    function importStaffBulk() {
+      const text = document.getElementById("staffBulkBox").value.trim();
+      if (!text) {
+        showToast("取り込むスタッフがない");
+        return;
+      }
+      let count = 0;
+      text.split(/\n+/).forEach((line, index) => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+        if (index === 0 && trimmed.includes("名前") && trimmed.includes("店舗")) return;
+        const [name, storeText, dayText, timeText, tagText, supportText] = trimmed.split(",").map(item => (item || "").trim());
+        if (upsertStaff({
+          name,
+          stores: parseStores(storeText),
+          days: parseDays(dayText),
+          times: splitValues(timeText),
+          tags: splitValues(tagText),
+          support: ["1", "true", "応援", "応援マルチ"].includes(String(supportText).toLowerCase())
+        })) count += 1;
+      });
+      renderAll();
+      showToast(`${count}人を取り込んだ`);
+    }
+
+    function exportStaffBulk() {
+      const lines = [
+        "名前,店舗,曜日,対応時間,タグ,応援",
+        ...staff.map(person => [
+          person.name,
+          person.stores.map(key => stores[key].name).join("/"),
+          (person.days || []).join("/"),
+          person.times.join("/"),
+          person.tags.join("/"),
+          person.support ? "1" : "0"
+        ].join(","))
+      ];
+      document.getElementById("staffBulkBox").value = lines.join("\n");
+    }
+
+    function removeStaffFromSchedule(name) {
+      Object.values(state.schedule).forEach(storeMap => {
+        Object.values(storeMap).forEach(slotMap => {
+          Object.keys(slotMap).forEach(slot => {
+            slotMap[slot] = slotMap[slot].filter(person => person.name !== name);
+          });
+        });
+      });
+    }
+
+    function serializeState() {
+      return {
+        month: state.month,
+        startDay: state.startDay,
+        today: state.today,
+        selectedStore: state.selectedStore,
+        schedule: state.schedule,
+        staff,
+        requirements: storeOrder.reduce((map, storeKey) => {
+          map[storeKey] = stores[storeKey].requirements;
+          return map;
+        }, {}),
+        availability
+      };
+    }
+
+    function applySerialized(payload) {
+      if (!payload || typeof payload !== "object") return false;
+      if (payload.month) state.month = payload.month;
+      if (payload.startDay) state.startDay = Number(payload.startDay);
+      if (payload.today) state.today = payload.today;
+      if (payload.selectedStore) state.selectedStore = payload.selectedStore;
+      if (payload.schedule) state.schedule = payload.schedule;
+      if (Array.isArray(payload.staff) && payload.staff.length) {
+        staff.length = 0;
+        payload.staff.forEach(person => upsertStaff(person));
+      }
+      if (payload.requirements) {
+        storeOrder.forEach(storeKey => {
+          if (payload.requirements[storeKey]) stores[storeKey].requirements = payload.requirements[storeKey];
+        });
+      }
+      if (payload.availability) {
+        Object.keys(availability).forEach(name => delete availability[name]);
+        Object.entries(payload.availability).forEach(([name, dates]) => {
+          availability[name] = Array.isArray(dates) ? dates : [];
+        });
+      }
+      document.getElementById("homeMonth").value = state.month;
+      document.getElementById("monthInput").value = state.month;
+      document.getElementById("homeStartDay").value = String(state.startDay);
+      document.getElementById("startDayInput").value = String(state.startDay);
+      document.getElementById("storeInput").value = state.selectedStore;
+      document.getElementById("todayInput").value = state.today;
+      return true;
+    }
+
+    function persistState() {
+      if (!state.ready) return;
+      try {
+        localStorage.setItem("makotsuShiftBeta464", JSON.stringify(serializeState()));
+      } catch (error) {
+        console.warn("save failed", error);
+      }
+    }
+
+    function loadPersistedState() {
+      try {
+        const raw = localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
+        if (!raw) return false;
+        return applySerialized(JSON.parse(raw));
+      } catch (error) {
+        console.warn("load failed", error);
+        return false;
+      }
+    }
+
+    function renderDataBox() {
+      const box = document.getElementById("jsonBox");
+      if (box && !box.value) box.value = JSON.stringify(serializeState(), null, 2);
+    }
+
+    function resetSample() {
+      state.schedule = {};
+      state.selected = null;
+      state.month = "2026-07";
+      state.startDay = 16;
+      state.today = "2026-07-16";
+      const original = state.selectedStore;
+      state.bulkGenerating = true;
+      storeOrder.forEach(storeKey => {
+        state.selectedStore = storeKey;
+        generateMonth();
+      });
+      state.bulkGenerating = false;
+      state.selectedStore = original || "miyanoshita";
+      applySerialized(serializeState());
+      renderAll();
+      showToast("サンプルへ戻した");
+    }
+
+    function bindEvents() {
+      document.querySelectorAll("[data-view]").forEach(btn => {
+        btn.addEventListener("click", () => switchView(btn.dataset.view));
+      });
+      document.querySelectorAll("[data-jump]").forEach(btn => {
+        btn.addEventListener("click", () => switchView(btn.dataset.jump));
+      });
+      document.getElementById("homeApply").addEventListener("click", syncPeriodFromHome);
+      document.getElementById("monthInput").addEventListener("change", syncPeriodFromMonthly);
+      document.getElementById("startDayInput").addEventListener("change", syncPeriodFromMonthly);
+      document.getElementById("storeInput").addEventListener("change", event => {
+        state.selectedStore = event.target.value;
+        state.selected = null;
+        renderAll();
+      });
+      document.getElementById("generateBtn").addEventListener("click", generateMonth);
+      document.getElementById("clearStoreBtn").addEventListener("click", clearStore);
+      document.getElementById("autoFillShortageBtn").addEventListener("click", fillVisibleStoreShortages);
+      document.getElementById("trimOverstaffBtn").addEventListener("click", trimVisibleStoreOverstaffing);
+      document.getElementById("csvBtn").addEventListener("click", exportCsv);
+      document.getElementById("printBtn").addEventListener("click", () => window.print());
+      document.getElementById("finishedPrintBtn").addEventListener("click", () => window.print());
+      document.getElementById("finishedStore").addEventListener("change", renderFinished);
+      document.getElementById("shortageStore").addEventListener("change", renderShortage);
+      document.getElementById("shortageRefresh").addEventListener("click", renderShortage);
+      document.getElementById("fillFirstShortageBtn").addEventListener("click", () => {
+        fillFirstShortage(document.getElementById("shortageStore").value);
+      });
+      document.getElementById("refreshLineBtn").addEventListener("click", renderLineMessage);
+      document.getElementById("copyLineBtn").addEventListener("click", async () => {
+        const text = document.getElementById("lineMessage").value;
+        try {
+          await navigator.clipboard.writeText(text);
+          showToast("LINE文面をコピーした");
+        } catch (error) {
+          showToast("コピーできない環境。文面を手動で選択してコピー");
+        }
+      });
+      document.getElementById("issuesStore").addEventListener("change", renderIssues);
+      document.getElementById("issuesRefresh").addEventListener("click", renderIssues);
+      document.getElementById("fillAllBtn").addEventListener("click", generateAllStores);
+      document.getElementById("staffSearch").addEventListener("input", renderStaff);
+      document.getElementById("staffStoreFilter").addEventListener("change", renderStaff);
+      document.getElementById("staffTagFilter").addEventListener("change", renderStaff);
+      document.getElementById("addStaffBtn").addEventListener("click", addStaffFromForm);
+      document.getElementById("bulkImportStaffBtn").addEventListener("click", importStaffBulk);
+      document.getElementById("exportStaffBtn").addEventListener("click", exportStaffBulk);
+      document.getElementById("saveNowBtn").addEventListener("click", () => {
+        persistState();
+        showToast("保存した");
+      });
+      document.getElementById("loadNowBtn").addEventListener("click", () => {
+        if (loadPersistedState()) {
+          renderAll();
+          showToast("保存データを読み込んだ");
+        } else {
+          showToast("保存データがない");
+        }
+      });
+      document.getElementById("resetSampleBtn").addEventListener("click", resetSample);
+      document.getElementById("exportJsonBtn").addEventListener("click", () => {
+        document.getElementById("jsonBox").value = JSON.stringify(serializeState(), null, 2);
+      });
+      document.getElementById("importJsonBtn").addEventListener("click", () => {
+        try {
+          const payload = JSON.parse(document.getElementById("jsonBox").value);
+          if (applySerialized(payload)) {
+            renderAll();
+            showToast("JSONを取り込んだ");
+          }
+        } catch (error) {
+          showToast("JSONの形式が崩れている");
+        }
+      });
+      document.getElementById("todayInput").addEventListener("change", event => {
+        state.today = event.target.value;
+        renderToday();
+      });
+      document.getElementById("prevDayBtn").addEventListener("click", () => {
+        state.today = iso(addDays(new Date(`${state.today}T00:00:00`), -1));
+        renderToday();
+      });
+      document.getElementById("nextDayBtn").addEventListener("click", () => {
+        state.today = iso(addDays(new Date(`${state.today}T00:00:00`), 1));
+        renderToday();
+      });
+      document.getElementById("addAvailabilityBtn").addEventListener("click", () => {
+        const name = document.getElementById("availabilityStaff").value;
+        const dateIso = document.getElementById("availabilityDate").value;
+        if (!availability[name]) availability[name] = [];
+        if (dateIso && !availability[name].includes(dateIso)) {
+          availability[name].push(dateIso);
+        }
+        renderAll();
+      });
+      document.getElementById("managerMode").addEventListener("click", () => {
+        document.getElementById("managerMode").classList.add("active");
+        document.getElementById("ownerMode").classList.remove("active");
+        switchView("monthly");
+      });
+      document.getElementById("ownerMode").addEventListener("click", () => {
+        document.getElementById("ownerMode").classList.add("active");
+        document.getElementById("managerMode").classList.remove("active");
+        switchView("owner");
+      });
+    }
+
+    staff.forEach(person => {
+      person.days = person.days && person.days.length ? person.days : ["月", "火", "水", "木", "金", "土", "日"];
+      person.slots = slotsFromTimes(person.times || []);
+      if (!person.slots.length) person.slots = [...slots];
+      if (!availability[person.name]) availability[person.name] = [];
+    });
+    bindEvents();
+    const restored = loadPersistedState();
+    state.ready = true;
+    switchView("dashboard");
+    renderAll();
+    const status = document.getElementById("jsStatus");
+    if (status) {
+      status.className = "status-bar ready";
+      status.textContent = restored ? "操作OK。保存データを読み込みました" : "操作OK。自動作成はボタンを押すと開始します";
+    }
+  </script>
+</body>
+</html>
