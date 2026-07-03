@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Makotsu Shift beta4.8.2</title>
+  <title>Makotsu Shift beta4.10</title>
   <style>
     :root {
       color-scheme: light;
@@ -834,8 +834,8 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>Makotsu Shift beta4.8.2</h1>
-        <p>週単位の完成シフト表示と印刷に対応した版</p>
+        <h1>Makotsu Shift beta4.10</h1>
+        <p>りえちゃん作の実勤務ロジックと社員休みカウントを取り込んだ版</p>
       </div>
       <div class="role-switch" aria-label="表示モード">
         <a class="btn active" id="managerMode" href="#monthlyView" data-jump="monthly">りえ用</a>
@@ -907,7 +907,7 @@
                 <td>扇町</td>
                 <td>水・木・金・土・日</td>
                 <td>6-9</td>
-                <td>朝、残業不可</td>
+                <td>朝、固定、残業不可</td>
               </tr>
               <tr>
                 <td><strong>ミミ</strong></td>
@@ -1102,8 +1102,8 @@
                 <td><strong>宮下 店長（小島）</strong></td>
                 <td>宮ノ下</td>
                 <td>月・火・水・木・金・土・日</td>
-                <td>6-15 / 9-18 / 13-22 / 16-25 / 22-6</td>
-                <td>店長、小島、店舗別店長、どの時間曜日もOK、7日休み、1日8h</td>
+                <td>15-24 / 6-15 / 9-18 / 13-22 / 16-25 / 22-6</td>
+                <td>店長、小島、店舗別店長、15-24優先、どの時間曜日もOK、7日休み、1日8h</td>
               </tr>
               <tr>
                 <td><strong>笹島</strong></td>
@@ -1144,15 +1144,15 @@
                 <td><strong>山崎</strong></td>
                 <td>宮ノ下</td>
                 <td>月・火・木・金・土・日</td>
-                <td>6-9 / 9-17 / 17-22 / 22-6</td>
-                <td>主婦、水不可、月火木金土日フリー、宮下責任者候補</td>
+                <td>6-9 / 9-15 / 9-18 / 13-22 / 17-24 / 18-24</td>
+                <td>主婦、水不可、24時まで、フル夜勤NG、宮下責任者候補</td>
               </tr>
               <tr>
                 <td><strong>松本</strong></td>
                 <td>宮ノ下</td>
                 <td>月・火・水・木・金・土・日</td>
-                <td>6-9 / 9-17 / 17-22 / 22-6</td>
-                <td>フリーター、夜勤OK、全てOK</td>
+                <td>6-9 / 6-15 / 9-15 / 13-22 / 18-24 / 24-6</td>
+                <td>フリーター、夜勤OK、実勤務寄せ、万能扱い注意</td>
               </tr>
               <tr>
                 <td><strong>鈴木（たいせい）</strong></td>
@@ -1172,8 +1172,8 @@
                 <td><strong>かずや</strong></td>
                 <td>宮ノ下</td>
                 <td>月・火・水・木・金・土・日</td>
-                <td>6-22</td>
-                <td>フリー</td>
+                <td>12-18 / 17-21 / 18-21 / 18-22 / 19-22</td>
+                <td>フリー、夕方短時間寄り</td>
               </tr>
               <tr>
                 <td><strong>かずき</strong></td>
@@ -1186,8 +1186,8 @@
                 <td><strong>金子</strong></td>
                 <td>宮ノ下</td>
                 <td>月・水・日</td>
-                <td>17-22</td>
-                <td>学生、月水日17-22のみ</td>
+                <td>16-20 / 17-22</td>
+                <td>学生、16-20あり、月水日17-22のみ</td>
               </tr>
               <tr>
                 <td><strong>まこつ。</strong></td>
@@ -1221,7 +1221,7 @@
           <a class="btn" href="#availabilityView" data-view="availability">希望休</a>
           <a class="btn" href="#staffView" data-view="staff">スタッフ</a>
           <a class="btn" href="#dataView" data-view="data">保存/出力</a>
-          <div class="sub">beta4.8.2の軸</div>
+          <div class="sub">beta4.10の軸</div>
           <div class="muted">手書きメモの条件に加えて、過剰配置・前後勤務・本人希望を見ながら自動作成する。</div>
         </nav>
       </aside>
@@ -1727,7 +1727,7 @@
       { name: "下田", stores: ["ougicho", "higashicho", "miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-15", "9-15", "17-22", "18-24"], tags: ["基本:月火木金は東町", "水土日は扇町9-15", "扇町では9-17なし", "扇町木曜17-22", "宮下18-24のみ", "人不足時6時からOK", "45分休憩", "東町責任者候補"], support: false },
       { name: "芳澤", stores: ["ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["フリーター", "どの曜日時間OK", "責任者同伴のみ", "電話対応不可", "クレーム対応不可", "下田と組合せNG"], support: false },
       { name: "鈴木（久華）", stores: ["ougicho"], days: ["金", "土"], slots: [], times: ["17-22"], tags: ["夕方", "扇町鈴木"], support: false },
-      { name: "植村", stores: ["ougicho"], days: ["水", "木", "金", "土", "日"], slots: [], times: ["6-9"], tags: ["朝", "残業不可"], support: false },
+      { name: "植村", stores: ["ougicho"], days: ["水", "木", "金", "土", "日"], slots: [], times: ["6-9"], tags: ["朝", "固定", "残業不可"], support: false },
       { name: "ミミ", stores: ["ougicho", "higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["フリーター", "どの曜日もOK", "どの時間もOK", "多く勤務希望", "扇町東町"], support: false },
       { name: "中込", stores: ["ougicho"], days: ["金"], slots: [], times: ["22-6"], tags: ["主婦", "夜勤のみ", "扇町2-7ワンオペ可"], support: false },
       { name: "安彦", stores: ["ougicho"], days: ["火", "木", "土", "日"], slots: [], times: ["6-9"], tags: ["フリーター", "朝"], support: false },
@@ -1757,19 +1757,19 @@
       { name: "キーズ", stores: ["higashicho"], days: ["火", "金", "土", "日"], slots: [], times: ["6-18", "9-21", "12-24"], tags: ["月水木以外", "12hまで", "週28hまで", "副業あり", "東町12hまで"], support: false },
       { name: "山梨", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-6"], tags: ["一般", "セブン副業", "週1-2希望日", "夜勤"], support: false },
 
-      { name: "宮下 店長（小島）", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-15", "9-18", "13-22", "16-25", "22-6"], tags: ["店長", "小島", "店舗別店長", "どの時間曜日もOK", "7日休み", "1日8h"], support: false },
+      { name: "宮下 店長（小島）", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["15-24", "6-15", "9-18", "13-22", "16-25", "22-6"], tags: ["店長", "小島", "店舗別店長", "15-24優先", "どの時間曜日もOK", "7日休み", "1日8h"], support: false },
       { name: "笹島", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-9"], tags: ["フリーター", "1h休憩", "宮下24時以降ワンオペ可"], support: false },
       { name: "幸本", stores: ["miyanoshita"], days: ["月", "水"], slots: [], times: ["9-13"], tags: ["主婦"], support: false },
       { name: "古屋", stores: ["miyanoshita"], days: ["月", "火", "土"], slots: [], times: ["12-17", "9-13"], tags: ["主婦", "月12-17", "火9-13", "土12-17"], support: false },
       { name: "西村", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金"], slots: [], times: ["9-17"], tags: ["主婦", "1人親世帯", "土日不可"], support: false },
       { name: "高橋(宮下)", stores: ["miyanoshita"], days: ["火", "水", "木"], slots: [], times: ["13-17", "9-17"], tags: ["主婦", "火水13-17", "木9-17", "宮下責任者候補"], support: false },
-      { name: "山崎", stores: ["miyanoshita"], days: ["月", "火", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["主婦", "水不可", "月火木金土日フリー", "宮下責任者候補"], support: false },
-      { name: "松本", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["フリーター", "夜勤OK", "全てOK"], support: false },
+      { name: "山崎", stores: ["miyanoshita"], days: ["月", "火", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-15", "9-18", "13-22", "17-24", "18-24"], tags: ["主婦", "水不可", "24時まで", "フル夜勤NG", "宮下責任者候補"], support: false },
+      { name: "松本", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "6-15", "9-15", "13-22", "18-24", "24-6"], tags: ["フリーター", "夜勤OK", "実勤務寄せ", "万能扱い注意"], support: false },
       { name: "鈴木（たいせい）", stores: ["miyanoshita"], days: ["月", "金"], slots: [], times: ["16-20", "9-13"], tags: ["学生", "宮ノ下鈴木", "月金16-20", "月9-13要確認"], support: false },
       { name: "柴田まちこ", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9"], tags: ["主婦", "6-9のみ", "日曜フリー要確認", "宮下24時以降ワンオペ可"], support: false },
-      { name: "かずや", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-22"], tags: ["フリー"], support: false },
+      { name: "かずや", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["12-18", "17-21", "18-21", "18-22", "19-22"], tags: ["フリー", "夕方短時間寄り"], support: false },
       { name: "かずき", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-22"], tags: ["フリーター", "フリー"], support: false },
-      { name: "金子", stores: ["miyanoshita"], days: ["月", "水", "日"], slots: [], times: ["17-22"], tags: ["学生", "月水日17-22のみ"], support: false },
+      { name: "金子", stores: ["miyanoshita"], days: ["月", "水", "日"], slots: [], times: ["16-20", "17-22"], tags: ["学生", "16-20あり", "月水日17-22のみ"], support: false },
 
       { name: "まこつ。", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-18", "13-22", "17-22", "22-6"], tags: ["オーナー", "応援マルチ"], support: true },
       { name: "りえ", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-18", "13-22", "17-22", "22-6"], tags: ["マネージャー", "応援マルチ"], support: true }
@@ -2026,6 +2026,11 @@
       return slots.filter(slot => coversSlot(time, slot));
     }
 
+    function assignmentSlots(time, options = {}) {
+      if (!options.allowPartialOverlap) return coveredSlots(time);
+      return slots.filter(slot => overlapsSlot(time, slot));
+    }
+
     function assignmentExists(cell, assignment) {
       return cell.some(existing => assignmentKey(existing) === assignmentKey(assignment));
     }
@@ -2037,11 +2042,11 @@
       if (!matchesDay(person, dateIso)) return false;
       if (hasIncompatiblePerson(dateIso, storeKey, person.name)) return false;
       if (options.avoidLongStreak && !isPersonAssignedOnDate(dateIso, person.name)) {
-        const maxDays = options.maxConsecutiveWorkDays || 5;
+        const maxDays = Math.max(options.maxConsecutiveWorkDays || 5, maxConsecutiveWorkDaysFor(person, time));
         if (projectedConsecutiveWorkDays(person.name, dateIso) > maxDays) return false;
       }
       const assignment = { name: person.name, time, support: person.support };
-      const targets = coveredSlots(time);
+      const targets = assignmentSlots(time, options);
       if (!targets.length) return false;
       const alreadyAssigned = isAssignedAnywhere(dateIso, person.name);
       const sameAssignmentAlready = targets.every(slot => {
@@ -2063,8 +2068,7 @@
     function addShiftToDay(dateIso, storeKey, person, time, options = {}) {
       if (!canPlaceShift(dateIso, storeKey, person, time, options)) return false;
       const assignment = { name: person.name, time, support: person.support };
-      slots.forEach(slot => {
-        if (!coversSlot(time, slot)) return;
+      assignmentSlots(time, options).forEach(slot => {
         const cell = ensureCell(dateIso, storeKey, slot);
         if (options.respectCapacity && cell.length >= requirement(storeKey, slot) && !assignmentExists(cell, assignment)) return;
         if (!assignmentExists(cell, assignment)) {
@@ -2074,12 +2078,67 @@
       return true;
     }
 
+    function isFixedPerson(person) {
+      return Boolean(person && person.tags && person.tags.some(tag => (
+        tag.includes("固定") && !tag.includes("固定休")
+      )));
+    }
+
+    function fixedAppliesToStore(person, storeKey) {
+      const fixedTags = (person.tags || []).filter(tag => tag.includes("固定") && !tag.includes("固定休"));
+      const storeNames = Object.values(stores).map(store => store.name);
+      return fixedTags.some(tag => {
+        const mentionedStores = storeNames.filter(name => tag.includes(name));
+        return !mentionedStores.length || tag.includes(stores[storeKey].name);
+      });
+    }
+
+    function fixedPeopleFor(storeKey, dateIso) {
+      return staff.filter(person => (
+        !person.support &&
+        isFixedPerson(person) &&
+        fixedAppliesToStore(person, storeKey) &&
+        canWorkAtStore(person, storeKey) &&
+        matchesDay(person, dateIso) &&
+        !isUnavailable(person.name, dateIso)
+      ));
+    }
+
+    function prefillFixedShifts(dateIso, storeKey, options = {}) {
+      let addedCount = 0;
+      fixedPeopleFor(storeKey, dateIso).forEach(person => {
+        const times = [...(person.times || [])].sort((a, b) => {
+          const aHours = assignmentHours({ time: a });
+          const bHours = assignmentHours({ time: b });
+          return aHours - bHours;
+        });
+        times.forEach(time => {
+          if (addShiftToDay(dateIso, storeKey, person, time, options)) addedCount += 1;
+        });
+      });
+      return addedCount;
+    }
+
     function removeShiftFromDay(dateIso, storeKey, assignment) {
       slots.forEach(slot => {
         const cell = ensureCell(dateIso, storeKey, slot);
         const index = cell.findIndex(existing => assignmentKey(existing) === assignmentKey(assignment));
         if (index >= 0) cell.splice(index, 1);
       });
+    }
+
+    function removePersonFromDate(dateIso, personName) {
+      const cleanName = canonicalStaffName(personName);
+      let removed = 0;
+      storeOrder.forEach(storeKey => {
+        slots.forEach(slot => {
+          const cell = ensureCell(dateIso, storeKey, slot);
+          const before = cell.length;
+          state.schedule[dateIso][storeKey][slot] = cell.filter(assignment => canonicalStaffName(assignment.name) !== cleanName);
+          removed += before - state.schedule[dateIso][storeKey][slot].length;
+        });
+      });
+      return removed;
     }
 
     function personAssignmentsForDay(dateIso, personName) {
@@ -2161,14 +2220,16 @@
       if (hours <= 4) score += 18;
       if (hours >= 9) score -= 12;
       if (hours >= 12) score -= 30;
-      if (hasTag(person, "固定")) score += 8;
+      if (isFixedPerson(person)) score += 8;
+      if (hasTag(person, "15-24優先") && time === "15-24") score += 42;
+      if (hasTag(person, "フル夜勤NG") && parseRange(time)[1] > 24) score -= 500;
       if (hasTag(person, "希望提出型")) score -= 20;
       return score;
     }
 
     function bestTimeFor(person, storeKey, slot, dateIso, options = {}) {
       const best = person.times
-        .filter(time => coversSlot(time, slot))
+        .filter(time => options.allowPartialOverlap ? overlapsSlot(time, slot) : coversSlot(time, slot))
         .map(time => {
           const feasible = canPlaceShift(dateIso, storeKey, person, time, options);
           return { time, feasible, score: timeFitScore(person, time, slot) };
@@ -2182,7 +2243,7 @@
       if (!canWorkAtStore(person, storeKey)) return -10000;
       let score = 0;
       if (canWorkAtStore(person, storeKey)) score += 40;
-      if (person.slots.includes(slot) || person.times.some(time => coversSlot(time, slot))) score += 40;
+      if (person.slots.includes(slot) || person.times.some(time => options.allowPartialOverlap ? overlapsSlot(time, slot) : coversSlot(time, slot))) score += 40;
       const time = bestTimeFor(person, storeKey, slot, dateIso, options);
       if (!time) score -= 1000;
       else score += timeFitScore(person, time, slot);
@@ -2195,8 +2256,9 @@
       if (already) score -= 70;
       score += restScore(person, slot, dateIso);
       const projectedStreak = projectedConsecutiveWorkDays(person.name, dateIso);
-      if (!already && projectedStreak >= 6) {
-        score -= options.avoidLongStreak ? 10000 : (projectedStreak - 5) * 90;
+      const maxConsecutive = time ? Math.max(options.maxConsecutiveWorkDays || 5, maxConsecutiveWorkDaysFor(person, time)) : (options.maxConsecutiveWorkDays || 5);
+      if (!already && projectedStreak > maxConsecutive) {
+        score -= options.avoidLongStreak ? 10000 : (projectedStreak - maxConsecutive) * 90;
       } else if (!already && projectedStreak === 5) {
         score -= 80;
       }
@@ -2223,18 +2285,34 @@
       }
       const direct = person.times.find(time => time === slot);
       if (direct) return direct;
-      const covering = person.times.find(time => coversSlot(time, slot));
+      const covering = person.times.find(time => options.allowPartialOverlap ? overlapsSlot(time, slot) : coversSlot(time, slot));
       return covering || person.times[0] || slot;
+    }
+
+    function normalizedSlotRangeForTime(time, slot) {
+      const [start, end] = parseRange(time);
+      let [slotStart, slotEnd] = parseRange(slot);
+      if (end > 24 && slotEnd <= 9) {
+        slotStart += 24;
+        slotEnd += 24;
+      } else if (end > 24 && slotStart < start) {
+        slotStart += 24;
+        slotEnd += 24;
+      }
+      return [slotStart, slotEnd];
     }
 
     function coversSlot(time, slot) {
       const [start, end] = parseRange(time);
-      let [slotStart, slotEnd] = parseRange(slot);
-      if (end > 24 && slotStart < start) {
-        slotStart += 24;
-        slotEnd += 24;
-      }
+      const [slotStart, slotEnd] = normalizedSlotRangeForTime(time, slot);
       return start <= slotStart && end >= slotEnd;
+    }
+
+    function overlapsSlot(time, slot) {
+      const [start, end] = parseRange(time);
+      const [slotStart, slotEnd] = normalizedSlotRangeForTime(time, slot);
+      if (slot === "22-6" && end <= 24 && start < 22) return false;
+      return start < slotEnd && end > slotStart;
     }
 
     function parseRange(label) {
@@ -2244,6 +2322,14 @@
       if (Number.isNaN(end)) end = 24;
       if (end <= start) end += 24;
       return [start, end];
+    }
+
+    function maxConsecutiveWorkDaysFor(person, time) {
+      const hours = assignmentHours({ time });
+      if (hasTag(person, "社員") || hasTag(person, "店長")) return 5;
+      if (hours <= 3 || hasTag(person, "6-9のみ") || hasTag(person, "朝")) return 10;
+      if (hasTag(person, "夜勤のみ") || person.name === "笹島") return 10;
+      return 5;
     }
 
     function canRemoveWithoutShortage(dateIso, storeKey, assignment) {
@@ -2273,7 +2359,10 @@
             let guard = 0;
             while (cell.length > requirement(storeKey, slot) && guard < 10) {
               const removable = [...cell]
-                .filter(assignment => canRemoveWithoutShortage(dateIso, storeKey, assignment))
+                .filter(assignment => {
+                  const person = findStaff(assignment.name);
+                  return !isFixedPerson(person) && canRemoveWithoutShortage(dateIso, storeKey, assignment);
+                })
                 .sort((a, b) => overstaffRemovalScore(dateIso, storeKey, slot, a) - overstaffRemovalScore(dateIso, storeKey, slot, b))[0];
               if (!removable) break;
               removeShiftFromDay(dateIso, storeKey, removable);
@@ -2290,12 +2379,24 @@
     function generateMonth() {
       const dates = periodDates();
       const storeKey = state.selectedStore;
-      const options = { respectCapacity: true, preventDoubleBooking: true, avoidLongStreak: true, maxConsecutiveWorkDays: 5, loadMap: buildLoadMap() };
+      const options = { respectCapacity: true, preventDoubleBooking: true, avoidLongStreak: true, maxConsecutiveWorkDays: 5, allowPartialOverlap: true, loadMap: buildLoadMap() };
       dates.forEach((date, dateIndex) => {
         const dateIso = iso(date);
         slots.forEach(slot => {
           const cell = ensureCell(dateIso, storeKey, slot);
           cell.length = 0;
+        });
+        fixedPeopleFor(storeKey, dateIso).forEach(person => {
+          const wasAssigned = isAssignedAnywhere(dateIso, person.name);
+          const times = [...(person.times || [])].sort((a, b) => {
+            const aHours = assignmentHours({ time: a });
+            const bHours = assignmentHours({ time: b });
+            return aHours - bHours;
+          });
+          times.some(time => addShiftToDay(dateIso, storeKey, person, time, options));
+          if (!wasAssigned && isAssignedAnywhere(dateIso, person.name)) {
+            options.loadMap.set(person.name, (options.loadMap.get(person.name) || 0) + 1);
+          }
         });
         for (let pass = 0; pass < 8; pass += 1) {
           let changed = false;
@@ -2357,7 +2458,7 @@
         showToast("不足はない");
         return false;
       }
-      const options = { respectCapacity: true, preventDoubleBooking: true, allowSupport: true, avoidLongStreak: true, maxConsecutiveWorkDays: 5, loadMap: buildLoadMap() };
+      const options = { respectCapacity: true, preventDoubleBooking: true, allowSupport: true, avoidLongStreak: true, maxConsecutiveWorkDays: 5, allowPartialOverlap: true, loadMap: buildLoadMap() };
       const candidate = candidatesFor(row.storeKey, row.slot, row.dateIso, options)[0];
       if (!candidate) {
         showToast("候補が見つからない");
@@ -2664,6 +2765,83 @@
       return rows;
     }
 
+    function hourLabel(hour) {
+      const start = hour % 24;
+      const end = (hour + 1) % 24;
+      return `${start}-${end}`;
+    }
+
+    function hourRangeLabel(startHour, endHour) {
+      return `${startHour % 24}-${endHour % 24}`;
+    }
+
+    function slotHourRange(slot) {
+      const [start, end] = parseRange(slot);
+      return { start, end, slot };
+    }
+
+    function assignmentCoversHour(assignment, hour) {
+      const [start, end] = parseRange(assignment.time);
+      let targetHour = hour;
+      if (end > 24 && hour < start) targetHour += 24;
+      return start <= targetHour && targetHour < end;
+    }
+
+    function hourlyCoverage(dateIso, storeKey, hour) {
+      const map = new Map();
+      slots.forEach(slot => {
+        readCell(dateIso, storeKey, slot).forEach(assignment => {
+          if (assignmentCoversHour(assignment, hour)) {
+            map.set(assignmentKey(assignment), assignment);
+          }
+        });
+      });
+      return [...map.values()];
+    }
+
+    function collectHourlyShortages(storeFilter = "all") {
+      const rows = [];
+      periodDates().forEach(date => {
+        const dateIso = iso(date);
+        storeOrder.forEach(storeKey => {
+          if (storeFilter !== "all" && storeFilter !== storeKey) return;
+          slots.map(slotHourRange).forEach(range => {
+            const slotPeople = ensureCell(dateIso, storeKey, range.slot);
+            const req = requirement(storeKey, range.slot);
+            if (req <= 0 || slotPeople.length < req) return;
+            let active = null;
+            for (let hour = range.start; hour < range.end; hour += 1) {
+              const people = hourlyCoverage(dateIso, storeKey, hour);
+              if (people.length < req) {
+                const shortage = req - people.length;
+                if (active && active.endHour === hour && active.count === people.length && active.shortage === shortage) {
+                  active.endHour = hour + 1;
+                } else {
+                  if (active) rows.push(active);
+                  active = {
+                    date,
+                    dateIso,
+                    storeKey,
+                    slot: range.slot,
+                    startHour: hour,
+                    endHour: hour + 1,
+                    req,
+                    count: people.length,
+                    shortage
+                  };
+                }
+              } else if (active) {
+                rows.push(active);
+                active = null;
+              }
+            }
+            if (active) rows.push(active);
+          });
+        });
+      });
+      return rows;
+    }
+
     function renderShortage() {
       const filter = document.getElementById("shortageStore").value;
       const rows = collectShortages(filter);
@@ -2687,6 +2865,41 @@
         </tr>
       `;
       renderLineMessage();
+    }
+
+    function isCoreEmployee(person) {
+      return hasTag(person, "社員") || hasTag(person, "店長");
+    }
+
+    function targetOffDays(person) {
+      if (hasTag(person, "7日休み")) return 7;
+      return isCoreEmployee(person) ? 7 : 0;
+    }
+
+    function offDaysInPeriod(personName) {
+      return periodDates().filter(date => !isPersonAssignedOnDate(iso(date), personName)).length;
+    }
+
+    function collectCoreRestIssues(storeFilter = "all") {
+      const dates = periodDates();
+      const reportDate = dates[dates.length - 1] || new Date();
+      return staff
+        .filter(person => isCoreEmployee(person) && targetOffDays(person) > 0)
+        .filter(person => storeFilter === "all" || canWorkAtStore(person, storeFilter))
+        .map(person => {
+          const offDays = offDaysInPeriod(person.name);
+          const target = targetOffDays(person);
+          return { person, offDays, target, shortage: Math.max(0, target - offDays) };
+        })
+        .filter(row => row.shortage > 0)
+        .map(row => ({
+          level: "注意",
+          severity: 2,
+          date: reportDate,
+          storeKey: row.person.stores[0] || "miyanoshita",
+          target: row.person.name,
+          message: `社員休み ${row.offDays}/${row.target}日。あと${row.shortage}日休みが必要`
+        }));
     }
 
     function collectIssues(storeFilter = "all") {
@@ -2834,6 +3047,19 @@
         });
         flushStreak();
       });
+
+      collectHourlyShortages(storeFilter).forEach(row => {
+        issues.push({
+          level: "注意",
+          severity: 2,
+          date: row.date,
+          storeKey: row.storeKey,
+          target: `${row.slot} / ${hourRangeLabel(row.startHour, row.endHour)}`,
+          message: `時間別不足: 必要${row.req}人に対して${row.count}人。枠内の一部だけ穴の可能性`
+        });
+      });
+
+      issues.push(...collectCoreRestIssues(storeFilter));
 
       return issues.sort((a, b) => b.severity - a.severity || a.date - b.date);
     }
@@ -3342,7 +3568,7 @@
     function persistState() {
       if (!state.ready) return;
       try {
-        localStorage.setItem("makotsuShiftBeta482", JSON.stringify(serializeState()));
+        localStorage.setItem("makotsuShiftBeta410", JSON.stringify(serializeState()));
       } catch (error) {
         console.warn("save failed", error);
       }
@@ -3350,7 +3576,7 @@
 
     function loadPersistedState() {
       try {
-        const raw = localStorage.getItem("makotsuShiftBeta482") || localStorage.getItem("makotsuShiftBeta48") || localStorage.getItem("makotsuShiftBeta47") || localStorage.getItem("makotsuShiftBeta465") || localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
+        const raw = localStorage.getItem("makotsuShiftBeta410") || localStorage.getItem("makotsuShiftBeta49") || localStorage.getItem("makotsuShiftBeta482") || localStorage.getItem("makotsuShiftBeta48") || localStorage.getItem("makotsuShiftBeta47") || localStorage.getItem("makotsuShiftBeta465") || localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
         if (!raw) return false;
         return applySerialized(JSON.parse(raw));
       } catch (error) {
@@ -3476,13 +3702,15 @@
         renderToday();
       });
       document.getElementById("addAvailabilityBtn").addEventListener("click", () => {
-        const name = document.getElementById("availabilityStaff").value;
+        const name = canonicalStaffName(document.getElementById("availabilityStaff").value);
         const dateIso = document.getElementById("availabilityDate").value;
         if (!availability[name]) availability[name] = [];
         if (dateIso && !availability[name].includes(dateIso)) {
           availability[name].push(dateIso);
         }
+        const removed = dateIso ? removePersonFromDate(dateIso, name) : 0;
         renderAll();
+        if (removed) showToast(`${name}の${dateIso}分をシフトから外した`);
       });
       document.getElementById("managerMode").addEventListener("click", () => {
         document.getElementById("managerMode").classList.add("active");
