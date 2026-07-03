@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Makotsu Shift beta4.7</title>
+  <title>Makotsu Shift beta4.8</title>
   <style>
     :root {
       color-scheme: light;
@@ -834,7 +834,7 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>Makotsu Shift beta4.7</h1>
+        <h1>Makotsu Shift beta4.8</h1>
         <p>週単位の完成シフト表示と印刷に対応した版</p>
       </div>
       <div class="role-switch" aria-label="表示モード">
@@ -1905,6 +1905,10 @@
       return state.schedule[dateIso][storeKey][slot];
     }
 
+    function readCell(dateIso, storeKey, slot) {
+      return (((state.schedule[dateIso] || {})[storeKey] || {})[slot]) || [];
+    }
+
     function requirement(storeKey, slot) {
       return stores[storeKey] && stores[storeKey].requirements[slot] ? stores[storeKey].requirements[slot] : 0;
     }
@@ -2023,6 +2027,10 @@
       if (isUnavailable(person.name, dateIso)) return false;
       if (!matchesDay(person, dateIso)) return false;
       if (hasIncompatiblePerson(dateIso, storeKey, person.name)) return false;
+      if (options.avoidLongStreak && !isPersonAssignedOnDate(dateIso, person.name)) {
+        const maxDays = options.maxConsecutiveWorkDays || 5;
+        if (projectedConsecutiveWorkDays(person.name, dateIso) > maxDays) return false;
+      }
       const assignment = { name: person.name, time, support: person.support };
       const targets = coveredSlots(time);
       if (!targets.length) return false;
@@ -2079,6 +2087,37 @@
       return periodDates().filter(date => (
         isAssignedAnywhere(iso(date), personName)
       )).length;
+    }
+
+    function isPersonAssignedOnDate(dateIso, personName, storeFilter = "all") {
+      return storeOrder.some(storeKey => {
+        if (storeFilter !== "all" && storeFilter !== storeKey) return false;
+        return slots.some(slot => (
+          readCell(dateIso, storeKey, slot).some(item => item.name === personName)
+        ));
+      });
+    }
+
+    function assignedStoreKeysForPersonOnDate(dateIso, personName, storeFilter = "all") {
+      return storeOrder.filter(storeKey => {
+        if (storeFilter !== "all" && storeFilter !== storeKey) return false;
+        return slots.some(slot => (
+          readCell(dateIso, storeKey, slot).some(item => item.name === personName)
+        ));
+      });
+    }
+
+    function projectedConsecutiveWorkDays(personName, dateIso, storeFilter = "all") {
+      const date = new Date(`${dateIso}T00:00:00`);
+      let before = 0;
+      for (let cursor = addDays(date, -1); isPersonAssignedOnDate(iso(cursor), personName, storeFilter); cursor = addDays(cursor, -1)) {
+        before += 1;
+      }
+      let after = 0;
+      for (let cursor = addDays(date, 1); isPersonAssignedOnDate(iso(cursor), personName, storeFilter); cursor = addDays(cursor, 1)) {
+        after += 1;
+      }
+      return before + 1 + after;
     }
 
     function buildLoadMap() {
@@ -2146,6 +2185,12 @@
       const already = isAssignedAnywhere(dateIso, person.name);
       if (already) score -= 70;
       score += restScore(person, slot, dateIso);
+      const projectedStreak = projectedConsecutiveWorkDays(person.name, dateIso);
+      if (!already && projectedStreak >= 6) {
+        score -= options.avoidLongStreak ? 10000 : (projectedStreak - 5) * 90;
+      } else if (!already && projectedStreak === 5) {
+        score -= 80;
+      }
       score -= (options.loadMap ? (options.loadMap.get(person.name) || 0) : 0) * 2;
       return score;
     }
@@ -2236,7 +2281,7 @@
     function generateMonth() {
       const dates = periodDates();
       const storeKey = state.selectedStore;
-      const options = { respectCapacity: true, preventDoubleBooking: true, loadMap: buildLoadMap() };
+      const options = { respectCapacity: true, preventDoubleBooking: true, avoidLongStreak: true, maxConsecutiveWorkDays: 5, loadMap: buildLoadMap() };
       dates.forEach((date, dateIndex) => {
         const dateIso = iso(date);
         slots.forEach(slot => {
@@ -2303,7 +2348,7 @@
         showToast("不足はない");
         return false;
       }
-      const options = { respectCapacity: true, preventDoubleBooking: true, allowSupport: true, loadMap: buildLoadMap() };
+      const options = { respectCapacity: true, preventDoubleBooking: true, allowSupport: true, avoidLongStreak: true, maxConsecutiveWorkDays: 5, loadMap: buildLoadMap() };
       const candidate = candidatesFor(row.storeKey, row.slot, row.dateIso, options)[0];
       if (!candidate) {
         showToast("候補が見つからない");
@@ -2743,24 +2788,42 @@
       });
 
       staff.forEach(person => {
-        let streak = 0;
-        periodDates().forEach(date => {
-          const dateIso = iso(date);
-          const assigned = storeOrder.some(storeKey => (
-            slots.some(slot => ensureCell(dateIso, storeKey, slot).some(item => item.name === person.name))
-          ));
-          streak = assigned ? streak + 1 : 0;
-          if (streak >= 6) {
+        let streakStart = null;
+        let streakEnd = null;
+        let streakStores = new Set();
+
+        const flushStreak = () => {
+          if (!streakStart || !streakEnd) return;
+          const count = Math.round((streakEnd - streakStart) / 86400000) + 1;
+          if (count >= 6) {
+            const storeKeys = [...streakStores];
+            const storeNames = storeKeys.map(key => stores[key].name).join("、");
             issues.push({
-              level: "注意",
-              severity: 2,
-              date,
-              storeKey: "miyanoshita",
+              level: count >= 7 ? "危険" : "注意",
+              severity: count >= 7 ? 3 : 2,
+              date: streakEnd,
+              storeKey: storeKeys[0] || "miyanoshita",
               target: person.name,
-              message: `${streak}連勤の可能性`
+              message: `${dateLabel(streakStart)}〜${dateLabel(streakEnd)} ${count}連勤の可能性${storeNames ? `（${storeNames}）` : ""}`
             });
           }
+          streakStart = null;
+          streakEnd = null;
+          streakStores = new Set();
+        };
+
+        periodDates().forEach(date => {
+          const dateIso = iso(date);
+          const assignedStores = assignedStoreKeysForPersonOnDate(dateIso, person.name, storeFilter);
+          if (assignedStores.length) {
+            if (!streakStart) streakStart = date;
+            streakEnd = date;
+            assignedStores.forEach(key => streakStores.add(key));
+          } else {
+            flushStreak();
+          }
         });
+        flushStreak();
       });
 
       return issues.sort((a, b) => b.severity - a.severity || a.date - b.date);
@@ -3224,7 +3287,7 @@
     function persistState() {
       if (!state.ready) return;
       try {
-        localStorage.setItem("makotsuShiftBeta47", JSON.stringify(serializeState()));
+        localStorage.setItem("makotsuShiftBeta48", JSON.stringify(serializeState()));
       } catch (error) {
         console.warn("save failed", error);
       }
@@ -3232,7 +3295,7 @@
 
     function loadPersistedState() {
       try {
-        const raw = localStorage.getItem("makotsuShiftBeta47") || localStorage.getItem("makotsuShiftBeta465") || localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
+        const raw = localStorage.getItem("makotsuShiftBeta48") || localStorage.getItem("makotsuShiftBeta47") || localStorage.getItem("makotsuShiftBeta465") || localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
         if (!raw) return false;
         return applySerialized(JSON.parse(raw));
       } catch (error) {
