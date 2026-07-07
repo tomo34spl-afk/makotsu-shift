@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Makotsu Shift beta4.10</title>
+  <title>Makotsu Shift beta4.10.24</title>
   <style>
     :root {
       color-scheme: light;
@@ -470,6 +470,90 @@
       padding: 10px;
     }
 
+    .timeline-map {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .timeline-row {
+      display: grid;
+      grid-template-columns: 74px minmax(0, 1fr) 116px;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 10px;
+    }
+
+    .timeline-store {
+      color: var(--strong);
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .timeline-track {
+      position: relative;
+      height: 42px;
+      border-top: 2px solid #b9c2cf;
+      margin-top: 16px;
+    }
+
+    .timeline-tick {
+      position: absolute;
+      top: -9px;
+      width: 1px;
+      height: 14px;
+      background: #8b95a3;
+    }
+
+    .timeline-tick span {
+      position: absolute;
+      top: -18px;
+      left: -10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .hole-segment {
+      position: absolute;
+      top: -7px;
+      height: 18px;
+      min-width: 10px;
+      border: 1px solid #e59f25;
+      background: repeating-linear-gradient(135deg, #fff7ed 0 5px, #fed7aa 5px 9px);
+      border-radius: 3px;
+      color: var(--warn);
+      font-size: 11px;
+      font-weight: 800;
+      text-align: center;
+      line-height: 16px;
+      overflow: hidden;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    .hole-segment.bad {
+      border-color: #e17b72;
+      background: repeating-linear-gradient(135deg, #fff5f4 0 5px, #fca5a5 5px 9px);
+      color: var(--danger);
+    }
+
+    .hole-segment.selected {
+      outline: 2px solid var(--strong);
+      outline-offset: 2px;
+    }
+
+    .timeline-summary {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: right;
+    }
+
     .candidate-list {
       display: grid;
       gap: 7px;
@@ -567,6 +651,68 @@
       font-size: 12px;
     }
 
+    .rest-summary {
+      border-top: 1px solid var(--line);
+      padding: 10px 12px 12px;
+      background: #fff;
+    }
+
+    .rest-summary-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: baseline;
+      margin-bottom: 8px;
+      color: var(--strong);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .rest-summary-title span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .rest-count-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 6px;
+    }
+
+    .rest-count-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 7px 8px;
+      background: var(--panel-2);
+      font-size: 12px;
+    }
+
+    .rest-count-item.rest-ok {
+      background: #f0fdf4;
+      border-color: #bbf7d0;
+    }
+
+    .rest-count-item.rest-warn {
+      background: #fffbeb;
+      border-color: #fed7aa;
+    }
+
+    .rest-count-item strong {
+      color: var(--strong);
+      font-size: 12px;
+    }
+
+    .rest-count-item .rest-meta {
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
     .weekly-print-active .monthly-print-section {
       display: none;
     }
@@ -577,6 +723,50 @@
 
     .hidden {
       display: none !important;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      background: rgba(15, 23, 42, .45);
+    }
+
+    .modal {
+      width: min(760px, 100%);
+      max-height: min(92vh, 760px);
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .modal-head h3 {
+      margin: 0 0 4px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .modal-grid label.full {
+      grid-column: 1 / -1;
     }
 
     .panel:target {
@@ -731,6 +921,14 @@
       .today-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+
+      .timeline-row {
+        grid-template-columns: 1fr;
+      }
+
+      .timeline-summary {
+        text-align: left;
+      }
     }
 
     @media (max-width: 620px) {
@@ -749,6 +947,7 @@
       .cards,
       .staff-grid,
       .today-grid,
+      .modal-grid,
       .requirements {
         grid-template-columns: 1fr;
       }
@@ -827,6 +1026,31 @@
       .weekly-print-section {
         page-break-after: avoid;
       }
+
+      .rest-summary {
+        padding: 6px 8px;
+      }
+
+      .rest-summary-title {
+        margin-bottom: 5px;
+        font-size: 11px;
+      }
+
+      .rest-count-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 4px;
+      }
+
+      .rest-count-item {
+        border-radius: 0;
+        padding: 4px 5px;
+        font-size: 9px;
+      }
+
+      .rest-count-item strong,
+      .rest-count-item .rest-meta {
+        font-size: 9px;
+      }
     }
   </style>
 </head>
@@ -834,8 +1058,8 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>Makotsu Shift beta4.10</h1>
-        <p>りえちゃん作の実勤務ロジックと社員休みカウントを取り込んだ版</p>
+        <h1>Makotsu Shift beta4.10.24</h1>
+        <p>穴マップから候補とLINE文面へつなぐ版</p>
       </div>
       <div class="role-switch" aria-label="表示モード">
         <a class="btn active" id="managerMode" href="#monthlyView" data-jump="monthly">りえ用</a>
@@ -953,17 +1177,17 @@
               </tr>
               <tr>
                 <td><strong>木村</strong></td>
-                <td>宮ノ下 / 東町 / 扇町</td>
+                <td>扇町</td>
                 <td>月・火・水・木・金・土・日</td>
                 <td>22-7 / 24-9</td>
-                <td>主婦、社員、夜勤のみ、16日-翌15日、7日休み、9h拘束8h勤務</td>
+                <td>主婦、社員、扇町メイン、夜勤のみ、16日-翌15日、7日休み、9h拘束8h勤務</td>
               </tr>
               <tr>
                 <td><strong>塚脇</strong></td>
                 <td>東町 / 扇町</td>
                 <td>月・火・水・木・金</td>
                 <td>6-9</td>
-                <td>週2、東町扇町対応可、名前要確認</td>
+                <td>週2、東町扇町対応可</td>
               </tr>
               <tr>
                 <td><strong>宮崎</strong></td>
@@ -974,17 +1198,17 @@
               </tr>
               <tr>
                 <td><strong>加藤</strong></td>
-                <td>宮ノ下 / 東町 / 扇町</td>
+                <td>東町</td>
                 <td>月・火・水・木・金・土・日</td>
                 <td>22-7 / 24-9 / 21-6</td>
-                <td>社員、基本夜勤、全て対応OK、16日-翌15日、7日休み</td>
+                <td>社員、東町メイン、基本夜勤、16日-翌15日、7日休み</td>
               </tr>
               <tr>
                 <td><strong>富田</strong></td>
-                <td>宮ノ下 / 東町 / 扇町</td>
+                <td>東町</td>
                 <td>月・火・木・金・土・日</td>
                 <td>9-18 / 13-22 / 22-7 / 24-9</td>
-                <td>社員、15日-翌15日、7日休み、水曜固定休、木曜午後希望、9h拘束8h勤務</td>
+                <td>社員、東町メイン、15日-翌15日、7日休み、水曜固定休、木曜午後希望、9h拘束8h勤務</td>
               </tr>
               <tr>
                 <td><strong>東町 店長（小澤）</strong></td>
@@ -1022,7 +1246,7 @@
                 <td>学生、土日どの時間もOK</td>
               </tr>
               <tr>
-                <td><strong>石住井</strong></td>
+                <td><strong>碓井</strong></td>
                 <td>東町</td>
                 <td>月・火・水・木・金・日</td>
                 <td>22-2 / 24-6</td>
@@ -1041,6 +1265,13 @@
                 <td>土・日</td>
                 <td>6-9</td>
                 <td>一般、土日のみ、6-9要確認</td>
+              </tr>
+              <tr>
+                <td><strong>隆嶺</strong></td>
+                <td>東町</td>
+                <td>土</td>
+                <td>6-9</td>
+                <td>朝、土のみ、要確認</td>
               </tr>
               <tr>
                 <td><strong>多田</strong></td>
@@ -1067,8 +1298,8 @@
                 <td><strong>柳川</strong></td>
                 <td>東町</td>
                 <td>月・火・水・木・金・土・日</td>
-                <td>13-17 / 17-23</td>
-                <td>東町のみ、週2-3回、どの曜日OK、最長6h、夕勤人不足ならOK</td>
+                <td>6-11 / 9-14 / 13-18 / 17-22</td>
+                <td>東町のみ、週2-3回、どの曜日OK、どの時間OK、5h程度、夕勤人不足ならOK</td>
               </tr>
               <tr>
                 <td><strong>守屋</strong></td>
@@ -1097,6 +1328,13 @@
                 <td>月・火・水・木・金・土・日</td>
                 <td>22-6</td>
                 <td>一般、セブン副業、週1-2希望日、夜勤</td>
+              </tr>
+              <tr>
+                <td><strong>河野</strong></td>
+                <td>東町</td>
+                <td>月・火・木・金</td>
+                <td>22-2</td>
+                <td>準夜勤、月火木金22-2、要確認</td>
               </tr>
               <tr>
                 <td><strong>宮下 店長（小島）</strong></td>
@@ -1157,9 +1395,9 @@
               <tr>
                 <td><strong>鈴木（たいせい）</strong></td>
                 <td>宮ノ下</td>
-                <td>月・金</td>
+                <td>月・金・日</td>
                 <td>16-20 / 9-13</td>
-                <td>学生、宮ノ下鈴木、月金16-20、月9-13要確認</td>
+                <td>学生、宮ノ下鈴木、月金16-20固定、日9-13固定</td>
               </tr>
               <tr>
                 <td><strong>柴田まちこ</strong></td>
@@ -1185,9 +1423,9 @@
               <tr>
                 <td><strong>金子</strong></td>
                 <td>宮ノ下</td>
-                <td>月・水・日</td>
-                <td>16-20 / 17-22</td>
-                <td>学生、16-20あり、月水日17-22のみ</td>
+                <td>水・日</td>
+                <td>17-22</td>
+                <td>学生、水日17-22のみ</td>
               </tr>
               <tr>
                 <td><strong>まこつ。</strong></td>
@@ -1218,11 +1456,11 @@
           <a class="btn" href="#finishedView" data-view="finished">完成シフト</a>
           <a class="btn" href="#shortageView" data-view="shortage">不足チェック</a>
           <a class="btn" href="#issuesView" data-view="issues">危険チェック</a>
-          <a class="btn" href="#availabilityView" data-view="availability">希望休</a>
+          <a class="btn" href="#availabilityView" data-view="availability">希望休/有給</a>
           <a class="btn" href="#staffView" data-view="staff">スタッフ</a>
           <a class="btn" href="#dataView" data-view="data">保存/出力</a>
-          <div class="sub">beta4.10の軸</div>
-          <div class="muted">手書きメモの条件に加えて、過剰配置・前後勤務・本人希望を見ながら自動作成する。</div>
+          <div class="sub">beta4.10.24の軸</div>
+          <div class="muted">社員先入れ。社員休み7日・有給・急遽休みを見ながら月間作成する。</div>
         </nav>
       </aside>
 
@@ -1270,6 +1508,37 @@
             <a class="btn" href="#finishedView" data-jump="finished">完成シフトを見る</a>
             <a class="btn" href="#shortageView" data-jump="shortage">不足だけ見る</a>
           </div>
+          <div class="detail-box">
+            <h3>急遽休み対応</h3>
+            <div class="controls">
+              <label>休む人
+                <select id="homeEmergencyStaff"></select>
+              </label>
+              <label>日付
+                <input id="homeEmergencyDate" type="date" value="2026-07-16">
+              </label>
+              <label>店舗
+                <select id="homeEmergencyStore">
+                  <option value="miyanoshita">宮ノ下</option>
+                  <option value="higashicho">東町</option>
+                  <option value="ougicho">扇町</option>
+                </select>
+              </label>
+              <label>時間帯
+                <select id="homeEmergencySlot">
+                  <option value="6-9">6-9</option>
+                  <option value="9-13">9-13</option>
+                  <option value="13-17">13-17</option>
+                  <option value="17-22">17-22</option>
+                  <option value="22-6">22-6</option>
+                </select>
+              </label>
+              <button class="btn primary" id="homeEmergencyApply" type="button">急遽休み登録</button>
+            </div>
+            <div id="homeEmergencyCandidates" class="candidate-list">
+              <div class="muted">休む人・日付・時間帯を選ぶとピンチヒッター候補が出ます。</div>
+            </div>
+          </div>
         </section>
 
         <section class="panel hidden" id="todayView">
@@ -1307,7 +1576,7 @@
                 <div class="card">
                   <div class="metric-label">概算人件費</div>
                   <div class="metric-value" id="ownerLabor">-</div>
-                  <div class="metric-sub">仮時給で概算</div>
+                  <div class="metric-sub">早朝1250 / 日勤1225-1250 / 夜勤1531</div>
                 </div>
               </div>
               <div class="table-wrap">
@@ -1362,6 +1631,7 @@
               </select>
             </label>
             <button class="btn primary" id="generateBtn" type="button">1か月分を仮作成</button>
+            <button class="btn" id="generateAllMonthlyBtn" type="button">全店舗を仮作成</button>
             <button class="btn" id="clearStoreBtn" type="button">表示店舗を空にする</button>
             <div class="toolbar-right">
               <button class="btn" id="autoFillShortageBtn" type="button">表示店舗の不足を補充</button>
@@ -1431,6 +1701,7 @@
                 <tbody id="weeklyFinishedBody"></tbody>
               </table>
             </div>
+            <div class="rest-summary" id="weeklyRestSummary"></div>
             <p class="weekly-print-note">りえちゃん確認用。1週間だけ印刷する時は「この週を印刷」。</p>
           </div>
           <div class="print-sheet monthly-print-section">
@@ -1444,6 +1715,7 @@
                 <tbody id="finishedBody"></tbody>
               </table>
             </div>
+            <div class="rest-summary" id="monthlyRestSummary"></div>
           </div>
         </section>
 
@@ -1462,6 +1734,19 @@
             <button class="btn primary" id="fillFirstShortageBtn" type="button">先頭の不足を候補で埋める</button>
           </div>
           <div class="detail-box">
+            <div class="controls">
+              <label>穴マップ日付
+                <input id="shortageMapDate" type="date">
+              </label>
+              <button class="btn" id="shortageMapPrev" type="button">前日</button>
+              <button class="btn" id="shortageMapNext" type="button">翌日</button>
+            </div>
+            <div class="timeline-map" id="shortageTimelineMap"></div>
+            <div class="candidate-list" id="shortageHoleDetail">
+              <div class="muted">色付きの穴を押すと、候補とLINE文面が出ます。</div>
+            </div>
+          </div>
+          <div class="detail-box">
             <h3>LINE文面</h3>
             <textarea id="lineMessage" class="textarea" readonly></textarea>
             <div class="status-row">
@@ -1475,6 +1760,7 @@
                 <tr>
                   <th>日付</th>
                   <th>店舗</th>
+                  <th>区分</th>
                   <th>時間帯</th>
                   <th>必要</th>
                   <th>配置</th>
@@ -1517,15 +1803,17 @@
         </section>
 
         <section class="panel hidden" id="availabilityView">
-          <h2>希望休</h2>
+          <h2>希望休・有給・急遽休み</h2>
           <div class="controls">
             <label>スタッフ
               <select id="availabilityStaff"></select>
             </label>
-            <label>休み日
+            <label>日付
               <input id="availabilityDate" type="date" value="2026-07-20">
             </label>
             <button class="btn primary" id="addAvailabilityBtn" type="button">希望休を追加</button>
+            <button class="btn" id="addPaidLeaveBtn" type="button">有給を追加</button>
+            <button class="btn" id="addEmergencyAbsenceBtn" type="button">急遽休み</button>
           </div>
           <div class="availability-list" id="availabilityList"></div>
         </section>
@@ -1624,6 +1912,46 @@
     </div>
   </div>
 
+  <div class="modal-backdrop hidden" id="staffEditModal" role="dialog" aria-modal="true" aria-labelledby="staffEditTitle">
+    <div class="modal">
+      <div class="modal-head">
+        <div>
+          <h3 id="staffEditTitle">勤務条件を編集</h3>
+          <p class="muted">保存するとスタッフ一覧、希望休・有給・急遽休み、作成済みシフト内の名前にも反映します。</p>
+        </div>
+        <button class="btn small" id="staffEditClose" type="button">閉じる</button>
+      </div>
+      <div class="modal-grid">
+        <label>名前
+          <input id="editStaffName" type="text">
+        </label>
+        <label>応援マルチ
+          <select id="editStaffSupport">
+            <option value="false">通常</option>
+            <option value="true">応援マルチ</option>
+          </select>
+        </label>
+        <label>店舗
+          <input id="editStaffStores" type="text" placeholder="例: 宮ノ下/東町">
+        </label>
+        <label>曜日
+          <input id="editStaffDays" type="text" placeholder="例: 月/水/金 または 全曜日">
+        </label>
+        <label class="full">対応時間
+          <input id="editStaffTimes" type="text" placeholder="例: 9-17/17-22/22-6">
+        </label>
+        <label class="full">タグ・条件
+          <textarea id="editStaffTags" class="textarea" placeholder="例: 社員/東町メイン/7日休み/固定"></textarea>
+        </label>
+      </div>
+      <div class="status-row">
+        <button class="btn primary" id="staffEditSave" type="button">保存</button>
+        <button class="btn" id="staffEditCancel" type="button">キャンセル</button>
+      </div>
+      <p class="muted">自動作成に反映するには、保存後に「全店舗を仮作成」をもう一度押してください。</p>
+    </div>
+  </div>
+
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
@@ -1640,6 +1968,15 @@
           target = target.parentNode;
         }
         return null;
+      }
+
+      function isFormControl(target) {
+        while (target && target !== document.body) {
+          var name = target.tagName ? target.tagName.toLowerCase() : "";
+          if (name === "select" || name === "option" || name === "input" || name === "textarea" || name === "label") return true;
+          target = target.parentNode;
+        }
+        return false;
       }
 
       function setStatus(text, className) {
@@ -1682,6 +2019,7 @@
       }
 
       function handleTap(event) {
+        if (isFormControl(event.target)) return;
         var button = findActionButton(event.target);
         if (!button) return;
         var view = button.getAttribute("data-view") || button.getAttribute("data-jump");
@@ -1723,10 +2061,10 @@
     const staff = [
       { name: "扇町 店長（齋藤）", stores: ["ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-15", "9-18", "13-22", "16-25", "22-6"], tags: ["店長", "齋藤", "店舗別店長", "どの時間もOK", "7日休み", "1日8h"], support: false },
       { name: "赤瀬", stores: ["ougicho"], days: ["月", "水", "金"], slots: [], times: ["9-17"], tags: ["主婦", "1h休憩", "扇町責任者候補"], support: false },
-      { name: "グルン", stores: ["ougicho"], days: ["月", "火", "木", "金"], slots: [], times: ["9-13", "9-17"], tags: ["主婦", "月金9-13", "火木9-17", "45分休憩", "扇町責任者候補"], support: false },
+      { name: "グルン", stores: ["ougicho"], days: ["月", "火", "木", "金"], slots: [], times: ["9-13", "9-17"], tags: ["主婦", "固定", "月金9-13固定", "火木9-17固定", "45分休憩", "扇町責任者候補"], support: false },
       { name: "下田", stores: ["ougicho", "higashicho", "miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-15", "9-15", "17-22", "18-24"], tags: ["基本:月火木金は東町", "水土日は扇町9-15", "扇町では9-17なし", "扇町木曜17-22", "宮下18-24のみ", "人不足時6時からOK", "45分休憩", "東町責任者候補"], support: false },
       { name: "芳澤", stores: ["ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["フリーター", "どの曜日時間OK", "責任者同伴のみ", "電話対応不可", "クレーム対応不可", "下田と組合せNG"], support: false },
-      { name: "鈴木（久華）", stores: ["ougicho"], days: ["金", "土"], slots: [], times: ["17-22"], tags: ["夕方", "扇町鈴木"], support: false },
+      { name: "鈴木（久華）", stores: ["ougicho"], days: ["金", "土"], slots: [], times: ["17-22"], tags: ["夕方", "固定", "金土17-22固定", "扇町鈴木"], support: false },
       { name: "植村", stores: ["ougicho"], days: ["水", "木", "金", "土", "日"], slots: [], times: ["6-9"], tags: ["朝", "固定", "残業不可"], support: false },
       { name: "ミミ", stores: ["ougicho", "higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["フリーター", "どの曜日もOK", "どの時間もOK", "多く勤務希望", "扇町東町"], support: false },
       { name: "中込", stores: ["ougicho"], days: ["金"], slots: [], times: ["22-6"], tags: ["主婦", "夜勤のみ", "扇町2-7ワンオペ可"], support: false },
@@ -1734,28 +2072,30 @@
       { name: "分部", stores: ["ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["21-24"], tags: ["主婦", "週2-3回", "希望提出型", "副業登録"], support: false },
       { name: "斎藤ゆうな", stores: ["ougicho"], days: ["月"], slots: [], times: ["13-17"], tags: ["学生", "月のみ要確認"], support: false },
       { name: "工藤", stores: ["ougicho", "higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["主婦", "どの曜日もOK", "どの時間もOK", "多く勤務希望", "ミミさんと同じ", "東町責任者候補", "東町3-6ワンオペ可", "扇町2-7ワンオペ可"], support: false },
-      { name: "木村", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-7", "24-9"], tags: ["主婦", "社員", "夜勤のみ", "16日-翌15日", "7日休み", "9h拘束8h勤務"], support: false },
+      { name: "木村", stores: ["ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-7", "24-9"], tags: ["主婦", "社員", "扇町メイン", "夜勤のみ", "扇町社員", "月水木土日夜勤", "休み多い時は火曜調整", "16日-翌15日", "7日休み", "9h拘束8h勤務"], support: false },
       { name: "塚脇", stores: ["higashicho", "ougicho"], days: ["月", "火", "水", "木", "金"], slots: [], times: ["6-9"], tags: ["週2", "東町扇町対応可"], support: false },
       { name: "宮崎", stores: ["ougicho"], days: ["火", "水"], slots: [], times: ["22-2"], tags: ["学生", "夜勤短時間のみ"], support: false },
-      { name: "加藤", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-7", "24-9", "21-6"], tags: ["社員", "基本夜勤", "全て対応OK", "16日-翌15日", "7日休み"], support: false },
-      { name: "富田", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "木", "金", "土", "日"], slots: [], times: ["9-18", "13-22", "22-7", "24-9"], tags: ["社員", "15日-翌15日", "7日休み", "水曜固定休", "木曜午後希望", "9h拘束8h勤務"], support: false },
+      { name: "加藤", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-7", "24-9", "21-6"], tags: ["社員", "東町メイン", "基本夜勤", "16日-翌15日", "7日休み"], support: false },
+      { name: "富田", stores: ["higashicho"], days: ["月", "火", "木", "金", "土", "日"], slots: [], times: ["9-18", "13-22", "22-7", "24-9"], tags: ["社員", "東町メイン", "15日-翌15日", "7日休み", "水曜固定休", "木曜午後希望", "9h拘束8h勤務"], support: false },
       { name: "東町 店長（小澤）", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["9-18", "13-22", "22-7", "24-9"], tags: ["社員", "店長", "小澤", "店舗別店長", "16日-翌15日", "7日休み", "9h拘束8h勤務", "1h休憩"], support: false },
 
       { name: "高橋(東町)", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["18-22"], tags: ["主婦", "どの曜日もOK"], support: false },
       { name: "高木", stores: ["higashicho"], days: ["火", "木"], slots: [], times: ["18-22"], tags: ["学生", "火木のみ"], support: false },
       { name: "大津", stores: ["higashicho"], days: ["土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["学生", "土日どの時間もOK"], support: false },
       { name: "佐々木(絢)", stores: ["higashicho"], days: ["土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["学生", "土日どの時間もOK"], support: false },
-      { name: "石住井", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "日"], slots: [], times: ["22-2", "24-6"], tags: ["フリーター", "準夜勤", "基本22-2", "土曜以外OK", "山梨と入る日のみ24-6", "ワンオペ夜勤しばらくなし"], support: false },
+      { name: "碓井", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "日"], slots: [], times: ["22-2", "24-6"], tags: ["フリーター", "準夜勤", "基本22-2", "土曜以外OK", "山梨と入る日のみ24-6", "ワンオペ夜勤しばらくなし"], support: false },
       { name: "和田", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-6"], tags: ["主婦", "夜勤", "どの曜日もOK", "東町3-6ワンオペ可"], support: false },
       { name: "済藤", stores: ["higashicho"], days: ["土", "日"], slots: [], times: ["6-9"], tags: ["一般", "土日のみ", "6-9要確認"], support: false },
+      { name: "隆嶺", stores: ["higashicho"], days: ["土"], slots: [], times: ["6-9"], tags: ["朝", "土のみ", "要確認"], support: false },
       { name: "多田", stores: ["higashicho"], days: ["月", "水", "金"], slots: [], times: ["6-9"], tags: ["早朝のみ", "残業不可"], support: false },
       { name: "佐々木（綾）", stores: ["higashicho"], days: ["水"], slots: [], times: ["9-13"], tags: ["主婦", "水のみ"], support: false },
       { name: "永井", stores: ["higashicho", "ougicho"], days: ["火", "水", "木"], slots: [], times: ["9-16", "9-17"], tags: ["火木9-16扇町固定", "水9-16", "扇町火木9-17", "45分休憩", "扇町責任者候補"], support: false },
-      { name: "柳川", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["13-17", "17-23"], tags: ["東町のみ", "週2-3回", "どの曜日OK", "最長6h", "夕勤人不足ならOK"], support: false },
+      { name: "柳川", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-11", "9-14", "13-18", "17-22"], tags: ["東町のみ", "週2-3回", "どの曜日OK", "どの時間OK", "5h程度", "夕勤人不足ならOK"], support: false },
       { name: "守屋", stores: ["higashicho"], days: ["月", "金"], slots: [], times: ["13-17"], tags: ["固定"], support: false },
       { name: "ダハム", stores: ["higashicho"], days: ["火", "水", "土"], slots: [], times: ["13-19", "13-17"], tags: ["火水13-19固定", "土13-17", "外国留学生", "それ以外不可"], support: false },
       { name: "キーズ", stores: ["higashicho"], days: ["火", "金", "土", "日"], slots: [], times: ["6-18", "9-21", "12-24"], tags: ["月水木以外", "12hまで", "週28hまで", "副業あり", "東町12hまで"], support: false },
       { name: "山梨", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-6"], tags: ["一般", "セブン副業", "週1-2希望日", "夜勤"], support: false },
+      { name: "河野", stores: ["higashicho"], days: ["月", "火", "木", "金"], slots: [], times: ["22-2"], tags: ["準夜勤", "月火木金22-2", "要確認"], support: false },
 
       { name: "宮下 店長（小島）", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["15-24", "6-15", "9-18", "13-22", "16-25", "22-6"], tags: ["店長", "小島", "店舗別店長", "15-24優先", "どの時間曜日もOK", "7日休み", "1日8h"], support: false },
       { name: "笹島", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-9"], tags: ["フリーター", "1h休憩", "宮下24時以降ワンオペ可"], support: false },
@@ -1765,11 +2105,11 @@
       { name: "高橋(宮下)", stores: ["miyanoshita"], days: ["火", "水", "木"], slots: [], times: ["13-17", "9-17"], tags: ["主婦", "火水13-17", "木9-17", "宮下責任者候補"], support: false },
       { name: "山崎", stores: ["miyanoshita"], days: ["月", "火", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-15", "9-18", "13-22", "17-24", "18-24"], tags: ["主婦", "水不可", "24時まで", "フル夜勤NG", "宮下責任者候補"], support: false },
       { name: "松本", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "6-15", "9-15", "13-22", "18-24", "24-6"], tags: ["フリーター", "夜勤OK", "実勤務寄せ", "万能扱い注意"], support: false },
-      { name: "鈴木（たいせい）", stores: ["miyanoshita"], days: ["月", "金"], slots: [], times: ["16-20", "9-13"], tags: ["学生", "宮ノ下鈴木", "月金16-20", "月9-13要確認"], support: false },
+      { name: "鈴木（たいせい）", stores: ["miyanoshita"], days: ["月", "金", "日"], slots: [], times: ["16-20", "9-13"], tags: ["学生", "宮ノ下鈴木", "月金16-20固定", "日9-13固定"], support: false },
       { name: "柴田まちこ", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9"], tags: ["主婦", "6-9のみ", "日曜フリー要確認", "宮下24時以降ワンオペ可"], support: false },
       { name: "かずや", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["12-18", "17-21", "18-21", "18-22", "19-22"], tags: ["フリー", "夕方短時間寄り"], support: false },
       { name: "かずき", stores: ["miyanoshita"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-22"], tags: ["フリーター", "フリー"], support: false },
-      { name: "金子", stores: ["miyanoshita"], days: ["月", "水", "日"], slots: [], times: ["16-20", "17-22"], tags: ["学生", "16-20あり", "月水日17-22のみ"], support: false },
+      { name: "金子", stores: ["miyanoshita"], days: ["水", "日"], slots: [], times: ["17-22"], tags: ["学生", "水日17-22のみ"], support: false },
 
       { name: "まこつ。", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-18", "13-22", "17-22", "22-6"], tags: ["オーナー", "応援マルチ"], support: true },
       { name: "りえ", stores: ["miyanoshita", "higashicho", "ougicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["6-9", "9-18", "13-22", "17-22", "22-6"], tags: ["マネージャー", "応援マルチ"], support: true }
@@ -1779,15 +2119,27 @@
       map[person.name] = [];
       return map;
     }, {});
+    const paidLeave = staff.reduce((map, person) => {
+      map[person.name] = [];
+      return map;
+    }, {});
+    const emergencyAbsences = staff.reduce((map, person) => {
+      map[person.name] = [];
+      return map;
+    }, {});
     const staffNameAliases = {
       "塚用船": "塚脇",
-      "富崎": "宮崎"
+      "富崎": "宮崎",
+      "石住井": "碓井",
+      "碓氷": "碓井",
+      "グリーン": "グルン",
+      "タタ田": "多田"
     };
     const incompatiblePairs = [
       ["芳澤", "下田"],
       ["和田", "工藤"],
       ["和田", "守屋"],
-      ["和田", "石住井"],
+      ["和田", "碓井"],
       ["和田", "山梨"]
     ];
 
@@ -1800,7 +2152,10 @@
       selected: null,
       schedule: {},
       ready: false,
-      bulkGenerating: false
+      bulkGenerating: false,
+      needsFreshGeneration: false,
+      currentView: "dashboard",
+      selectedShortageHole: null
     };
 
     const dom = {
@@ -1818,6 +2173,32 @@
       },
       toast: document.getElementById("toast")
     };
+
+    const STORAGE_KEY = "makotsuShiftBeta41024";
+    const LEGACY_STORAGE_KEYS = [
+      "makotsuShiftBeta41023",
+      "makotsuShiftBeta41022",
+      "makotsuShiftBeta41021",
+      "makotsuShiftBeta41020",
+      "makotsuShiftBeta41019",
+      "makotsuShiftBeta41018",
+      "makotsuShiftBeta41017",
+      "makotsuShiftBeta41016",
+      "makotsuShiftBeta41015",
+      "makotsuShiftBeta41014",
+      "makotsuShiftBeta410",
+      "makotsuShiftBeta49",
+      "makotsuShiftBeta482",
+      "makotsuShiftBeta48",
+      "makotsuShiftBeta47",
+      "makotsuShiftBeta465",
+      "makotsuShiftBeta464",
+      "makotsuShiftBeta462",
+      "makotsuShiftBeta461",
+      "makotsuShiftBeta46"
+    ];
+
+    let editingStaffName = "";
 
     function pad(n) {
       return String(n).padStart(2, "0");
@@ -1922,8 +2303,24 @@
       renderAll();
     }
 
+    function isInDateList(map, personName, dateIso) {
+      const name = canonicalStaffName(personName);
+      return (map[name] || []).includes(dateIso);
+    }
+
+    function isPaidLeave(personName, dateIso) {
+      return isInDateList(paidLeave, personName, dateIso);
+    }
+
+    function isEmergencyAbsence(personName, dateIso) {
+      return isInDateList(emergencyAbsences, personName, dateIso);
+    }
+
     function isUnavailable(personName, dateIso) {
-      return (availability[personName] || []).includes(dateIso);
+      const name = canonicalStaffName(personName);
+      return isInDateList(availability, name, dateIso)
+        || isPaidLeave(name, dateIso)
+        || isEmergencyAbsence(name, dateIso);
     }
 
     function findStaff(name) {
@@ -1933,6 +2330,92 @@
     function canonicalStaffName(name) {
       const value = String(name || "").trim();
       return staffNameAliases[value] || value;
+    }
+
+    function mergeUnique(base, additions) {
+      return [...new Set([...(base || []), ...(additions || [])])];
+    }
+
+    function enforceKnownStaffCorrections() {
+      const corrections = {
+        "赤瀬": {
+          stores: ["ougicho"],
+          days: ["月", "水", "金"],
+          times: ["9-17"],
+          requiredTags: ["主婦", "1h休憩", "扇町責任者候補", "月水金9-17"]
+        },
+        "グルン": {
+          stores: ["ougicho"],
+          days: ["月", "火", "木", "金"],
+          times: ["9-13", "9-17"],
+          requiredTags: ["主婦", "固定", "月金9-13固定", "火木9-17固定", "45分休憩", "扇町責任者候補"]
+        },
+        "鈴木（久華）": {
+          stores: ["ougicho"],
+          days: ["金", "土"],
+          times: ["17-22"],
+          requiredTags: ["夕方", "固定", "金土17-22固定", "扇町鈴木"]
+        },
+        "下田": {
+          stores: ["ougicho", "higashicho", "miyanoshita"],
+          requiredTags: ["扇町では9-17なし", "扇町木曜17-22", "宮下18-24のみ"]
+        },
+        "木村": {
+          stores: ["ougicho"],
+          requiredTags: ["社員", "扇町メイン", "扇町社員", "7日休み"]
+        },
+        "加藤": {
+          stores: ["higashicho"],
+          requiredTags: ["社員", "東町メイン", "基本夜勤", "7日休み"]
+        },
+        "富田": {
+          stores: ["higashicho"],
+          requiredTags: ["社員", "東町メイン", "7日休み"]
+        },
+        "塚脇": { requiredTags: ["東町扇町対応可"] },
+        "宮崎": { requiredTags: ["夜勤短時間のみ"] },
+        "碓井": { requiredTags: ["基本22-2", "山梨と入る日のみ24-6"] },
+        "隆嶺": {
+          stores: ["higashicho"],
+          days: ["土"],
+          times: ["6-9"],
+          requiredTags: ["朝", "土のみ", "要確認"]
+        },
+        "柳川": {
+          stores: ["higashicho"],
+          days: ["月", "火", "水", "木", "金", "土", "日"],
+          times: ["6-11", "9-14", "13-18", "17-22"],
+          requiredTags: ["東町のみ", "週2-3回", "どの曜日OK", "どの時間OK", "5h程度"]
+        },
+        "河野": {
+          stores: ["higashicho"],
+          days: ["月", "火", "木", "金"],
+          times: ["22-2"],
+          requiredTags: ["準夜勤", "月火木金22-2", "要確認"]
+        },
+        "鈴木（たいせい）": {
+          stores: ["miyanoshita"],
+          days: ["月", "金", "日"],
+          times: ["16-20", "9-13"],
+          requiredTags: ["学生", "宮ノ下鈴木", "月金16-20固定", "日9-13固定"]
+        },
+        "金子": {
+          stores: ["miyanoshita"],
+          days: ["水", "日"],
+          times: ["17-22"],
+          requiredTags: ["学生", "水日17-22のみ"]
+        }
+      };
+      staff.forEach(person => {
+        const correction = corrections[person.name];
+        if (!correction) return;
+        if (correction.stores) person.stores = [...correction.stores];
+        if (correction.days) person.days = [...correction.days];
+        if (correction.times) person.times = [...correction.times];
+        person.tags = mergeUnique(person.tags, correction.requiredTags || []);
+        person.slots = slotsFromTimes(person.times || []);
+        if (!person.slots.length) person.slots = [...slots];
+      });
     }
 
     function hasTag(person, text) {
@@ -1966,6 +2449,19 @@
       });
     }
 
+    function requiresResponsibleCompanion(person) {
+      return hasTag(person, "責任者同伴のみ");
+    }
+
+    function hasResponsibleCompanionForShift(dateIso, storeKey, person, time, options = {}) {
+      if (!requiresResponsibleCompanion(person)) return true;
+      return assignmentSlots(time, options).every(slot => {
+        const people = ensureCell(dateIso, storeKey, slot)
+          .filter(assignment => canonicalStaffName(assignment.name) !== canonicalStaffName(person.name));
+        return hasResponsiblePerson(people);
+      });
+    }
+
     function isAssignedAnywhere(dateIso, personName) {
       return storeOrder.some(storeKey => (
         slots.some(slot => ensureCell(dateIso, storeKey, slot).some(x => x.name === personName))
@@ -1986,10 +2482,16 @@
       return [...map.values()];
     }
 
-    function wageOf(name) {
+    function hourlyWageFor(name, hour) {
       if (name === "まこつ。" || name === "りえ") return 0;
-      if (["工藤", "ミミ", "山梨"].includes(name)) return 1500;
-      return 1200;
+      const clockHour = ((Math.floor(hour) % 24) + 24) % 24;
+      if (clockHour >= 22 || clockHour < 6) return 1531;
+      if (clockHour >= 6 && clockHour < 9) return 1250;
+      return ["永井", "赤瀬"].includes(name) ? 1250 : 1225;
+    }
+
+    function wageOf(name) {
+      return hourlyWageFor(name, 9);
     }
 
     function assignmentHours(assignment) {
@@ -1997,12 +2499,22 @@
       return Math.max(0, end - start);
     }
 
+    function assignmentLaborCost(assignment) {
+      const [start, end] = parseRange(assignment.time);
+      let total = 0;
+      for (let hour = start; hour < end; hour += 1) {
+        const next = Math.min(hour + 1, end);
+        total += (next - hour) * hourlyWageFor(assignment.name, hour);
+      }
+      return total;
+    }
+
     function storeLabor(storeKey) {
       let total = 0;
       periodDates().forEach(date => {
         const dateIso = iso(date);
         uniqueAssignments(dateIso, storeKey).forEach(assignment => {
-          total += assignmentHours(assignment) * wageOf(assignment.name);
+          total += assignmentLaborCost(assignment);
         });
       });
       return total;
@@ -2041,8 +2553,15 @@
       if (isUnavailable(person.name, dateIso)) return false;
       if (!matchesDay(person, dateIso)) return false;
       if (hasIncompatiblePerson(dateIso, storeKey, person.name)) return false;
+      if (!hasResponsibleCompanionForShift(dateIso, storeKey, person, time, options)) return false;
+      if (options.requireFullSlotCoverage && options.targetSlot && !coversSlot(time, options.targetSlot)) return false;
+      if (options.enforceCoreWorkLimit && isCoreEmployee(person) && !isPersonAssignedOnDate(dateIso, person.name)) {
+        if (projectedWorkDays(person, options) >= targetWorkDays(person)) return false;
+      }
       if (options.avoidLongStreak && !isPersonAssignedOnDate(dateIso, person.name)) {
-        const maxDays = Math.max(options.maxConsecutiveWorkDays || 5, maxConsecutiveWorkDaysFor(person, time));
+        const maxDays = options.strictConsecutiveLimit
+          ? (options.maxConsecutiveWorkDays || 5)
+          : Math.max(options.maxConsecutiveWorkDays || 5, maxConsecutiveWorkDaysFor(person, time));
         if (projectedConsecutiveWorkDays(person.name, dateIso) > maxDays) return false;
       }
       const assignment = { name: person.name, time, support: person.support };
@@ -2084,6 +2603,23 @@
       )));
     }
 
+    function fixedTimesForDate(person, dateIso) {
+      if (!person || !dateIso) return [];
+      const day = dowLabel(new Date(`${dateIso}T00:00:00`));
+      const ranges = [];
+      (person.tags || []).forEach(tag => {
+        if (!tag.includes("固定") || !tag.includes(day)) return;
+        const matches = tag.match(/\d{1,2}-\d{1,2}/g) || [];
+        ranges.push(...matches);
+      });
+      return [...new Set(ranges.filter(time => (person.times || []).includes(time)))];
+    }
+
+    function candidateTimesFor(person, dateIso = null) {
+      const fixedTimes = isFixedPerson(person) ? fixedTimesForDate(person, dateIso) : [];
+      return fixedTimes.length ? fixedTimes : (person.times || []);
+    }
+
     function fixedAppliesToStore(person, storeKey) {
       const fixedTags = (person.tags || []).filter(tag => tag.includes("固定") && !tag.includes("固定休"));
       const storeNames = Object.values(stores).map(store => store.name);
@@ -2107,7 +2643,7 @@
     function prefillFixedShifts(dateIso, storeKey, options = {}) {
       let addedCount = 0;
       fixedPeopleFor(storeKey, dateIso).forEach(person => {
-        const times = [...(person.times || [])].sort((a, b) => {
+        const times = [...candidateTimesFor(person, dateIso)].sort((a, b) => {
           const aHours = assignmentHours({ time: a });
           const bHours = assignmentHours({ time: b });
           return aHours - bHours;
@@ -2157,6 +2693,34 @@
       )).length;
     }
 
+    function paidLeaveDaysInDates(personName, dates) {
+      return dates.filter(date => isPaidLeave(personName, iso(date))).length;
+    }
+
+    function emergencyAbsenceDaysInDates(personName, dates) {
+      return dates.filter(date => isEmergencyAbsence(personName, iso(date))).length;
+    }
+
+    function targetWorkDays(person) {
+      return Math.max(0, periodDates().length - targetOffDays(person));
+    }
+
+    function projectedWorkDays(person, options = {}) {
+      const name = canonicalStaffName(person.name);
+      return options.loadMap ? (options.loadMap.get(name) || 0) : personAssignedDaysInPeriod(name);
+    }
+
+    function coreRestBalanceScore(person, dateIso, options = {}) {
+      if (!isCoreEmployee(person) || !targetOffDays(person)) return 0;
+      if (isUnavailable(person.name, dateIso)) return -10000;
+      const currentWork = projectedWorkDays(person, options);
+      const targetWork = targetWorkDays(person);
+      const deficit = targetWork - currentWork;
+      if (deficit > 0) return Math.min(520, deficit * 32);
+      if (deficit === 0) return -35;
+      return Math.max(-420, deficit * 120);
+    }
+
     function isPersonAssignedOnDate(dateIso, personName, storeFilter = "all") {
       return storeOrder.some(storeKey => {
         if (storeFilter !== "all" && storeFilter !== storeKey) return false;
@@ -2190,6 +2754,20 @@
 
     function buildLoadMap() {
       return new Map(staff.map(person => [person.name, personAssignedDaysInPeriod(person.name)]));
+    }
+
+    function generationOptions(extra = {}) {
+      return {
+        respectCapacity: true,
+        preventDoubleBooking: true,
+        avoidLongStreak: true,
+        maxConsecutiveWorkDays: 5,
+        allowPartialOverlap: false,
+        requireFullSlotCoverage: true,
+        enforceCoreWorkLimit: true,
+        loadMap: buildLoadMap(),
+        ...extra
+      };
     }
 
     function hasLateShift(dateIso, personName) {
@@ -2228,10 +2806,10 @@
     }
 
     function bestTimeFor(person, storeKey, slot, dateIso, options = {}) {
-      const best = person.times
+      const best = candidateTimesFor(person, dateIso)
         .filter(time => options.allowPartialOverlap ? overlapsSlot(time, slot) : coversSlot(time, slot))
         .map(time => {
-          const feasible = canPlaceShift(dateIso, storeKey, person, time, options);
+          const feasible = canPlaceShift(dateIso, storeKey, person, time, { ...options, targetSlot: slot });
           return { time, feasible, score: timeFitScore(person, time, slot) };
         })
         .filter(item => item.feasible || !options.respectCapacity)
@@ -2256,13 +2834,17 @@
       if (already) score -= 70;
       score += restScore(person, slot, dateIso);
       const projectedStreak = projectedConsecutiveWorkDays(person.name, dateIso);
-      const maxConsecutive = time ? Math.max(options.maxConsecutiveWorkDays || 5, maxConsecutiveWorkDaysFor(person, time)) : (options.maxConsecutiveWorkDays || 5);
+      const maxConsecutive = options.strictConsecutiveLimit
+        ? (options.maxConsecutiveWorkDays || 5)
+        : time ? Math.max(options.maxConsecutiveWorkDays || 5, maxConsecutiveWorkDaysFor(person, time)) : (options.maxConsecutiveWorkDays || 5);
       if (!already && projectedStreak > maxConsecutive) {
         score -= options.avoidLongStreak ? 10000 : (projectedStreak - maxConsecutive) * 90;
       } else if (!already && projectedStreak === 5) {
         score -= 80;
       }
-      score -= (options.loadMap ? (options.loadMap.get(person.name) || 0) : 0) * 2;
+      score += coreRestBalanceScore(person, dateIso, options);
+      const load = options.loadMap ? (options.loadMap.get(person.name) || 0) : 0;
+      score -= load * (isCoreEmployee(person) ? 0.35 : 2);
       return score;
     }
 
@@ -2285,8 +2867,9 @@
       }
       const direct = person.times.find(time => time === slot);
       if (direct) return direct;
-      const covering = person.times.find(time => options.allowPartialOverlap ? overlapsSlot(time, slot) : coversSlot(time, slot));
-      return covering || person.times[0] || slot;
+      const times = candidateTimesFor(person, dateIso);
+      const covering = times.find(time => options.allowPartialOverlap ? overlapsSlot(time, slot) : coversSlot(time, slot));
+      return covering || times[0] || slot;
     }
 
     function normalizedSlotRangeForTime(time, slot) {
@@ -2361,7 +2944,7 @@
               const removable = [...cell]
                 .filter(assignment => {
                   const person = findStaff(assignment.name);
-                  return !isFixedPerson(person) && canRemoveWithoutShortage(dateIso, storeKey, assignment);
+                  return !isFixedPerson(person) && !isCoreEmployee(person) && canRemoveWithoutShortage(dateIso, storeKey, assignment);
                 })
                 .sort((a, b) => overstaffRemovalScore(dateIso, storeKey, slot, a) - overstaffRemovalScore(dateIso, storeKey, slot, b))[0];
               if (!removable) break;
@@ -2376,19 +2959,249 @@
       return removed;
     }
 
+    function removableAssignmentsForPersonOnDate(dateIso, personName, storeFilter = "all", options = {}) {
+      const rows = [];
+      storeOrder.forEach(storeKey => {
+        if (storeFilter !== "all" && storeFilter !== storeKey) return;
+        uniqueAssignments(dateIso, storeKey).forEach(assignment => {
+          if (canonicalStaffName(assignment.name) !== canonicalStaffName(personName)) return;
+          const person = findStaff(assignment.name);
+          if (!person || isFixedPerson(person) || isCoreEmployee(person) || person.support) return;
+          if (!options.allowShortage && !canRemoveWithoutShortage(dateIso, storeKey, assignment)) return;
+          rows.push({ storeKey, assignment });
+        });
+      });
+      return rows;
+    }
+
+    function resolveLongStreaks(storeFilter = "all", maxDays = 5) {
+      let removed = 0;
+      let guard = 0;
+      while (guard < 120) {
+        let changed = false;
+        for (const person of staff) {
+          let segment = [];
+          const flush = () => {
+            if (segment.length <= maxDays) {
+              segment = [];
+              return false;
+            }
+            const ordered = [...segment].sort((a, b) => {
+              const aDistance = Math.abs(segment.indexOf(a) - Math.floor(segment.length / 2));
+              const bDistance = Math.abs(segment.indexOf(b) - Math.floor(segment.length / 2));
+              return aDistance - bDistance;
+            });
+            for (const dateIso of ordered) {
+              const removable = removableAssignmentsForPersonOnDate(dateIso, person.name, storeFilter)[0]
+                || removableAssignmentsForPersonOnDate(dateIso, person.name, storeFilter, { allowShortage: true })[0];
+              if (!removable) continue;
+              removeShiftFromDay(dateIso, removable.storeKey, removable.assignment);
+              removed += 1;
+              segment = [];
+              return true;
+            }
+            segment = [];
+            return false;
+          };
+          for (const date of periodDates()) {
+            const dateIso = iso(date);
+            if (isPersonAssignedOnDate(dateIso, person.name, storeFilter)) {
+              segment.push(dateIso);
+            } else if (flush()) {
+              changed = true;
+              break;
+            }
+          }
+          if (!changed && flush()) changed = true;
+          if (changed) break;
+        }
+        if (!changed) break;
+        guard += 1;
+      }
+      return removed;
+    }
+
+    function canRemoveForCoreReplacement(dateIso, storeKey, assignment, replacementSlots) {
+      const person = findStaff(assignment.name);
+      if (!person || isFixedPerson(person) || isCoreEmployee(person) || person.support) return false;
+      const covered = assignmentSlots(assignment.time, { allowPartialOverlap: true });
+      return covered.every(slot => {
+        const cell = ensureCell(dateIso, storeKey, slot);
+        return replacementSlots.includes(slot) || cell.length > requirement(storeKey, slot);
+      });
+    }
+
+    function makeRoomForCore(dateIso, storeKey, person, time, options = {}) {
+      const replacementSlots = assignmentSlots(time, options);
+      for (const slot of replacementSlots) {
+        if (requirement(storeKey, slot) <= 0) return false;
+        const cell = ensureCell(dateIso, storeKey, slot);
+        if (cell.some(assignment => assignment.name === person.name && assignment.time === time)) continue;
+        while (cell.length >= requirement(storeKey, slot)) {
+          const removable = [...cell]
+            .filter(assignment => canRemoveForCoreReplacement(dateIso, storeKey, assignment, replacementSlots))
+            .sort((a, b) => overstaffRemovalScore(dateIso, storeKey, slot, a) - overstaffRemovalScore(dateIso, storeKey, slot, b))[0];
+          if (!removable) return false;
+          removeShiftFromDay(dateIso, storeKey, removable);
+        }
+      }
+      return true;
+    }
+
+    function coreSlotOptions(person, dateIso, storeFilter, options = {}) {
+      const storeKeys = person.stores.filter(storeKey => storeFilter === "all" || storeFilter === storeKey);
+      const rows = [];
+      storeKeys.forEach(storeKey => {
+        slots.forEach(slot => {
+          const time = bestTimeFor(person, storeKey, slot, dateIso, { ...options, respectCapacity: false });
+          if (!time) return;
+          rows.push({
+            storeKey,
+            slot,
+            time,
+            score: scoreCandidate(person, storeKey, slot, dateIso, { ...options, respectCapacity: false })
+          });
+        });
+      });
+      return rows.sort((a, b) => b.score - a.score);
+    }
+
+    function corePlacementOptions(person, storeFilter, options = {}) {
+      const maxDaysFallback = Math.max(6, maxConsecutiveWorkDaysFor(person, "9-18"));
+      const rows = [];
+      periodDates().forEach(date => {
+        const dateIso = iso(date);
+        if (isPersonAssignedOnDate(dateIso, person.name)) return;
+        if (!matchesDay(person, dateIso)) return;
+        if (isUnavailable(person.name, dateIso)) return;
+        const projectedStreak = projectedConsecutiveWorkDays(person.name, dateIso);
+        if (projectedStreak > maxDaysFallback) return;
+        coreSlotOptions(person, dateIso, storeFilter, options).forEach(row => {
+          const targets = assignmentSlots(row.time, options);
+          const shortageBonus = targets.reduce((sum, slot) => {
+            const cell = ensureCell(dateIso, row.storeKey, slot);
+            return sum + Math.max(0, requirement(row.storeKey, slot) - cell.length) * 18;
+          }, 0);
+          const roomPenalty = targets.reduce((sum, slot) => {
+            const cell = ensureCell(dateIso, row.storeKey, slot);
+            return sum + (cell.length >= requirement(row.storeKey, slot) ? 8 : 0);
+          }, 0);
+          rows.push({
+            ...row,
+            dateIso,
+            projectedStreak,
+            score: row.score + shortageBonus - roomPenalty - projectedStreak * 3
+          });
+        });
+      });
+      return rows.sort((a, b) => b.score - a.score);
+    }
+
+    function tryPlaceCoreEmployee(person, storeFilter, options = {}) {
+      const rows = corePlacementOptions(person, storeFilter, options);
+      for (const row of rows) {
+        if (makeRoomForCore(row.dateIso, row.storeKey, person, row.time, options)) {
+          const added = addShiftToDay(row.dateIso, row.storeKey, person, row.time, options);
+          if (added) {
+            options.loadMap.set(person.name, (options.loadMap.get(person.name) || 0) + 1);
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    function rebalanceCoreRest(storeFilter = "all") {
+      const options = generationOptions();
+      let changed = 0;
+      let guard = 0;
+      const skipped = new Set();
+      while (guard < 240) {
+        const row = coreRestRows(storeFilter)
+          .filter(item => item.excess > 0)
+          .filter(item => !skipped.has(item.person.name))
+          .sort((a, b) => b.excess - a.excess)[0];
+        if (!row) break;
+        if (tryPlaceCoreEmployee(row.person, storeFilter, options)) {
+          changed += 1;
+          skipped.clear();
+        } else {
+          skipped.add(row.person.name);
+        }
+        guard += 1;
+      }
+      if (changed) trimOverstaffing(storeFilter);
+      return changed;
+    }
+
+    function coreDailyOptions(person, dateIso, storeKey, options = {}) {
+      return candidateTimesFor(person, dateIso)
+        .map(time => {
+          const targets = assignmentSlots(time, options);
+          if (!targets.length) return null;
+          const shortageFill = targets.reduce((sum, slot) => {
+            const cell = ensureCell(dateIso, storeKey, slot);
+            return sum + Math.max(0, requirement(storeKey, slot) - cell.length);
+          }, 0);
+          const spanPenalty = targets.length * 3;
+          const feasible = canPlaceShift(dateIso, storeKey, person, time, options);
+          return {
+            time,
+            feasible,
+            score: shortageFill * 40 + timeFitScore(person, time, targets[0] || slots[0]) - spanPenalty
+          };
+        })
+        .filter(Boolean)
+        .filter(row => row.feasible)
+        .sort((a, b) => b.score - a.score);
+    }
+
+    function prefillCoreEmployeesForDate(dateIso, storeKey, options = {}) {
+      let addedCount = 0;
+      const corePriority = person => (
+        hasTag(person, "夜勤のみ") || hasTag(person, "基本夜勤") ? 2 : 1
+      );
+      const corePeople = staff
+        .filter(person => isCoreEmployee(person) && canWorkAtStore(person, storeKey))
+        .filter(person => !isPersonAssignedOnDate(dateIso, person.name))
+        .filter(person => matchesDay(person, dateIso))
+        .filter(person => !isUnavailable(person.name, dateIso))
+        .filter(person => projectedWorkDays(person, options) < targetWorkDays(person))
+        .sort((a, b) => {
+          const aNeed = targetWorkDays(a) - projectedWorkDays(a, options);
+          const bNeed = targetWorkDays(b) - projectedWorkDays(b, options);
+          return corePriority(b) - corePriority(a) || bNeed - aNeed || coreRestBalanceScore(b, dateIso, options) - coreRestBalanceScore(a, dateIso, options);
+        });
+
+      corePeople.forEach(person => {
+        const row = coreDailyOptions(person, dateIso, storeKey, options)[0];
+        if (!row) return;
+        const added = addShiftToDay(dateIso, storeKey, person, row.time, options);
+        if (added) {
+          options.loadMap.set(person.name, (options.loadMap.get(person.name) || 0) + 1);
+          addedCount += 1;
+        }
+      });
+      return addedCount;
+    }
+
     function generateMonth() {
       const dates = periodDates();
       const storeKey = state.selectedStore;
-      const options = { respectCapacity: true, preventDoubleBooking: true, avoidLongStreak: true, maxConsecutiveWorkDays: 5, allowPartialOverlap: true, loadMap: buildLoadMap() };
-      dates.forEach((date, dateIndex) => {
+      dates.forEach(date => {
         const dateIso = iso(date);
         slots.forEach(slot => {
           const cell = ensureCell(dateIso, storeKey, slot);
           cell.length = 0;
         });
+      });
+      const options = generationOptions();
+      dates.forEach((date, dateIndex) => {
+        const dateIso = iso(date);
+        prefillCoreEmployeesForDate(dateIso, storeKey, options);
         fixedPeopleFor(storeKey, dateIso).forEach(person => {
           const wasAssigned = isAssignedAnywhere(dateIso, person.name);
-          const times = [...(person.times || [])].sort((a, b) => {
+          const times = [...candidateTimesFor(person, dateIso)].sort((a, b) => {
             const aHours = assignmentHours({ time: a });
             const bHours = assignmentHours({ time: b });
             return aHours - bHours;
@@ -2398,6 +3211,22 @@
             options.loadMap.set(person.name, (options.loadMap.get(person.name) || 0) + 1);
           }
         });
+        staff
+          .filter(person => isCoreEmployee(person) && canWorkAtStore(person, storeKey))
+          .filter(person => !isPersonAssignedOnDate(dateIso, person.name))
+          .filter(person => projectedWorkDays(person, options) < targetWorkDays(person))
+          .sort((a, b) => coreRestBalanceScore(b, dateIso, options) - coreRestBalanceScore(a, dateIso, options))
+          .forEach(person => {
+            slots.some(slot => {
+              const time = bestTimeFor(person, storeKey, slot, dateIso, options);
+              if (!time) return false;
+              const added = addShiftToDay(dateIso, storeKey, person, time, options);
+              if (added) {
+                options.loadMap.set(person.name, (options.loadMap.get(person.name) || 0) + 1);
+              }
+              return added;
+            });
+          });
         for (let pass = 0; pass < 8; pass += 1) {
           let changed = false;
           slots.forEach(slot => {
@@ -2406,7 +3235,7 @@
             if (cell.length >= req) return;
             const pool = candidatesFor(storeKey, slot, dateIso, options)
               .filter(item => !item.person.support && !isUnavailable(item.person.name, dateIso));
-            const picked = pool[(dateIndex + pass + slots.indexOf(slot)) % Math.max(pool.length, 1)];
+            const picked = pool[0];
             if (picked) {
               const wasAssigned = isAssignedAnywhere(dateIso, picked.person.name);
               const added = addShiftToDay(dateIso, storeKey, picked.person, picked.time, options);
@@ -2420,6 +3249,8 @@
         }
       });
       trimOverstaffing(storeKey);
+      rebalanceCoreRest(storeKey);
+      resolveLongStreaks(storeKey, 5);
       if (!state.bulkGenerating) {
         showToast(`${stores[storeKey].name}の1か月分を仮作成した`);
         renderAll();
@@ -2446,6 +3277,9 @@
         state.selectedStore = storeKey;
         generateMonth();
       });
+      rebalanceCoreRest("all");
+      trimOverstaffing("all");
+      resolveLongStreaks("all", 5);
       state.bulkGenerating = false;
       state.selectedStore = original;
       renderAll();
@@ -2453,30 +3287,29 @@
     }
 
     function fillFirstShortage(storeFilter = "all") {
-      const row = collectShortages(storeFilter)[0];
+      const row = collectAllShortages(storeFilter)[0];
       if (!row) {
         showToast("不足はない");
         return false;
       }
-      const options = { respectCapacity: true, preventDoubleBooking: true, allowSupport: true, avoidLongStreak: true, maxConsecutiveWorkDays: 5, allowPartialOverlap: true, loadMap: buildLoadMap() };
-      const candidate = candidatesFor(row.storeKey, row.slot, row.dateIso, options)[0];
+      const candidate = priorityCandidateForShortage(row);
       if (!candidate) {
         showToast("候補が見つからない");
         return false;
       }
-      if (!addShiftToDay(row.dateIso, row.storeKey, candidate.person, candidate.time, options)) {
+      if (!addShiftToDay(row.dateIso, row.storeKey, candidate.person, candidate.time, candidate.options)) {
         showToast("過剰なしで入れられる候補がない");
         return false;
       }
       state.selected = { dateIso: row.dateIso, storeKey: row.storeKey, slot: row.slot };
       renderAll();
-      showToast(`${stores[row.storeKey].name} ${row.slot} に ${candidate.person.name} を追加`);
+      showToast(`${stores[row.storeKey].name} ${row.slot} に ${candidate.person.name} を追加（${candidate.tier}）`);
       return true;
     }
 
     function fillVisibleStoreShortages() {
       let guard = 0;
-      while (collectShortages(state.selectedStore).length && guard < 80) {
+      while (collectAllShortages(state.selectedStore).length && guard < 80) {
         if (!fillFirstShortage(state.selectedStore)) break;
         guard += 1;
       }
@@ -2595,6 +3428,7 @@
         <div class="status-row">
           ${people.map((person, index) => `
             <button class="btn small" type="button" data-remove="${index}">${person.name}を外す</button>
+            <button class="btn small" type="button" data-emergency="${index}">${person.name}急遽休み</button>
           `).join("") || `<span class="muted">まだ配置なし</span>`}
         </div>
       `;
@@ -2603,6 +3437,19 @@
           event.stopPropagation();
           removeShiftFromDay(dateIso, storeKey, people[Number(btn.dataset.remove)]);
           renderAll();
+        });
+      });
+      detail.querySelectorAll("[data-emergency]").forEach(btn => {
+        btn.addEventListener("click", event => {
+          event.stopPropagation();
+          const assignment = people[Number(btn.dataset.emergency)];
+          if (!assignment) return;
+          const name = canonicalStaffName(assignment.name);
+          if (!emergencyAbsences[name]) emergencyAbsences[name] = [];
+          if (!emergencyAbsences[name].includes(dateIso)) emergencyAbsences[name].push(dateIso);
+          removeShiftFromDay(dateIso, storeKey, assignment);
+          renderAll();
+          showToast(`${name}を${dateIso}の急遽休みにした`);
         });
       });
 
@@ -2684,17 +3531,19 @@
           </tr>
         `;
       }).join("");
+      renderCoreRestSummary("monthlyRestSummary", storeKey, periodDates(), "monthly");
     }
 
     function renderWeeklyFinished(storeKey) {
       const select = document.getElementById("finishedWeekStart");
       const weeks = weekOptions();
       const previous = select.value || state.selectedWeekStart;
-      select.innerHTML = weeks.map(startDate => {
+      const weekOptionsHtml = weeks.map(startDate => {
         const startIso = iso(startDate);
         const endDate = addDays(startDate, 6);
         return `<option value="${startIso}">${dateLabel(startDate)}(${dowLabel(startDate)})〜${dateLabel(endDate)}(${dowLabel(endDate)})</option>`;
       }).join("");
+      syncSelectOptions(select, weekOptionsHtml, previous);
       if (previous && weeks.some(date => iso(date) === previous)) {
         state.selectedWeekStart = previous;
       }
@@ -2744,6 +3593,7 @@
           </tr>
         `;
       }).join("");
+      renderCoreRestSummary("weeklyRestSummary", storeKey, dates, "weekly");
     }
 
     function collectShortages(storeFilter = "all") {
@@ -2775,9 +3625,29 @@
       return `${startHour % 24}-${endHour % 24}`;
     }
 
+    function dayHourLabel(hour) {
+      return hour === 24 ? "24" : String(hour % 24);
+    }
+
+    function dayHourRangeLabel(startHour, endHour) {
+      return `${dayHourLabel(startHour)}-${dayHourLabel(endHour)}`;
+    }
+
     function slotHourRange(slot) {
       const [start, end] = parseRange(slot);
       return { start, end, slot };
+    }
+
+    function requirementForHour(storeKey, hour) {
+      let result = { req: 0, slot: "" };
+      slots.map(slotHourRange).forEach(range => {
+        const targetHour = range.end > 24 && hour < range.start ? hour + 24 : hour;
+        if (range.start <= targetHour && targetHour < range.end) {
+          const req = requirement(storeKey, range.slot);
+          if (req > result.req) result = { req, slot: range.slot };
+        }
+      });
+      return result;
     }
 
     function assignmentCoversHour(assignment, hour) {
@@ -2842,26 +3712,502 @@
       return rows;
     }
 
+    function collectAllShortages(storeFilter = "all") {
+      const slotRows = collectShortages(storeFilter).map(row => ({
+        ...row,
+        kind: "枠不足",
+        timeLabel: row.slot
+      }));
+      const hourlyGroups = new Map();
+      collectHourlyShortages(storeFilter).forEach(row => {
+        const key = `${row.dateIso}|${row.storeKey}|${row.slot}`;
+        const current = hourlyGroups.get(key) || {
+          ...row,
+          kind: "時間不足",
+          ranges: [],
+          count: row.count,
+          shortage: row.shortage
+        };
+        current.ranges.push(hourRangeLabel(row.startHour, row.endHour));
+        current.count = Math.min(current.count, row.count);
+        current.shortage = Math.max(current.shortage, row.shortage);
+        hourlyGroups.set(key, current);
+      });
+      const hourlyRows = [...hourlyGroups.values()].map(row => ({
+        ...row,
+        timeLabel: `${row.slot} / ${row.ranges.join("、")}`
+      }));
+      return [...slotRows, ...hourlyRows]
+        .sort((a, b) => a.date - b.date || storeOrder.indexOf(a.storeKey) - storeOrder.indexOf(b.storeKey));
+    }
+
+    function collectShortageGroupCount(storeFilter = "all") {
+      const groups = new Set();
+      collectAllShortages(storeFilter).forEach(row => {
+        groups.add(`${row.dateIso}|${row.storeKey}`);
+      });
+      return groups.size;
+    }
+
+    function candidateNameList(rows, limit = 4) {
+      return [...new Set(rows.map(item => item.person.name))].slice(0, limit);
+    }
+
+    function coreAdjustmentCandidatesFor(row, restRows = coreRestRows("all")) {
+      const options = generationOptions({ allowSupport: false });
+      return staff
+        .filter(person => isCoreEmployee(person))
+        .filter(person => !person.support)
+        .filter(person => canWorkAtStore(person, row.storeKey))
+        .map(person => {
+          const rest = restRows.find(item => item.person.name === person.name);
+          const time = bestTimeFor(person, row.storeKey, row.slot, row.dateIso, options);
+          if (!time || !canPlaceShift(row.dateIso, row.storeKey, person, time, options)) return null;
+          const restDiff = rest ? rest.restDiff : 0;
+          return {
+            person,
+            time,
+            score: scoreCandidate(person, row.storeKey, row.slot, row.dateIso, options) + Math.max(0, restDiff) * 60,
+            reason: restDiff > 0 ? `休み多め+${restDiff}` : "社員調整"
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3);
+    }
+
+    function supportAdjustmentCandidatesFor(row) {
+      const options = generationOptions({ allowSupport: true });
+      return staff
+        .filter(person => person.support || hasTag(person, "応援マルチ"))
+        .map(person => {
+          const time = bestTimeFor(person, row.storeKey, row.slot, row.dateIso, options);
+          if (!time || !canPlaceShift(row.dateIso, row.storeKey, person, time, options)) return null;
+          return {
+            person,
+            time,
+            score: scoreCandidate(person, row.storeKey, row.slot, row.dateIso, options),
+            reason: "最終応援"
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 2);
+    }
+
+    function partialCoverageCandidatesFor(row) {
+      if (row.kind !== "時間不足") return [];
+      const options = generationOptions({
+        allowPartialOverlap: true,
+        requireFullSlotCoverage: false,
+        allowSupport: false
+      });
+      return staff
+        .filter(person => !person.support)
+        .filter(person => canWorkAtStore(person, row.storeKey))
+        .map(person => {
+          const time = bestTimeFor(person, row.storeKey, row.slot, row.dateIso, options);
+          if (!time || !canPlaceShift(row.dateIso, row.storeKey, person, time, options)) return null;
+          return {
+            person,
+            time,
+            score: scoreCandidate(person, row.storeKey, row.slot, row.dateIso, options),
+            reason: "部分穴"
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3);
+    }
+
+    function priorityCandidateForShortage(row) {
+      const normalOptions = generationOptions({ allowSupport: false });
+      const normal = candidatesFor(row.storeKey, row.slot, row.dateIso, normalOptions)
+        .filter(item => !item.person.support)[0];
+      if (normal) return { ...normal, options: normalOptions, tier: "通常" };
+
+      const coreOptions = generationOptions({ allowSupport: false });
+      const core = coreAdjustmentCandidatesFor(row, coreRestRows("all"))[0];
+      if (core) return { ...core, options: coreOptions, tier: "社員調整" };
+
+      const partialOptions = generationOptions({
+        allowPartialOverlap: true,
+        requireFullSlotCoverage: false,
+        allowSupport: false
+      });
+      const partial = partialCoverageCandidatesFor(row)[0];
+      if (partial) return { ...partial, options: partialOptions, tier: "部分穴" };
+
+      const supportOptions = generationOptions({ allowSupport: true });
+      const support = supportAdjustmentCandidatesFor(row)[0];
+      if (support) return { ...support, options: supportOptions, tier: "最終応援" };
+      return null;
+    }
+
+    function shortageCandidateLabel(row, context = {}) {
+      const restRows = context.restRows || coreRestRows("all");
+      const normalOptions = generationOptions({ allowSupport: false });
+      const normal = candidatesFor(row.storeKey, row.slot, row.dateIso, normalOptions)
+        .filter(item => !item.person.support)
+        .slice(0, 3);
+      const parts = [];
+      const normalNames = candidateNameList(normal);
+      if (normalNames.length) parts.push(`通常:${normalNames.join("、")}`);
+      if (normalNames.length >= 3) return parts.join(" / ");
+      const core = coreAdjustmentCandidatesFor(row, restRows);
+      const coreNames = core.map(item => `${item.person.name}(${item.reason})`);
+      if (coreNames.length) parts.push(`社員調整:${coreNames.join("、")}`);
+      if (normalNames.length + coreNames.length >= 3) return parts.join(" / ");
+      const partial = partialCoverageCandidatesFor(row);
+      const partialNames = candidateNameList(partial);
+      if (partialNames.length) parts.push(`部分:${partialNames.join("、")}`);
+      if (normalNames.length + coreNames.length + partialNames.length >= 3) return parts.join(" / ");
+      const support = supportAdjustmentCandidatesFor(row);
+      const supportNames = candidateNameList(support, 2);
+      if (supportNames.length) parts.push(`最終:${supportNames.join("、")}`);
+      return parts.join(" / ") || "候補なし。条件変更が必要";
+    }
+
+    function collectShortageDisplayRows(storeFilter = "all") {
+      const groups = new Map();
+      const context = { restRows: coreRestRows("all") };
+      collectAllShortages(storeFilter).forEach(row => {
+        const key = `${row.dateIso}|${row.storeKey}`;
+        const current = groups.get(key) || {
+          date: row.date,
+          dateIso: row.dateIso,
+          storeKey: row.storeKey,
+          kind: "不足あり",
+          timeLabels: [],
+          shortage: 0,
+          candidates: []
+        };
+        current.timeLabels.push(`${row.kind}:${row.timeLabel} 不足${row.shortage}`);
+        current.shortage += row.shortage;
+        const label = shortageCandidateLabel(row, context);
+        if (label) current.candidates.push(label);
+        groups.set(key, current);
+      });
+      return [...groups.values()].map(row => ({
+        ...row,
+        timeLabel: row.timeLabels.join(" / "),
+        req: "-",
+        count: "-",
+        candidateLabel: [...new Set(row.candidates)].slice(0, 3).join(" / ")
+      })).sort((a, b) => a.date - b.date || storeOrder.indexOf(a.storeKey) - storeOrder.indexOf(b.storeKey));
+    }
+
+    function ensureShortageMapDate() {
+      const input = document.getElementById("shortageMapDate");
+      if (!input) return state.today;
+      const dates = periodDates();
+      const valid = dates.map(date => iso(date));
+      if (!input.value || !valid.includes(input.value)) {
+        input.value = valid.includes(state.today) ? state.today : (valid[0] || state.today);
+      }
+      return input.value;
+    }
+
+    function dailyShortageSegments(storeKey, dateIso) {
+      const segments = [];
+      for (let hour = 0; hour < 24; hour += 1) {
+        const { req, slot } = requirementForHour(storeKey, hour);
+        const count = hourlyCoverage(dateIso, storeKey, hour).length;
+        const shortage = Math.max(0, req - count);
+        if (req <= 0 || shortage <= 0) {
+          continue;
+        }
+        const previous = segments[segments.length - 1];
+        if (previous && previous.endHour === hour && previous.shortage === shortage) {
+          previous.endHour = hour + 1;
+          previous.req = Math.max(previous.req, req);
+          previous.count = Math.min(previous.count, count);
+          if (!previous.slots.includes(slot)) previous.slots.push(slot);
+        } else {
+          segments.push({
+            startHour: hour,
+            endHour: hour + 1,
+            req,
+            count,
+            shortage,
+            slots: [slot]
+          });
+        }
+      }
+      return segments;
+    }
+
+    function shortageRowFromSegment(storeKey, dateIso, segment) {
+      const primarySlot = segment.slots[0] || requirementForHour(storeKey, segment.startHour).slot || slots[0];
+      return {
+        date: new Date(`${dateIso}T00:00:00`),
+        dateIso,
+        storeKey,
+        slot: primarySlot,
+        kind: "時間不足",
+        startHour: segment.startHour,
+        endHour: segment.endHour,
+        req: segment.req,
+        count: segment.count,
+        shortage: segment.shortage,
+        timeLabel: `${primarySlot} / ${dayHourRangeLabel(segment.startHour, segment.endHour)}`
+      };
+    }
+
+    function selectedShortageRow() {
+      const hole = state.selectedShortageHole;
+      if (!hole) return null;
+      const segments = dailyShortageSegments(hole.storeKey, hole.dateIso);
+      const segment = segments.find(item => item.startHour === hole.startHour && item.endHour === hole.endHour);
+      if (!segment) return null;
+      return shortageRowFromSegment(hole.storeKey, hole.dateIso, segment);
+    }
+
+    function normalizeShortageDetailRow(row) {
+      if (!row) return null;
+      if (row.slot) return row;
+      const dateIso = row.dateIso || iso(row.date);
+      const source = collectAllShortages(row.storeKey).find(item => (
+        item.dateIso === dateIso && item.storeKey === row.storeKey
+      ));
+      return source || row;
+    }
+
+    function candidatePriorityGroupsFor(row) {
+      row = normalizeShortageDetailRow(row);
+      if (!row || !row.slot) {
+        return [
+          { label: "通常候補", rows: [] },
+          { label: "社員調整", rows: [] },
+          { label: "部分勤務", rows: [] },
+          { label: "最終応援", rows: [] }
+        ];
+      }
+      const restRows = coreRestRows("all");
+      const normalOptions = generationOptions({ allowSupport: false });
+      const normal = candidatesFor(row.storeKey, row.slot, row.dateIso, normalOptions)
+        .filter(item => !item.person.support)
+        .slice(0, 4)
+        .map(item => ({ ...item, tier: "通常候補", options: normalOptions, reason: "通常条件で配置可" }));
+
+      const coreOptions = generationOptions({ allowSupport: false });
+      const core = coreAdjustmentCandidatesFor(row, restRows)
+        .slice(0, 3)
+        .map(item => ({ ...item, tier: "社員調整", options: coreOptions, reason: item.reason }));
+
+      const partialOptions = generationOptions({
+        allowPartialOverlap: true,
+        requireFullSlotCoverage: false,
+        allowSupport: false
+      });
+      const partial = partialCoverageCandidatesFor(row)
+        .slice(0, 3)
+        .map(item => ({ ...item, tier: "部分勤務", options: partialOptions, reason: "枠全体ではなく穴時間の一部を埋める候補" }));
+
+      const supportOptions = generationOptions({ allowSupport: true });
+      const support = supportAdjustmentCandidatesFor(row)
+        .slice(0, 2)
+        .map(item => ({ ...item, tier: "最終応援", options: supportOptions, reason: "まこつ。/りえ等の最終応援枠" }));
+
+      return [
+        { label: "通常候補", rows: normal },
+        { label: "社員調整", rows: core },
+        { label: "部分勤務", rows: partial },
+        { label: "最終応援", rows: support }
+      ];
+    }
+
+    function relaxHintsFor(row, groups) {
+      const hints = [];
+      if (!(groups[0] && groups[0].rows.length)) {
+        hints.push("通常条件では候補が薄い。希望休、固定店舗、対応時間、重複、連勤、社員休みのどれかで止まっている可能性。");
+      }
+      if (groups[1] && groups[1].rows.length) {
+        hints.push("社員休みが多めの人を1日だけ出勤調整すると埋まる可能性あり。");
+      }
+      if (groups[2] && groups[2].rows.length) {
+        hints.push("枠全体ではなく、穴の時間だけ部分勤務で頼むと埋まる可能性あり。");
+      }
+      if (groups[3] && groups[3].rows.length) {
+        hints.push("通常候補が厳しい場合は、まこつ。/りえの最終応援候補あり。");
+      }
+      if (!hints.length) {
+        hints.push("候補なし。必要人数、時間帯、店舗応援可否、本人希望のどれかを見直す必要あり。");
+      }
+      return hints;
+    }
+
+    function lineTextForShortage(row, candidates = []) {
+      row = normalizeShortageDetailRow(row);
+      if (!row) return "";
+      const date = row.date || new Date(`${row.dateIso}T00:00:00`);
+      const names = candidates.length ? candidates.map(item => `${item.person.name}(${item.time})`).join("、") : "候補確認中";
+      return [
+        "お疲れさまです。",
+        `${dateLabel(date)}(${dowLabel(date)}) ${stores[row.storeKey].name} ${row.timeLabel} が${row.shortage}名不足しています。`,
+        `候補: ${names}`,
+        "入れる方がいれば教えてください。"
+      ].join("\n");
+    }
+
+    function renderShortageHoleDetail(row = selectedShortageRow()) {
+      const box = document.getElementById("shortageHoleDetail");
+      if (!box) return;
+      row = normalizeShortageDetailRow(row);
+      if (!row) {
+        box.innerHTML = `<div class="muted">色付きの穴を押すと、候補とLINE文面が出ます。</div>`;
+        return;
+      }
+      const groups = candidatePriorityGroupsFor(row);
+      const allCandidates = groups.flatMap(group => group.rows);
+      const hints = relaxHintsFor(row, groups);
+      box.innerHTML = `
+        <div class="detail-box">
+          <h3>${stores[row.storeKey].name} ${dateLabel(row.date)}(${dowLabel(row.date)}) ${row.timeLabel}</h3>
+          <div class="status-row">
+            <span class="tag ${row.shortage >= 2 ? "bad" : "warn"}">不足${row.shortage}</span>
+            <span class="tag">必要${row.req}</span>
+            <span class="tag">配置${row.count}</span>
+          </div>
+        </div>
+        ${groups.map(group => `
+          <div class="detail-box">
+            <h3>${group.label}</h3>
+            ${group.rows.length ? group.rows.map(item => `
+              <div class="candidate">
+                <div>
+                  <strong>${item.person.name}</strong>
+                  <div class="reason">${item.time} / 理由：${item.reason || item.tier} / 適合 ${item.score}</div>
+                </div>
+                <button class="btn small ${group.label === "最終応援" ? "" : "primary"}" type="button"
+                  data-shortage-add="${item.person.name}"
+                  data-shortage-time="${item.time}"
+                  data-shortage-options="${item.tier || group.label}">
+                  入れる
+                </button>
+              </div>
+            `).join("") : `<div class="muted">該当候補なし</div>`}
+          </div>
+        `).join("")}
+        <div class="detail-box">
+          <h3>条件を緩めるなら</h3>
+          ${hints.map(hint => `<div class="person"><span>${hint}</span></div>`).join("")}
+        </div>
+        <div class="detail-box">
+          <h3>LINE文面</h3>
+          <textarea class="textarea" readonly>${lineTextForShortage(row, allCandidates.slice(0, 4))}</textarea>
+        </div>
+      `;
+      box.querySelectorAll("[data-shortage-add]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const person = staff.find(item => item.name === canonicalStaffName(btn.dataset.shortageAdd));
+          if (!person) return;
+          const tier = btn.dataset.shortageOptions || "";
+          const options = tier === "部分勤務"
+            ? generationOptions({ allowPartialOverlap: true, requireFullSlotCoverage: false, allowSupport: false })
+            : tier === "最終応援"
+              ? generationOptions({ allowSupport: true })
+              : generationOptions({ allowSupport: false });
+          const added = addShiftToDay(row.dateIso, row.storeKey, person, btn.dataset.shortageTime, options);
+          if (added) {
+            renderShortage();
+            showToast(`${stores[row.storeKey].name} ${row.timeLabel} に ${person.name} を追加`);
+          } else {
+            showToast("この候補は今の条件では入れられない");
+          }
+        });
+      });
+    }
+
+    function renderShortageTimelineMap() {
+      const wrap = document.getElementById("shortageTimelineMap");
+      if (!wrap) return;
+      const dateIso = ensureShortageMapDate();
+      const date = new Date(`${dateIso}T00:00:00`);
+      const filter = document.getElementById("shortageStore").value;
+      const keys = storeOrder.filter(storeKey => filter === "all" || filter === storeKey);
+      const ticks = [0, 6, 9, 13, 17, 22, 24].map(hour => `
+        <span class="timeline-tick" style="left:${(hour / 24) * 100}%"><span>${dayHourLabel(hour)}</span></span>
+      `).join("");
+      wrap.innerHTML = `
+        <div class="muted">${dateLabel(date)}(${dowLabel(date)}) の穴マップ。線の上に色が付いたところが不足。</div>
+        ${keys.map(storeKey => {
+          const segments = dailyShortageSegments(storeKey, dateIso);
+          const maxShortage = segments.reduce((max, item) => Math.max(max, item.shortage), 0);
+          const total = segments.reduce((sum, item) => sum + item.shortage, 0);
+          return `
+            <div class="timeline-row">
+              <div class="timeline-store">${stores[storeKey].name}</div>
+              <div class="timeline-track" aria-label="${stores[storeKey].name} ${dateIso} 不足タイムライン">
+                ${ticks}
+                ${segments.map(item => {
+                  const left = (item.startHour / 24) * 100;
+                  const width = ((item.endHour - item.startHour) / 24) * 100;
+                  const label = `${dayHourRangeLabel(item.startHour, item.endHour)} 不足${item.shortage}`;
+                  const selected = state.selectedShortageHole
+                    && state.selectedShortageHole.dateIso === dateIso
+                    && state.selectedShortageHole.storeKey === storeKey
+                    && state.selectedShortageHole.startHour === item.startHour
+                    && state.selectedShortageHole.endHour === item.endHour;
+                  return `
+                    <button class="hole-segment ${item.shortage >= 2 ? "bad" : ""} ${selected ? "selected" : ""}"
+                      type="button"
+                      data-hole-store="${storeKey}"
+                      data-hole-date="${dateIso}"
+                      data-hole-start="${item.startHour}"
+                      data-hole-end="${item.endHour}"
+                      style="left:${left}%;width:${width}%"
+                      title="${label} / 必要${item.req} 配置${item.count} / ${item.slots.join("、")}">
+                      ${item.shortage}
+                    </button>
+                  `;
+                }).join("")}
+              </div>
+              <div class="timeline-summary">
+                ${segments.length
+                  ? `<span class="tag ${maxShortage >= 2 ? "bad" : "warn"}">穴${segments.length}本 / 不足${total}</span>`
+                  : `<span class="tag ok">穴なし</span>`}
+              </div>
+            </div>
+          `;
+        }).join("")}
+      `;
+      wrap.querySelectorAll("[data-hole-store]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.selectedShortageHole = {
+            storeKey: btn.dataset.holeStore,
+            dateIso: btn.dataset.holeDate,
+            startHour: Number(btn.dataset.holeStart),
+            endHour: Number(btn.dataset.holeEnd)
+          };
+          renderShortageTimelineMap();
+          renderShortageHoleDetail();
+        });
+      });
+      renderShortageHoleDetail();
+    }
+
     function renderShortage() {
       const filter = document.getElementById("shortageStore").value;
-      const rows = collectShortages(filter);
+      const rows = collectShortageDisplayRows(filter);
       const body = document.getElementById("shortageBody");
+      renderShortageTimelineMap();
       body.innerHTML = rows.map(row => {
-        const candidates = candidatesFor(row.storeKey, row.slot, row.dateIso).slice(0, 3).map(item => item.person.name).join("、");
         return `
           <tr>
             <td>${dateLabel(row.date)}(${dowLabel(row.date)})</td>
             <td>${stores[row.storeKey].name}</td>
-            <td>${row.slot}</td>
+            <td><span class="tag bad">${row.kind}</span></td>
+            <td>${row.timeLabel}</td>
             <td>${row.req}</td>
             <td>${row.count}</td>
             <td><span class="tag bad">${row.shortage}</span></td>
-            <td>${candidates || "-"}</td>
+            <td>${row.candidateLabel || "-"}</td>
           </tr>
         `;
       }).join("") || `
         <tr>
-          <td colspan="7"><span class="tag ok">不足なし</span></td>
+          <td colspan="8"><span class="tag ok">不足なし</span></td>
         </tr>
       `;
       renderLineMessage();
@@ -2876,29 +4222,134 @@
       return isCoreEmployee(person) ? 7 : 0;
     }
 
+    function restAdjustmentHint(person, restDiff) {
+      if (person.name === "木村" && restDiff > 0) {
+        return "火曜で調整候補";
+      }
+      if (restDiff > 0) return "出勤調整候補";
+      if (restDiff < 0) return "休み追加候補";
+      return "OK";
+    }
+
+    function offDaysInDates(personName, dates) {
+      return dates.filter(date => !isPersonAssignedOnDate(iso(date), personName)).length;
+    }
+
     function offDaysInPeriod(personName) {
-      return periodDates().filter(date => !isPersonAssignedOnDate(iso(date), personName)).length;
+      return offDaysInDates(personName, periodDates());
+    }
+
+    function storeHasScheduleOnDate(dateIso, storeKey) {
+      return slots.some(slot => readCell(dateIso, storeKey, slot).length > 0);
+    }
+
+    function generatedDatesForCorePerson(person, storeFilter = "all", dates = periodDates()) {
+      const storeKeys = (person.stores || []).filter(storeKey => (
+        storeFilter === "all" || storeFilter === storeKey
+      ));
+      if (!storeKeys.length) return [];
+      return dates.filter(date => {
+        const dateIso = iso(date);
+        return storeKeys.some(storeKey => storeHasScheduleOnDate(dateIso, storeKey));
+      });
+    }
+
+    function targetOffDaysForGeneratedDates(person, generatedDates) {
+      const fullTarget = targetOffDays(person);
+      if (!fullTarget || !generatedDates.length) return 0;
+      const fullPeriodDays = periodDates().length || generatedDates.length;
+      if (generatedDates.length >= fullPeriodDays) return fullTarget;
+      return Math.max(1, Math.round(fullTarget * generatedDates.length / fullPeriodDays));
+    }
+
+    function coreRestRows(storeFilter = "all", displayDates = periodDates()) {
+      const period = periodDates();
+      const periodSet = new Set(period.map(date => iso(date)));
+      const activeDisplayDates = displayDates.filter(date => periodSet.has(iso(date)));
+      return staff
+        .filter(person => isCoreEmployee(person) && targetOffDays(person) > 0)
+        .filter(person => storeFilter === "all" || canWorkAtStore(person, storeFilter))
+        .map(person => {
+          const generatedPeriodDates = generatedDatesForCorePerson(person, storeFilter, period);
+          if (!generatedPeriodDates.length) return null;
+          const generatedPeriodSet = new Set(generatedPeriodDates.map(date => iso(date)));
+          const generatedDisplayDates = activeDisplayDates.filter(date => generatedPeriodSet.has(iso(date)));
+          const periodOffDays = offDaysInDates(person.name, generatedPeriodDates);
+          const displayOffDays = offDaysInDates(person.name, generatedDisplayDates);
+          const periodPaidLeaveDays = paidLeaveDaysInDates(person.name, generatedPeriodDates);
+          const displayPaidLeaveDays = paidLeaveDaysInDates(person.name, generatedDisplayDates);
+          const periodEmergencyDays = emergencyAbsenceDaysInDates(person.name, generatedPeriodDates);
+          const displayEmergencyDays = emergencyAbsenceDaysInDates(person.name, generatedDisplayDates);
+          const target = targetOffDaysForGeneratedDates(person, generatedPeriodDates);
+          return {
+            person,
+            target,
+            periodDays: generatedPeriodDates.length,
+            periodOffDays,
+            periodPaidLeaveDays,
+            periodEmergencyDays,
+            displayDays: generatedDisplayDates.length,
+            displayOffDays,
+            displayPaidLeaveDays,
+            displayEmergencyDays,
+            shortage: Math.max(0, target - periodOffDays),
+            excess: Math.max(0, periodOffDays - target),
+            restDiff: periodOffDays - target
+          };
+        })
+        .filter(Boolean);
+    }
+
+    function renderCoreRestSummary(elementId, storeFilter, displayDates, mode = "monthly") {
+      const box = document.getElementById(elementId);
+      if (!box) return;
+      const rows = coreRestRows(storeFilter, displayDates);
+      const label = mode === "weekly"
+        ? "週休 / 月休"
+        : "月間休み";
+      box.innerHTML = `
+        <div class="rest-summary-title">
+          社員休みカウント
+          <span>${label}</span>
+        </div>
+        <div class="rest-count-grid">
+          ${rows.map(row => {
+            const status = row.shortage > 0
+              ? `休み不足 あと${row.shortage}日`
+              : row.excess > 0
+                ? `休み多い +${row.excess}日`
+                : "OK";
+            const hint = restAdjustmentHint(row.person, row.restDiff);
+            const className = row.shortage > 0 || row.excess > 0 ? "rest-warn" : "rest-ok";
+            const leaveMeta = `有給${row.periodPaidLeaveDays}日 / 急休${row.periodEmergencyDays}日`;
+            const meta = mode === "weekly"
+              ? `週${row.displayOffDays}/${row.displayDays}日（有給${row.displayPaidLeaveDays}・急休${row.displayEmergencyDays}） / 月${row.periodOffDays}/${row.target}日 ${leaveMeta} ${status} ${hint}`
+              : `月${row.periodOffDays}/${row.target}日 ${leaveMeta} ${status} ${hint}`;
+            return `
+              <div class="rest-count-item ${className}">
+                <strong>${row.person.name}</strong>
+                <span class="rest-meta">${meta}</span>
+              </div>
+            `;
+          }).join("") || `<div class="muted">対象の社員・店長なし</div>`}
+        </div>
+      `;
     }
 
     function collectCoreRestIssues(storeFilter = "all") {
       const dates = periodDates();
       const reportDate = dates[dates.length - 1] || new Date();
-      return staff
-        .filter(person => isCoreEmployee(person) && targetOffDays(person) > 0)
-        .filter(person => storeFilter === "all" || canWorkAtStore(person, storeFilter))
-        .map(person => {
-          const offDays = offDaysInPeriod(person.name);
-          const target = targetOffDays(person);
-          return { person, offDays, target, shortage: Math.max(0, target - offDays) };
-        })
-        .filter(row => row.shortage > 0)
+      return coreRestRows(storeFilter)
+        .filter(row => row.shortage > 0 || row.excess > 0)
         .map(row => ({
           level: "注意",
           severity: 2,
           date: reportDate,
           storeKey: row.person.stores[0] || "miyanoshita",
           target: row.person.name,
-          message: `社員休み ${row.offDays}/${row.target}日。あと${row.shortage}日休みが必要`
+          message: row.shortage > 0
+            ? `社員休み ${row.periodOffDays}/${row.target}日。有給${row.periodPaidLeaveDays}日/急休${row.periodEmergencyDays}日。あと${row.shortage}日休みが必要`
+            : `社員休み ${row.periodOffDays}/${row.target}日。有給${row.periodPaidLeaveDays}日/急休${row.periodEmergencyDays}日。休み多め +${row.excess}日。${restAdjustmentHint(row.person, row.restDiff)}`
         }));
     }
 
@@ -2944,13 +4395,18 @@
                 });
               }
               if (isUnavailable(person.name, dateIso)) {
+                const unavailableReason = isPaidLeave(person.name, dateIso)
+                  ? "有給"
+                  : isEmergencyAbsence(person.name, dateIso)
+                    ? "急遽休み"
+                    : "希望休";
                 issues.push({
                   level: "危険",
                   severity: 3,
                   date,
                   storeKey,
                   target: person.name,
-                  message: `希望休なのに${slot}へ配置`
+                  message: `${unavailableReason}なのに${slot}へ配置`
                 });
               }
             });
@@ -3048,17 +4504,6 @@
         flushStreak();
       });
 
-      collectHourlyShortages(storeFilter).forEach(row => {
-        issues.push({
-          level: "注意",
-          severity: 2,
-          date: row.date,
-          storeKey: row.storeKey,
-          target: `${row.slot} / ${hourRangeLabel(row.startHour, row.endHour)}`,
-          message: `時間別不足: 必要${row.req}人に対して${row.count}人。枠内の一部だけ穴の可能性`
-        });
-      });
-
       issues.push(...collectCoreRestIssues(storeFilter));
 
       return issues.sort((a, b) => b.severity - a.severity || a.date - b.date);
@@ -3108,7 +4553,7 @@
       const box = document.getElementById("lineMessage");
       if (!box) return;
       const filter = document.getElementById("shortageStore").value;
-      const first = collectShortages(filter)[0];
+      const first = collectAllShortages(filter)[0];
       if (!first) {
         box.value = "不足枠はありません。";
         return;
@@ -3118,14 +4563,14 @@
         .map(item => item.person.name);
       box.value = [
         "お疲れさまです。",
-        `${dateLabel(first.date)}(${dowLabel(first.date)}) ${stores[first.storeKey].name} ${first.slot} が${first.shortage}名不足しています。`,
+        `${dateLabel(first.date)}(${dowLabel(first.date)}) ${stores[first.storeKey].name} ${first.timeLabel} が${first.shortage}名不足しています。`,
         candidates.length ? `候補: ${candidates.join("、")}` : "候補が見つかっていません。",
         "入れる方がいれば教えてください。"
       ].join("\n");
     }
 
     function renderOwnerDashboard() {
-      const shortages = collectShortages("all");
+      const shortages = collectShortageDisplayRows("all");
       const issues = collectIssues("all");
       const totalLabor = storeOrder.reduce((sum, storeKey) => sum + storeLabor(storeKey), 0);
       document.getElementById("ownerShortage").textContent = String(shortages.length);
@@ -3134,7 +4579,7 @@
       document.getElementById("ownerLabor").textContent = `¥${totalLabor.toLocaleString()}`;
 
       document.getElementById("ownerStoreBody").innerHTML = storeOrder.map(storeKey => {
-        const storeShortages = collectShortages(storeKey).length;
+        const storeShortages = collectShortageDisplayRows(storeKey).length;
         const storeIssues = collectIssues(storeKey).length;
         return `
           <tr class="${storeShortages || storeIssues ? "warn-row" : ""}">
@@ -3148,7 +4593,7 @@
       }).join("");
 
       const priority = [
-        ...shortages.slice(0, 3).map(row => `${dateLabel(row.date)} ${stores[row.storeKey].name} ${row.slot} 不足${row.shortage}`),
+        ...shortages.slice(0, 3).map(row => `${dateLabel(row.date)} ${stores[row.storeKey].name} 不足${row.shortage}`),
         ...issues.slice(0, 2).map(issue => `${dateLabel(issue.date)} ${issue.target}: ${issue.message}`)
       ];
       document.getElementById("ownerPriority").innerHTML = priority.length
@@ -3173,30 +4618,25 @@
       });
       grid.innerHTML = filtered.map(person => `
         <div class="staff-card">
-          <strong>${person.name}</strong>
+          <strong>${canonicalStaffName(person.name)}</strong>
           <div class="muted">${person.stores.map(key => stores[key].name).join(" / ")}</div>
           <div class="pill-row">
             ${person.tags.map(tag => `<span class="tag ${person.support ? "warn" : ""}">${tag}</span>`).join("")}
           </div>
           <div class="reason">曜日: ${(person.days || []).join("、") || "全曜日"}</div>
           <div class="reason">対応時間: ${person.times.join("、")}</div>
-          <div class="reason">希望休: ${(availability[person.name] || []).join("、") || "なし"}</div>
+          <div class="reason">希望休: ${(availability[canonicalStaffName(person.name)] || []).join("、") || "なし"}</div>
+          <div class="reason">有給: ${(paidLeave[canonicalStaffName(person.name)] || []).join("、") || "なし"}</div>
+          <div class="reason">急遽休み: ${(emergencyAbsences[canonicalStaffName(person.name)] || []).join("、") || "なし"}</div>
           <div class="status-row">
-            <button class="btn small" type="button" data-edit-staff="${person.name}">編集</button>
-            <button class="btn small" type="button" data-remove-staff="${person.name}">削除</button>
+            <button class="btn small" type="button" data-edit-staff="${canonicalStaffName(person.name)}">編集</button>
+            <button class="btn small" type="button" data-remove-staff="${canonicalStaffName(person.name)}">削除</button>
           </div>
         </div>
       `).join("") || `<div class="muted">該当スタッフなし</div>`;
       grid.querySelectorAll("[data-edit-staff]").forEach(btn => {
         btn.addEventListener("click", () => {
-          const person = staff.find(item => item.name === btn.dataset.editStaff);
-          if (!person) return;
-          document.getElementById("newStaffName").value = person.name;
-          document.getElementById("newStaffStores").value = person.stores.map(key => stores[key].name).join("/");
-          document.getElementById("newStaffDays").value = person.days && person.days.length ? person.days.join("/") : "全曜日";
-          document.getElementById("newStaffTimes").value = person.times.join("/");
-          document.getElementById("newStaffTags").value = person.tags.join("/");
-          document.getElementById("newStaffSupport").value = String(Boolean(person.support));
+          openStaffEditor(btn.dataset.editStaff);
         });
       });
       grid.querySelectorAll("[data-remove-staff]").forEach(btn => {
@@ -3205,6 +4645,8 @@
           const index = staff.findIndex(item => item.name === name);
           if (index >= 0) staff.splice(index, 1);
           delete availability[name];
+          delete paidLeave[name];
+          delete emergencyAbsences[name];
           removeStaffFromSchedule(name);
           renderAll();
           showToast(`${name}を削除した`);
@@ -3215,19 +4657,34 @@
     function renderAvailability() {
       const select = document.getElementById("availabilityStaff");
       const current = select.value;
-      select.innerHTML = staff.map(person => `<option value="${person.name}">${person.name}</option>`).join("");
-      if (staff.some(person => person.name === current)) select.value = current;
+      syncSelectOptions(select, staff.map(person => `<option value="${person.name}">${person.name}</option>`).join(""), current);
       const list = document.getElementById("availabilityList");
-      list.innerHTML = staff.map(person => `
+      list.innerHTML = staff.map(person => {
+        const name = canonicalStaffName(person.name);
+        return `
         <div class="staff-card">
-          <strong>${person.name}</strong>
+          <strong>${name}</strong>
+          <div class="reason">希望休</div>
           <div class="pill-row">
-            ${(availability[person.name] || []).map(dateIso => `
-              <button class="btn small" type="button" data-remove-availability="${person.name}|${dateIso}">${dateIso} を削除</button>
+            ${(availability[name] || []).map(dateIso => `
+              <button class="btn small" type="button" data-remove-availability="${name}|${dateIso}">${dateIso} を削除</button>
             `).join("") || `<span class="muted">希望休なし</span>`}
           </div>
+          <div class="reason">有給</div>
+          <div class="pill-row">
+            ${(paidLeave[name] || []).map(dateIso => `
+              <button class="btn small" type="button" data-remove-paid-leave="${name}|${dateIso}">${dateIso} を削除</button>
+            `).join("") || `<span class="muted">有給なし</span>`}
+          </div>
+          <div class="reason">急遽休み</div>
+          <div class="pill-row">
+            ${(emergencyAbsences[name] || []).map(dateIso => `
+              <button class="btn small" type="button" data-remove-emergency-absence="${name}|${dateIso}">${dateIso} を削除</button>
+            `).join("") || `<span class="muted">急遽休みなし</span>`}
+          </div>
         </div>
-      `).join("");
+      `;
+      }).join("");
       list.querySelectorAll("[data-remove-availability]").forEach(btn => {
         btn.addEventListener("click", () => {
           const [name, dateIso] = btn.dataset.removeAvailability.split("|");
@@ -3235,31 +4692,205 @@
           renderAll();
         });
       });
+      list.querySelectorAll("[data-remove-paid-leave]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const [name, dateIso] = btn.dataset.removePaidLeave.split("|");
+          paidLeave[name] = (paidLeave[name] || []).filter(item => item !== dateIso);
+          renderAll();
+        });
+      });
+      list.querySelectorAll("[data-remove-emergency-absence]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const [name, dateIso] = btn.dataset.removeEmergencyAbsence.split("|");
+          emergencyAbsences[name] = (emergencyAbsences[name] || []).filter(item => item !== dateIso);
+          renderAll();
+        });
+      });
     }
 
     function renderMetrics() {
       document.getElementById("metricPeriod").textContent = periodLabel();
-      document.getElementById("metricShortage").textContent = String(collectShortages("all").length);
+      document.getElementById("metricShortage").textContent = String(collectShortageGroupCount("all"));
       document.getElementById("metricStaff").textContent = String(staff.length);
     }
 
+    function syncSelectOptions(select, html, preferredValue = "") {
+      if (!select) return;
+      if (document.activeElement === select) return;
+      const current = preferredValue || select.value;
+      if (select.innerHTML !== html) select.innerHTML = html;
+      if ([...select.options].some(option => option.value === current)) {
+        select.value = current;
+      }
+    }
+
+    function emergencyCandidateRows() {
+      const name = canonicalStaffName(document.getElementById("homeEmergencyStaff").value);
+      const dateIso = document.getElementById("homeEmergencyDate").value || state.today;
+      const storeKey = document.getElementById("homeEmergencyStore").value;
+      const slot = document.getElementById("homeEmergencySlot").value;
+      const options = generationOptions({ respectCapacity: false, allowSupport: true });
+      return candidatesFor(storeKey, slot, dateIso, options)
+        .filter(item => item.person.name !== name)
+        .filter(item => !isUnavailable(item.person.name, dateIso))
+        .filter(item => !isPersonAssignedOnDate(dateIso, item.person.name))
+        .slice(0, 6);
+    }
+
+    function renderHomeEmergency() {
+      const staffSelect = document.getElementById("homeEmergencyStaff");
+      const dateInput = document.getElementById("homeEmergencyDate");
+      const storeSelect = document.getElementById("homeEmergencyStore");
+      const slotSelect = document.getElementById("homeEmergencySlot");
+      const list = document.getElementById("homeEmergencyCandidates");
+      if (!staffSelect || !dateInput || !storeSelect || !slotSelect || !list) return;
+
+      const currentStaff = canonicalStaffName(staffSelect.value);
+      const staffOptions = staff
+        .filter(person => !person.support)
+        .map(person => `<option value="${person.name}">${person.name}</option>`)
+        .join("");
+      syncSelectOptions(staffSelect, staffOptions, currentStaff);
+      if (!dateInput.value) dateInput.value = state.today;
+
+      const name = canonicalStaffName(staffSelect.value);
+      const dateIso = dateInput.value;
+      const storeKey = storeSelect.value;
+      const slot = slotSelect.value;
+      const existing = readCell(dateIso, storeKey, slot).filter(item => item.name === name);
+      const candidates = emergencyCandidateRows();
+      list.innerHTML = `
+        <div class="muted">
+          ${name}を${dateIso} ${stores[storeKey].name} ${slot}で急遽休みにする想定。
+          ${existing.length ? "この枠に配置あり。" : "この枠には未配置。"}
+        </div>
+        ${candidates.map(({ person, score, time }) => `
+          <div class="candidate">
+            <div>
+              <strong>${person.name}</strong>
+              <div class="reason">${time || pickTime(person, slot, dateIso, storeKey)} / ${person.tags.join(" / ")} / 適合 ${score}</div>
+            </div>
+            <button class="btn small ${person.support ? "" : "primary"}" type="button" data-emergency-add="${person.name}">入れる</button>
+          </div>
+        `).join("") || `<div class="muted">候補が見つかりません。応援マルチか条件修正が必要。</div>`}
+      `;
+      list.querySelectorAll("[data-emergency-add]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const person = findStaff(btn.dataset.emergencyAdd);
+          if (!person) return;
+          const time = pickTime(person, slot, dateIso, storeKey, {
+            respectCapacity: false,
+            allowSupport: true,
+            allowPartialOverlap: false,
+            requireFullSlotCoverage: true,
+            targetSlot: slot,
+            enforceCoreWorkLimit: true,
+            loadMap: buildLoadMap()
+          });
+          makeRoomForCore(dateIso, storeKey, person, time, {
+            respectCapacity: true,
+            preventDoubleBooking: true,
+            allowPartialOverlap: false,
+            requireFullSlotCoverage: true,
+            targetSlot: slot,
+            enforceCoreWorkLimit: true,
+            loadMap: buildLoadMap()
+          });
+          const added = addShiftToDay(dateIso, storeKey, person, time, {
+            respectCapacity: true,
+            preventDoubleBooking: true,
+            allowSupport: true,
+            avoidLongStreak: true,
+        maxConsecutiveWorkDays: 5,
+        strictConsecutiveLimit: true,
+        allowPartialOverlap: false,
+            requireFullSlotCoverage: true,
+            targetSlot: slot,
+            enforceCoreWorkLimit: true,
+            loadMap: buildLoadMap()
+          });
+          renderAll();
+          showToast(added ? `${stores[storeKey].name} ${slot} に ${person.name} を入れた` : "この候補は過剰なしでは入れられない");
+        });
+      });
+    }
+
+    function applyHomeEmergencyAbsence() {
+      const name = canonicalStaffName(document.getElementById("homeEmergencyStaff").value);
+      const dateIso = document.getElementById("homeEmergencyDate").value || state.today;
+      if (!emergencyAbsences[name]) emergencyAbsences[name] = [];
+      if (!emergencyAbsences[name].includes(dateIso)) emergencyAbsences[name].push(dateIso);
+      const removed = removePersonFromDate(dateIso, name);
+      renderAll();
+      showToast(removed ? `${name}を${dateIso}の急遽休みにしてシフトから外した` : `${name}を${dateIso}の急遽休みにした`);
+    }
+
+    function renderActiveView(view = state.currentView) {
+      if (view === "dashboard") {
+        renderMetrics();
+        renderHomeEmergency();
+        return;
+      }
+      if (view === "monthly") {
+        renderRequirements();
+        renderMonthlyTable();
+        renderSelectedDetail();
+        return;
+      }
+      if (view === "today") {
+        renderToday();
+        return;
+      }
+      if (view === "owner") {
+        renderOwnerDashboard();
+        return;
+      }
+      if (view === "finished") {
+        renderFinished();
+        return;
+      }
+      if (view === "shortage") {
+        renderShortage();
+        return;
+      }
+      if (view === "issues") {
+        renderIssues();
+        return;
+      }
+      if (view === "availability") {
+        renderAvailability();
+        return;
+      }
+      if (view === "staff") {
+        renderStaff();
+        return;
+      }
+      if (view === "data") {
+        renderDataBox();
+        return;
+      }
+      renderHomeEmergency();
+    }
+
     function renderAll() {
-      sanitizeInvalidStoreAssignments();
-      renderRequirements();
-      renderMonthlyTable();
-      renderSelectedDetail();
-      renderToday();
-      renderOwnerDashboard();
-      renderFinished();
-      renderShortage();
-      renderIssues();
-      renderStaff();
-      renderAvailability();
-      renderMetrics();
-      persistState();
+      const steps = [
+        ["名前正規化", normalizeSavedNames],
+        ["店舗割当チェック", sanitizeInvalidStoreAssignments],
+        ["ホーム指標", renderMetrics],
+        ["現在画面", () => renderActiveView(state.currentView)],
+        ["保存", persistState]
+      ];
+      steps.forEach(([label, fn]) => {
+        try {
+          fn();
+        } catch (error) {
+          reportError(label, error);
+        }
+      });
     }
 
     function switchView(view) {
+      state.currentView = view;
       Object.keys(dom.views).forEach(key => {
         const element = dom.views[key];
         if (element) element.classList.toggle("hidden", key !== view);
@@ -3267,13 +4898,7 @@
       document.querySelectorAll("[data-view]").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.view === view);
       });
-      if (view === "finished") renderFinished();
-      if (view === "shortage") renderShortage();
-      if (view === "today") renderToday();
-      if (view === "owner") renderOwnerDashboard();
-      if (view === "issues") renderIssues();
-      if (view === "availability") renderAvailability();
-      if (view === "data") renderDataBox();
+      renderActiveView(view);
     }
 
     function syncPeriodFromHome() {
@@ -3341,6 +4966,42 @@
       window.setTimeout(() => dom.toast.classList.remove("show"), 1800);
     }
 
+    function reportError(label, error) {
+      console.error(label, error);
+      const status = document.getElementById("jsStatus");
+      if (status) {
+        status.className = "status-bar warn";
+        status.textContent = `${label}でエラー。ほかの操作は継続できます`;
+      }
+    }
+
+    function safeRun(label, handler) {
+      return (...args) => {
+        try {
+          return handler(...args);
+        } catch (error) {
+          reportError(label, error);
+          showToast(`${label}で止まりました。画面下の保存/出力からJSON退避できます`);
+          return undefined;
+        }
+      };
+    }
+
+    function on(id, eventName, label, handler) {
+      const element = document.getElementById(id);
+      if (!element) {
+        reportError(`ボタン未検出:${id}`, new Error(`missing element ${id}`));
+        return;
+      }
+      element.addEventListener(eventName, safeRun(label || id, handler));
+    }
+
+    function onAll(selector, eventName, label, handler) {
+      document.querySelectorAll(selector).forEach(element => {
+        element.addEventListener(eventName, safeRun(label || selector, event => handler(event, element)));
+      });
+    }
+
     function normalizeStore(value) {
       const text = value.trim();
       if (!text) return null;
@@ -3396,7 +5057,97 @@
       if (index >= 0) staff[index] = clean;
       else staff.push(clean);
       if (!availability[clean.name]) availability[clean.name] = [];
+      if (!paidLeave[clean.name]) paidLeave[clean.name] = [];
+      if (!emergencyAbsences[clean.name]) emergencyAbsences[clean.name] = [];
       return true;
+    }
+
+    function findStaffByName(name) {
+      const target = canonicalStaffName(name);
+      return staff.find(person => canonicalStaffName(person.name) === target);
+    }
+
+    function moveDateMapEntries(map, oldName, newName) {
+      const oldKey = canonicalStaffName(oldName);
+      const newKey = canonicalStaffName(newName);
+      if (!oldKey || !newKey || oldKey === newKey || !map[oldKey]) return;
+      map[newKey] = [...new Set([...(map[newKey] || []), ...map[oldKey]])];
+      delete map[oldKey];
+    }
+
+    function renameStaffReferences(oldName, newName) {
+      const oldKey = canonicalStaffName(oldName);
+      const newKey = canonicalStaffName(newName);
+      if (!oldKey || !newKey || oldKey === newKey) return;
+      Object.values(state.schedule).forEach(storeMap => {
+        Object.values(storeMap).forEach(slotMap => {
+          Object.keys(slotMap).forEach(slot => {
+            if (!Array.isArray(slotMap[slot])) return;
+            slotMap[slot].forEach(assignment => {
+              if (canonicalStaffName(assignment.name) === oldKey) assignment.name = newKey;
+            });
+          });
+        });
+      });
+      moveDateMapEntries(availability, oldKey, newKey);
+      moveDateMapEntries(paidLeave, oldKey, newKey);
+      moveDateMapEntries(emergencyAbsences, oldKey, newKey);
+    }
+
+    function closeStaffEditor() {
+      editingStaffName = "";
+      const modal = document.getElementById("staffEditModal");
+      if (modal) modal.classList.add("hidden");
+    }
+
+    function openStaffEditor(name) {
+      const person = findStaffByName(name);
+      if (!person) return;
+      editingStaffName = canonicalStaffName(person.name);
+      document.getElementById("editStaffName").value = person.name;
+      document.getElementById("editStaffStores").value = (person.stores || []).map(key => stores[key]?.name || key).join("/");
+      document.getElementById("editStaffDays").value = person.days && person.days.length ? person.days.join("/") : "全曜日";
+      document.getElementById("editStaffTimes").value = (person.times || []).join("/");
+      document.getElementById("editStaffTags").value = (person.tags || []).join("/");
+      document.getElementById("editStaffSupport").value = String(Boolean(person.support));
+      document.getElementById("staffEditModal").classList.remove("hidden");
+      document.getElementById("editStaffName").focus();
+    }
+
+    function saveStaffEditor() {
+      const oldName = editingStaffName;
+      const name = canonicalStaffName(document.getElementById("editStaffName").value.trim());
+      if (!oldName || !name) {
+        showToast("名前が必要");
+        return;
+      }
+      const clean = {
+        name,
+        stores: parseStores(document.getElementById("editStaffStores").value),
+        days: parseDays(document.getElementById("editStaffDays").value),
+        times: splitValues(document.getElementById("editStaffTimes").value),
+        tags: splitValues(document.getElementById("editStaffTags").value),
+        support: document.getElementById("editStaffSupport").value === "true"
+      };
+      if (!clean.times.length) clean.times = ["9-18"];
+      if (!clean.tags.length) clean.tags = ["未分類"];
+      clean.slots = slotsFromTimes(clean.times);
+      if (!clean.slots.length) clean.slots = [...slots];
+      const existingIndex = staff.findIndex(person => canonicalStaffName(person.name) === oldName);
+      const duplicateIndex = staff.findIndex(person => canonicalStaffName(person.name) === name);
+      if (duplicateIndex >= 0 && duplicateIndex !== existingIndex) {
+        showToast("同じ名前のスタッフがいる");
+        return;
+      }
+      if (existingIndex >= 0) staff[existingIndex] = clean;
+      else staff.push(clean);
+      renameStaffReferences(oldName, clean.name);
+      if (!availability[clean.name]) availability[clean.name] = [];
+      if (!paidLeave[clean.name]) paidLeave[clean.name] = [];
+      if (!emergencyAbsences[clean.name]) emergencyAbsences[clean.name] = [];
+      closeStaffEditor();
+      renderAll();
+      showToast(`${clean.name}の勤務条件を保存した`);
     }
 
     function addStaffFromForm() {
@@ -3417,6 +5168,22 @@
       document.getElementById("newStaffSupport").value = "false";
       renderAll();
       showToast(`${name}を追加/更新した`);
+    }
+
+    function addDateBlock(type) {
+      const name = canonicalStaffName(document.getElementById("availabilityStaff").value);
+      const dateIso = document.getElementById("availabilityDate").value;
+      const map = type === "paid" ? paidLeave : type === "emergency" ? emergencyAbsences : availability;
+      const label = type === "paid" ? "有給" : type === "emergency" ? "急遽休み" : "希望休";
+      if (!name || !dateIso) {
+        showToast("スタッフと日付を選んで");
+        return;
+      }
+      if (!map[name]) map[name] = [];
+      if (!map[name].includes(dateIso)) map[name].push(dateIso);
+      const removed = removePersonFromDate(dateIso, name);
+      renderAll();
+      showToast(removed ? `${name}の${dateIso}を${label}にしてシフトから外した` : `${name}の${dateIso}を${label}にした`);
     }
 
     function importStaffBulk() {
@@ -3490,6 +5257,7 @@
       });
       staff.length = 0;
       uniqueStaff.forEach(person => staff.push(person));
+      enforceKnownStaffCorrections();
 
       Object.values(state.schedule).forEach(storeMap => {
         Object.values(storeMap).forEach(slotMap => {
@@ -3507,9 +5275,19 @@
           availability[newName] = [...new Set([...(availability[newName] || []), ...availability[oldName]])];
           delete availability[oldName];
         }
+        if (paidLeave[oldName]) {
+          paidLeave[newName] = [...new Set([...(paidLeave[newName] || []), ...paidLeave[oldName]])];
+          delete paidLeave[oldName];
+        }
+        if (emergencyAbsences[oldName]) {
+          emergencyAbsences[newName] = [...new Set([...(emergencyAbsences[newName] || []), ...emergencyAbsences[oldName]])];
+          delete emergencyAbsences[oldName];
+        }
       });
       staff.forEach(person => {
         if (!availability[person.name]) availability[person.name] = [];
+        if (!paidLeave[person.name]) paidLeave[person.name] = [];
+        if (!emergencyAbsences[person.name]) emergencyAbsences[person.name] = [];
       });
     }
 
@@ -3520,13 +5298,16 @@
         today: state.today,
         selectedStore: state.selectedStore,
         selectedWeekStart: state.selectedWeekStart,
+        appVersion: "beta4.10.24",
         schedule: state.schedule,
         staff,
         requirements: storeOrder.reduce((map, storeKey) => {
           map[storeKey] = stores[storeKey].requirements;
           return map;
         }, {}),
-        availability
+        availability,
+        paidLeave,
+        emergencyAbsences
       };
     }
 
@@ -3554,6 +5335,20 @@
           availability[cleanName] = [...new Set([...(availability[cleanName] || []), ...(Array.isArray(dates) ? dates : [])])];
         });
       }
+      if (payload.paidLeave) {
+        Object.keys(paidLeave).forEach(name => delete paidLeave[name]);
+        Object.entries(payload.paidLeave).forEach(([name, dates]) => {
+          const cleanName = canonicalStaffName(name);
+          paidLeave[cleanName] = [...new Set([...(paidLeave[cleanName] || []), ...(Array.isArray(dates) ? dates : [])])];
+        });
+      }
+      if (payload.emergencyAbsences) {
+        Object.keys(emergencyAbsences).forEach(name => delete emergencyAbsences[name]);
+        Object.entries(payload.emergencyAbsences).forEach(([name, dates]) => {
+          const cleanName = canonicalStaffName(name);
+          emergencyAbsences[cleanName] = [...new Set([...(emergencyAbsences[cleanName] || []), ...(Array.isArray(dates) ? dates : [])])];
+        });
+      }
       normalizeSavedNames();
       sanitizeInvalidStoreAssignments();
       document.getElementById("homeMonth").value = state.month;
@@ -3568,7 +5363,7 @@
     function persistState() {
       if (!state.ready) return;
       try {
-        localStorage.setItem("makotsuShiftBeta410", JSON.stringify(serializeState()));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(serializeState()));
       } catch (error) {
         console.warn("save failed", error);
       }
@@ -3576,9 +5371,20 @@
 
     function loadPersistedState() {
       try {
-        const raw = localStorage.getItem("makotsuShiftBeta410") || localStorage.getItem("makotsuShiftBeta49") || localStorage.getItem("makotsuShiftBeta482") || localStorage.getItem("makotsuShiftBeta48") || localStorage.getItem("makotsuShiftBeta47") || localStorage.getItem("makotsuShiftBeta465") || localStorage.getItem("makotsuShiftBeta464") || localStorage.getItem("makotsuShiftBeta462") || localStorage.getItem("makotsuShiftBeta461") || localStorage.getItem("makotsuShiftBeta46");
-        if (!raw) return false;
-        return applySerialized(JSON.parse(raw));
+        const currentRaw = localStorage.getItem(STORAGE_KEY);
+        if (currentRaw) return applySerialized(JSON.parse(currentRaw));
+        for (const key of LEGACY_STORAGE_KEYS) {
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
+          const payload = JSON.parse(raw);
+          if (applySerialized(payload)) {
+            state.schedule = {};
+            state.selected = null;
+            state.needsFreshGeneration = true;
+            return true;
+          }
+        }
+        return false;
       } catch (error) {
         console.warn("load failed", error);
         return false;
@@ -3611,40 +5417,59 @@
     }
 
     function bindEvents() {
-      document.querySelectorAll("[data-view]").forEach(btn => {
-        btn.addEventListener("click", () => switchView(btn.dataset.view));
+      onAll("[data-view]", "click", "画面切替", (event, btn) => {
+        event.preventDefault();
+        switchView(btn.dataset.view);
       });
-      document.querySelectorAll("[data-jump]").forEach(btn => {
-        btn.addEventListener("click", () => switchView(btn.dataset.jump));
+      onAll("[data-jump]", "click", "画面移動", (event, btn) => {
+        event.preventDefault();
+        switchView(btn.dataset.jump);
       });
-      document.getElementById("homeApply").addEventListener("click", syncPeriodFromHome);
-      document.getElementById("monthInput").addEventListener("change", syncPeriodFromMonthly);
-      document.getElementById("startDayInput").addEventListener("change", syncPeriodFromMonthly);
-      document.getElementById("storeInput").addEventListener("change", event => {
+      on("homeApply", "click", "期間反映", syncPeriodFromHome);
+      ["homeEmergencyStaff", "homeEmergencyDate", "homeEmergencyStore", "homeEmergencySlot"].forEach(id => {
+        const element = document.getElementById(id);
+        if (element) element.addEventListener("change", safeRun("急遽休み候補更新", renderHomeEmergency));
+      });
+      on("homeEmergencyApply", "click", "急遽休み登録", applyHomeEmergencyAbsence);
+      on("monthInput", "change", "月変更", syncPeriodFromMonthly);
+      on("startDayInput", "change", "締め日変更", syncPeriodFromMonthly);
+      on("storeInput", "change", "店舗変更", event => {
         state.selectedStore = event.target.value;
         state.selected = null;
         renderAll();
       });
-      document.getElementById("generateBtn").addEventListener("click", generateMonth);
-      document.getElementById("clearStoreBtn").addEventListener("click", clearStore);
-      document.getElementById("autoFillShortageBtn").addEventListener("click", fillVisibleStoreShortages);
-      document.getElementById("trimOverstaffBtn").addEventListener("click", trimVisibleStoreOverstaffing);
-      document.getElementById("csvBtn").addEventListener("click", exportCsv);
-      document.getElementById("printBtn").addEventListener("click", () => window.print());
-      document.getElementById("finishedPrintBtn").addEventListener("click", printFinishedMonth);
-      document.getElementById("weeklyPrintBtn").addEventListener("click", printFinishedWeek);
-      document.getElementById("finishedStore").addEventListener("change", renderFinished);
-      document.getElementById("finishedWeekStart").addEventListener("change", event => {
+      on("generateBtn", "click", "月間シフト作成", generateMonth);
+      on("generateAllMonthlyBtn", "click", "全店舗仮作成", generateAllStores);
+      on("clearStoreBtn", "click", "店舗シフトクリア", clearStore);
+      on("autoFillShortageBtn", "click", "不足自動補充", fillVisibleStoreShortages);
+      on("trimOverstaffBtn", "click", "過剰削減", trimVisibleStoreOverstaffing);
+      on("csvBtn", "click", "CSV出力", exportCsv);
+      on("printBtn", "click", "印刷", () => window.print());
+      on("finishedPrintBtn", "click", "完成シフト印刷", printFinishedMonth);
+      on("weeklyPrintBtn", "click", "週シフト印刷", printFinishedWeek);
+      on("finishedStore", "change", "完成シフト店舗変更", renderFinished);
+      on("finishedWeekStart", "change", "週シフト期間変更", event => {
         state.selectedWeekStart = event.target.value;
         renderFinished();
       });
-      document.getElementById("shortageStore").addEventListener("change", renderShortage);
-      document.getElementById("shortageRefresh").addEventListener("click", renderShortage);
-      document.getElementById("fillFirstShortageBtn").addEventListener("click", () => {
+      on("shortageStore", "change", "不足店舗変更", renderShortage);
+      on("shortageRefresh", "click", "不足更新", renderShortage);
+      on("shortageMapDate", "change", "穴マップ日付変更", renderShortageTimelineMap);
+      on("shortageMapPrev", "click", "穴マップ前日", () => {
+        const input = document.getElementById("shortageMapDate");
+        input.value = iso(addDays(new Date(`${ensureShortageMapDate()}T00:00:00`), -1));
+        renderShortageTimelineMap();
+      });
+      on("shortageMapNext", "click", "穴マップ翌日", () => {
+        const input = document.getElementById("shortageMapDate");
+        input.value = iso(addDays(new Date(`${ensureShortageMapDate()}T00:00:00`), 1));
+        renderShortageTimelineMap();
+      });
+      on("fillFirstShortageBtn", "click", "最初の不足補充", () => {
         fillFirstShortage(document.getElementById("shortageStore").value);
       });
-      document.getElementById("refreshLineBtn").addEventListener("click", renderLineMessage);
-      document.getElementById("copyLineBtn").addEventListener("click", async () => {
+      on("refreshLineBtn", "click", "LINE文面更新", renderLineMessage);
+      on("copyLineBtn", "click", "LINE文面コピー", async () => {
         const text = document.getElementById("lineMessage").value;
         try {
           await navigator.clipboard.writeText(text);
@@ -3653,20 +5478,29 @@
           showToast("コピーできない環境。文面を手動で選択してコピー");
         }
       });
-      document.getElementById("issuesStore").addEventListener("change", renderIssues);
-      document.getElementById("issuesRefresh").addEventListener("click", renderIssues);
-      document.getElementById("fillAllBtn").addEventListener("click", generateAllStores);
-      document.getElementById("staffSearch").addEventListener("input", renderStaff);
-      document.getElementById("staffStoreFilter").addEventListener("change", renderStaff);
-      document.getElementById("staffTagFilter").addEventListener("change", renderStaff);
-      document.getElementById("addStaffBtn").addEventListener("click", addStaffFromForm);
-      document.getElementById("bulkImportStaffBtn").addEventListener("click", importStaffBulk);
-      document.getElementById("exportStaffBtn").addEventListener("click", exportStaffBulk);
-      document.getElementById("saveNowBtn").addEventListener("click", () => {
+      on("issuesStore", "change", "危険チェック店舗変更", renderIssues);
+      on("issuesRefresh", "click", "危険チェック更新", renderIssues);
+      on("fillAllBtn", "click", "全店舗作成", generateAllStores);
+      on("staffSearch", "input", "スタッフ検索", renderStaff);
+      on("staffStoreFilter", "change", "スタッフ店舗絞込", renderStaff);
+      on("staffTagFilter", "change", "スタッフタグ絞込", renderStaff);
+      on("addStaffBtn", "click", "スタッフ追加", addStaffFromForm);
+      on("staffEditSave", "click", "勤務条件保存", saveStaffEditor);
+      on("staffEditClose", "click", "勤務条件編集を閉じる", closeStaffEditor);
+      on("staffEditCancel", "click", "勤務条件編集キャンセル", closeStaffEditor);
+      on("staffEditModal", "click", "勤務条件モーダル背景", event => {
+        if (event.target.id === "staffEditModal") closeStaffEditor();
+      });
+      document.addEventListener("keydown", event => {
+        if (event.key === "Escape") closeStaffEditor();
+      });
+      on("bulkImportStaffBtn", "click", "スタッフ一括取込", importStaffBulk);
+      on("exportStaffBtn", "click", "スタッフCSV出力", exportStaffBulk);
+      on("saveNowBtn", "click", "保存", () => {
         persistState();
         showToast("保存した");
       });
-      document.getElementById("loadNowBtn").addEventListener("click", () => {
+      on("loadNowBtn", "click", "保存データ読込", () => {
         if (loadPersistedState()) {
           renderAll();
           showToast("保存データを読み込んだ");
@@ -3674,11 +5508,11 @@
           showToast("保存データがない");
         }
       });
-      document.getElementById("resetSampleBtn").addEventListener("click", resetSample);
-      document.getElementById("exportJsonBtn").addEventListener("click", () => {
+      on("resetSampleBtn", "click", "サンプル初期化", resetSample);
+      on("exportJsonBtn", "click", "JSON出力", () => {
         document.getElementById("jsonBox").value = JSON.stringify(serializeState(), null, 2);
       });
-      document.getElementById("importJsonBtn").addEventListener("click", () => {
+      on("importJsonBtn", "click", "JSON取込", () => {
         try {
           const payload = JSON.parse(document.getElementById("jsonBox").value);
           if (applySerialized(payload)) {
@@ -3689,35 +5523,29 @@
           showToast("JSONの形式が崩れている");
         }
       });
-      document.getElementById("todayInput").addEventListener("change", event => {
+      on("todayInput", "change", "今日の日付変更", event => {
         state.today = event.target.value;
         renderToday();
       });
-      document.getElementById("prevDayBtn").addEventListener("click", () => {
+      on("prevDayBtn", "click", "前日へ", () => {
         state.today = iso(addDays(new Date(`${state.today}T00:00:00`), -1));
         renderToday();
       });
-      document.getElementById("nextDayBtn").addEventListener("click", () => {
+      on("nextDayBtn", "click", "翌日へ", () => {
         state.today = iso(addDays(new Date(`${state.today}T00:00:00`), 1));
         renderToday();
       });
-      document.getElementById("addAvailabilityBtn").addEventListener("click", () => {
-        const name = canonicalStaffName(document.getElementById("availabilityStaff").value);
-        const dateIso = document.getElementById("availabilityDate").value;
-        if (!availability[name]) availability[name] = [];
-        if (dateIso && !availability[name].includes(dateIso)) {
-          availability[name].push(dateIso);
-        }
-        const removed = dateIso ? removePersonFromDate(dateIso, name) : 0;
-        renderAll();
-        if (removed) showToast(`${name}の${dateIso}分をシフトから外した`);
-      });
-      document.getElementById("managerMode").addEventListener("click", () => {
+      on("addAvailabilityBtn", "click", "希望休追加", () => addDateBlock("availability"));
+      on("addPaidLeaveBtn", "click", "有給追加", () => addDateBlock("paid"));
+      on("addEmergencyAbsenceBtn", "click", "急遽休み追加", () => addDateBlock("emergency"));
+      on("managerMode", "click", "りえ用へ", event => {
+        event.preventDefault();
         document.getElementById("managerMode").classList.add("active");
         document.getElementById("ownerMode").classList.remove("active");
         switchView("monthly");
       });
-      document.getElementById("ownerMode").addEventListener("click", () => {
+      on("ownerMode", "click", "まこつ。用へ", event => {
+        event.preventDefault();
         document.getElementById("ownerMode").classList.add("active");
         document.getElementById("managerMode").classList.remove("active");
         switchView("owner");
@@ -3729,10 +5557,25 @@
       person.slots = slotsFromTimes(person.times || []);
       if (!person.slots.length) person.slots = [...slots];
       if (!availability[person.name]) availability[person.name] = [];
+      if (!paidLeave[person.name]) paidLeave[person.name] = [];
+      if (!emergencyAbsences[person.name]) emergencyAbsences[person.name] = [];
     });
     bindEvents();
     const restored = loadPersistedState();
     state.ready = true;
+    if (state.needsFreshGeneration) {
+      const originalStore = state.selectedStore || "miyanoshita";
+      state.bulkGenerating = true;
+      storeOrder.forEach(storeKey => {
+        state.selectedStore = storeKey;
+        generateMonth();
+      });
+      rebalanceCoreRest("all");
+      trimOverstaffing("all");
+      state.bulkGenerating = false;
+      state.selectedStore = originalStore;
+      state.needsFreshGeneration = false;
+    }
     switchView("dashboard");
     renderAll();
     const status = document.getElementById("jsStatus");
