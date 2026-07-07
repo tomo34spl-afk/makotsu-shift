@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Makotsu Shift beta4.10.28 りえリスト精査反映版</title>
+  <title>Makotsu Shift beta4.10.29 週締め運用版</title>
   <style>
     :root {
       color-scheme: light;
@@ -1058,11 +1058,11 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>Makotsu Shift beta4.10.28 りえリスト精査反映版</h1>
-        <p>りえちゃんリストを精査し、要確認者と希望提出型の自動配置を抑えた版。</p>
+        <h1>Makotsu Shift beta4.10.29 週締め運用版</h1>
+        <p>月間でざっくり土台を作り、毎週火曜に翌週分を締める版。</p>
       </div>
       <div class="role-switch" aria-label="表示モード">
-        <a class="btn active" id="managerMode" href="#monthlyView" data-jump="monthly">りえ用</a>
+        <a class="btn active" id="managerMode" href="#weeklyCloseView" data-jump="weeklyClose">りえ用</a>
         <a class="btn" id="ownerMode" href="#ownerView" data-jump="owner">まこつ。用</a>
       </div>
     </header>
@@ -1460,14 +1460,15 @@
           <a class="btn" href="#todayView" data-view="today">今日のシフト</a>
           <a class="btn" href="#ownerView" data-view="owner">まこつ。ダッシュボード</a>
           <a class="btn" href="#monthlyView" data-view="monthly">月間シフト作成</a>
+          <a class="btn" href="#weeklyCloseView" data-view="weeklyClose">週締め</a>
           <a class="btn" href="#finishedView" data-view="finished">完成シフト</a>
           <a class="btn" href="#shortageView" data-view="shortage">不足チェック</a>
           <a class="btn" href="#issuesView" data-view="issues">危険チェック</a>
           <a class="btn" href="#availabilityView" data-view="availability">希望休/有給</a>
           <a class="btn" href="#staffView" data-view="staff">スタッフ</a>
           <a class="btn" href="#dataView" data-view="data">保存/出力</a>
-          <div class="sub">beta4.10.28 りえリスト精査反映版</div>
-          <div class="muted">出勤希望を先に入れ、残りの穴を見ながら編集する。</div>
+          <div class="sub">beta4.10.29 週締め運用版</div>
+          <div class="muted">月間は土台。毎週、翌週分を締めて穴を埋める。</div>
         </nav>
       </aside>
 
@@ -1480,8 +1481,8 @@
             </label>
             <label>締め開始日
               <select id="homeStartDay">
-                <option value="1">1日</option>
-                <option value="16" selected>16日</option>
+                <option value="1" selected>1日</option>
+                <option value="16">16日</option>
               </select>
             </label>
             <button class="btn primary" id="homeApply" type="button">期間を反映</button>
@@ -1490,10 +1491,10 @@
             <div class="card">
               <div class="metric-label">作成期間</div>
               <div class="metric-value" id="metricPeriod">-</div>
-              <div class="metric-sub">締め期間で月間表を生成</div>
+              <div class="metric-sub">給与・月間土台用</div>
             </div>
             <div class="card">
-              <div class="metric-label">不足枠</div>
+              <div class="metric-label">月間不足枠</div>
               <div class="metric-value" id="metricShortage">-</div>
               <div class="metric-sub">配置不足の時間帯</div>
             </div>
@@ -1511,7 +1512,8 @@
           <div class="status-row">
             <a class="btn" href="#todayView" data-jump="today">今日のシフトを見る</a>
             <a class="btn" href="#ownerView" data-jump="owner">全店舗を見る</a>
-            <a class="btn primary" href="#monthlyView" data-jump="monthly">月間シフトを作る</a>
+            <a class="btn" href="#monthlyView" data-jump="monthly">月間の土台を作る</a>
+            <a class="btn primary" href="#weeklyCloseView" data-jump="weeklyClose">翌週分を締める</a>
             <a class="btn" href="#finishedView" data-jump="finished">完成シフトを見る</a>
             <a class="btn" href="#shortageView" data-jump="shortage">不足だけ見る</a>
           </div>
@@ -1522,7 +1524,7 @@
                 <select id="homeEmergencyStaff"></select>
               </label>
               <label>日付
-                <input id="homeEmergencyDate" type="date" value="2026-07-16">
+                <input id="homeEmergencyDate" type="date" value="2026-07-07">
               </label>
               <label>店舗
                 <select id="homeEmergencyStore">
@@ -1552,7 +1554,7 @@
           <h2>今日のシフト</h2>
           <div class="controls">
             <label>表示日
-              <input id="todayInput" type="date" value="2026-07-16">
+              <input id="todayInput" type="date" value="2026-07-07">
             </label>
             <button class="btn" id="prevDayBtn" type="button">前日</button>
             <button class="btn" id="nextDayBtn" type="button">翌日</button>
@@ -1620,14 +1622,18 @@
 
         <section class="panel hidden" id="monthlyView">
           <h2>月間シフト作成</h2>
+          <div class="detail-box">
+            <h3>月間は土台作成</h3>
+            <div class="muted">毎週希望が出るスタッフがいるため、ここで最終確定しない。ざっくり作って、翌週分は「週締め」で埋める。</div>
+          </div>
           <div class="controls">
             <label>対象月
               <input id="monthInput" type="month" value="2026-07">
             </label>
             <label>締め開始日
               <select id="startDayInput">
-                <option value="1">1日</option>
-                <option value="16" selected>16日</option>
+                <option value="1" selected>1日</option>
+                <option value="16">16日</option>
               </select>
             </label>
             <label>店舗
@@ -1673,6 +1679,68 @@
                   <button class="btn" id="csvBtn" type="button">CSV出力</button>
                   <button class="btn" id="printBtn" type="button">印刷</button>
                 </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="panel hidden" id="weeklyCloseView">
+          <h2>週締め</h2>
+          <div class="detail-box">
+            <h3>毎週火曜に翌週分を締める</h3>
+            <div class="muted">松永のように毎週希望が出る人は、月間土台では固定しすぎず、週締め時点の穴埋め要員として使う。</div>
+          </div>
+          <div class="controls">
+            <label>対象週
+              <select id="weeklyCloseStart"></select>
+            </label>
+            <label>店舗
+              <select id="weeklyCloseStore">
+                <option value="miyanoshita">宮ノ下</option>
+                <option value="higashicho">東町</option>
+                <option value="ougicho">扇町</option>
+              </select>
+            </label>
+            <button class="btn primary" id="generateWeeklyBtn" type="button">この週を締め作成</button>
+            <button class="btn" id="generateAllWeeklyBtn" type="button">全店舗この週を締め作成</button>
+            <button class="btn" id="clearWeeklyBtn" type="button">この週を空にする</button>
+          </div>
+          <div class="cards">
+            <div class="card">
+              <div class="metric-label">対象週</div>
+              <div class="metric-value" id="weeklyClosePeriod">-</div>
+              <div class="metric-sub">火曜確認、翌週分を締める</div>
+            </div>
+            <div class="card">
+              <div class="metric-label">週不足</div>
+              <div class="metric-value" id="weeklyCloseShortage">-</div>
+              <div class="metric-sub">対象週・対象店舗</div>
+            </div>
+            <div class="card">
+              <div class="metric-label">希望提出型</div>
+              <div class="metric-value" id="weeklyCloseHopeOnly">-</div>
+              <div class="metric-sub">週締めで使う穴埋め候補</div>
+            </div>
+          </div>
+          <div class="split">
+            <div class="table-wrap">
+              <table aria-label="週締め表">
+                <thead id="weeklyCloseHead"></thead>
+                <tbody id="weeklyCloseBody"></tbody>
+              </table>
+            </div>
+            <aside class="side-card no-print">
+              <div class="detail-box">
+                <h3>週締めメモ</h3>
+                <div id="weeklyCloseMemo"></div>
+              </div>
+              <div class="detail-box">
+                <h3>選択中の枠</h3>
+                <div id="weeklySelectedDetail" class="muted">不足セル、または編集したい枠を押す。</div>
+              </div>
+              <div class="detail-box">
+                <h3>候補</h3>
+                <div id="weeklyCandidateList" class="candidate-list"></div>
               </div>
             </aside>
           </div>
@@ -1999,6 +2067,7 @@
           today: "todayView",
           owner: "ownerView",
           monthly: "monthlyView",
+          weeklyClose: "weeklyCloseView",
           finished: "finishedView",
           shortage: "shortageView",
           issues: "issuesView",
@@ -2030,7 +2099,7 @@
         var button = findActionButton(event.target);
         if (!button) return;
         var view = button.getAttribute("data-view") || button.getAttribute("data-jump");
-        if (button.id === "managerMode") view = "monthly";
+        if (button.id === "managerMode") view = "weeklyClose";
         if (button.id === "ownerMode") view = "owner";
         if (!view) return;
         switchPanel(view);
@@ -2180,15 +2249,16 @@
     const state = {
       month: "2026-07",
       startDay: 1,
-      today: "2026-07-13",
+      today: "2026-07-07",
       selectedStore: "ougicho",
+      weeklyCloseStore: "higashicho",
       selectedWeekStart: "",
       selected: null,
       schedule: {},
       ready: false,
       bulkGenerating: false,
       needsFreshGeneration: false,
-      currentView: "monthly",
+      currentView: "weeklyClose",
       selectedShortageHole: null
     };
 
@@ -2198,6 +2268,7 @@
         today: document.getElementById("todayView"),
         owner: document.getElementById("ownerView"),
         monthly: document.getElementById("monthlyView"),
+        weeklyClose: document.getElementById("weeklyCloseView"),
         finished: document.getElementById("finishedView"),
         shortage: document.getElementById("shortageView"),
         issues: document.getElementById("issuesView"),
@@ -2208,8 +2279,8 @@
       toast: document.getElementById("toast")
     };
 
-    const STORAGE_KEY = "makotsuShiftBeta41028RieListRefined";
-    const LEGACY_STORAGE_KEYS = ["makotsuShiftBeta41027RieEdit"];
+    const STORAGE_KEY = "makotsuShiftBeta41029WeeklyClose";
+    const LEGACY_STORAGE_KEYS = ["makotsuShiftBeta41028RieListRefined", "makotsuShiftBeta41027RieEdit"];
 
     let editingStaffName = "";
 
@@ -2257,6 +2328,12 @@
       return Array.from({ length: 7 }, (_, index) => addDays(start, index));
     }
 
+    function nextWeeklyCloseStartIso(baseIso = state.today) {
+      const base = new Date(`${baseIso}T00:00:00`);
+      const thisMonday = mondayOf(base);
+      return iso(addDays(thisMonday, 7));
+    }
+
     function weekOptions() {
       const dates = periodDates();
       if (!dates.length) return [];
@@ -2277,9 +2354,23 @@
       }
       const valid = weeks.map(date => iso(date));
       if (!state.selectedWeekStart || !valid.includes(state.selectedWeekStart)) {
-        state.selectedWeekStart = valid[0];
+        const nextWeek = nextWeeklyCloseStartIso();
+        state.selectedWeekStart = valid.includes(nextWeek) ? nextWeek : valid[0];
       }
       return state.selectedWeekStart;
+    }
+
+    function selectedWeekDates() {
+      const weekStartIso = ensureSelectedWeekStart();
+      if (!weekStartIso) return [];
+      const periodSet = new Set(periodDates().map(date => iso(date)));
+      return weekDates(weekStartIso).filter(date => periodSet.has(iso(date)));
+    }
+
+    function weekLabel(dates) {
+      if (!dates.length) return "-";
+      const last = dates[dates.length - 1];
+      return `${dateLabel(dates[0])}(${dowLabel(dates[0])})〜${dateLabel(last)}(${dowLabel(last)})`;
     }
 
     function dateLabel(date) {
@@ -2677,7 +2768,7 @@
     function canPlaceShift(dateIso, storeKey, person, time, options = {}) {
       if (!person || !time) return false;
       if (!canWorkAtStore(person, storeKey)) return false;
-      if (hasTag(person, "希望日だけ配置") && !options.allowHopeOnlyPlacement) return false;
+      if (hasTag(person, "希望日だけ配置") && !options.allowHopeOnlyPlacement && !hasSubmittedWorkRequestTime(dateIso, storeKey, person.name, time)) return false;
       if (isUnavailable(person.name, dateIso)) return false;
       if (!matchesDay(person, dateIso)) return false;
       if (hasIncompatiblePerson(dateIso, storeKey, person.name)) return false;
@@ -2714,6 +2805,13 @@
 
     function submittedWorkRequestsFor(dateIso, storeKey) {
       return submittedWorkRequests.filter(row => row.dateIso === dateIso && row.storeKey === storeKey);
+    }
+
+    function hasSubmittedWorkRequestTime(dateIso, storeKey, personName, time = "") {
+      const name = canonicalStaffName(personName);
+      return submittedWorkRequestsFor(dateIso, storeKey).some(row => (
+        canonicalStaffName(row.name) === name && (!time || row.time === time)
+      ));
     }
 
     function isSubmittedWorkAssignment(dateIso, storeKey, assignment) {
@@ -3347,9 +3445,7 @@
       return addedCount;
     }
 
-    function generateMonth() {
-      const dates = periodDates();
-      const storeKey = state.selectedStore;
+    function generateDatesForStore(dates, storeKey, options = generationOptions()) {
       dates.forEach(date => {
         const dateIso = iso(date);
         slots.forEach(slot => {
@@ -3357,7 +3453,6 @@
           cell.length = 0;
         });
       });
-      const options = generationOptions();
       dates.forEach((date, dateIndex) => {
         const dateIso = iso(date);
         applySubmittedWorkRequestsForDate(dateIso, storeKey, options);
@@ -3411,6 +3506,12 @@
           if (!changed) return;
         }
       });
+    }
+
+    function generateMonth() {
+      const dates = periodDates();
+      const storeKey = state.selectedStore;
+      generateDatesForStore(dates, storeKey);
       trimOverstaffing(storeKey);
       rebalanceCoreRest(storeKey);
       resolveLongStreaks(storeKey, 5);
@@ -3418,6 +3519,79 @@
         showToast(`${stores[storeKey].name}の1か月分を仮作成した`);
         renderAll();
       }
+    }
+
+    function trimOverstaffingForDates(storeFilter = "all", dates = periodDates()) {
+      let removed = 0;
+      dates.forEach(date => {
+        const dateIso = iso(date);
+        storeOrder.forEach(storeKey => {
+          if (storeFilter !== "all" && storeFilter !== storeKey) return;
+          slots.forEach(slot => {
+            let cell = ensureCell(dateIso, storeKey, slot);
+            let guard = 0;
+            while (cell.length > requirement(storeKey, slot) && guard < 10) {
+              const removable = [...cell]
+                .filter(assignment => {
+                  const person = findStaff(assignment.name);
+                  return !isFixedPerson(person) && !isCoreEmployee(person) && canRemoveWithoutShortage(dateIso, storeKey, assignment);
+                })
+                .sort((a, b) => overstaffRemovalScore(dateIso, storeKey, slot, a) - overstaffRemovalScore(dateIso, storeKey, slot, b))[0];
+              if (!removable) break;
+              removeShiftFromDay(dateIso, storeKey, removable);
+              removed += 1;
+              cell = ensureCell(dateIso, storeKey, slot);
+              guard += 1;
+            }
+          });
+        });
+      });
+      return removed;
+    }
+
+    function generateWeeklyClose(storeKey = state.weeklyCloseStore) {
+      const dates = selectedWeekDates();
+      if (!dates.length) {
+        showToast("対象週が作成期間外");
+        return;
+      }
+      generateDatesForStore(dates, storeKey);
+      trimOverstaffingForDates(storeKey, dates);
+      state.weeklyCloseStore = storeKey;
+      state.selectedStore = storeKey;
+      showToast(`${stores[storeKey].name} ${weekLabel(dates)} を週締め作成した`);
+      renderAll();
+    }
+
+    function generateAllWeeklyClose() {
+      const dates = selectedWeekDates();
+      if (!dates.length) {
+        showToast("対象週が作成期間外");
+        return;
+      }
+      const original = state.weeklyCloseStore;
+      storeOrder.forEach(storeKey => {
+        generateDatesForStore(dates, storeKey);
+        trimOverstaffingForDates(storeKey, dates);
+      });
+      state.weeklyCloseStore = original || "higashicho";
+      state.selectedStore = state.weeklyCloseStore;
+      renderAll();
+      showToast(`全店舗 ${weekLabel(dates)} を週締め作成した`);
+    }
+
+    function clearWeeklyClose() {
+      const dates = selectedWeekDates();
+      const storeKey = state.weeklyCloseStore;
+      dates.forEach(date => {
+        const dateIso = iso(date);
+        if (state.schedule[dateIso] && state.schedule[dateIso][storeKey]) {
+          state.schedule[dateIso][storeKey] = {};
+        }
+      });
+      state.selected = null;
+      renderAll();
+      showToast(`${stores[storeKey].name} ${weekLabel(dates)} を空にした`);
     }
 
     function clearStore() {
@@ -3542,6 +3716,95 @@
       });
     }
 
+    function weeklyCloseShortageCount(storeKey, dates) {
+      return dates.reduce((total, date) => {
+        const dateIso = iso(date);
+        return total + slots.reduce((sum, slot) => {
+          const shortage = Math.max(0, requirement(storeKey, slot) - ensureCell(dateIso, storeKey, slot).length);
+          return sum + shortage;
+        }, 0);
+      }, 0);
+    }
+
+    function hopeOnlyStaffForStore(storeKey) {
+      return staff.filter(person => (
+        canWorkAtStore(person, storeKey) && hasTag(person, "希望日だけ配置")
+      ));
+    }
+
+    function submittedWorkRequestsForDates(dates, storeKey) {
+      const dateSet = new Set(dates.map(date => iso(date)));
+      return submittedWorkRequests.filter(row => row.storeKey === storeKey && dateSet.has(row.dateIso));
+    }
+
+    function renderWeeklyCloseControls() {
+      const select = document.getElementById("weeklyCloseStart");
+      const storeSelect = document.getElementById("weeklyCloseStore");
+      if (!select || !storeSelect) return;
+      const weeks = weekOptions();
+      const optionsHtml = weeks.map(startDate => {
+        const startIso = iso(startDate);
+        const endDate = addDays(startDate, 6);
+        return `<option value="${startIso}">${dateLabel(startDate)}(${dowLabel(startDate)})〜${dateLabel(endDate)}(${dowLabel(endDate)})</option>`;
+      }).join("");
+      syncSelectOptions(select, optionsHtml, state.selectedWeekStart || nextWeeklyCloseStartIso());
+      state.selectedWeekStart = select.value || ensureSelectedWeekStart();
+      storeSelect.value = state.weeklyCloseStore || state.selectedStore || "higashicho";
+      state.weeklyCloseStore = storeSelect.value;
+    }
+
+    function renderWeeklyClose() {
+      renderWeeklyCloseControls();
+      const storeKey = state.weeklyCloseStore || "higashicho";
+      const dates = selectedWeekDates();
+      const requests = submittedWorkRequestsForDates(dates, storeKey);
+      const hopeOnly = hopeOnlyStaffForStore(storeKey);
+      document.getElementById("weeklyClosePeriod").textContent = weekLabel(dates);
+      document.getElementById("weeklyCloseShortage").textContent = String(weeklyCloseShortageCount(storeKey, dates));
+      document.getElementById("weeklyCloseHopeOnly").textContent = `${requests.length}/${hopeOnly.length}`;
+      document.getElementById("weeklyCloseMemo").innerHTML = `
+        <div class="person">
+          <span>月間は仮。毎週火曜に翌週の希望を受けて、この週だけ締める。</span>
+        </div>
+        <div class="person">
+          <span>希望提出型: ${hopeOnly.map(person => person.name).join("、") || "なし"}</span>
+        </div>
+        <div class="person">
+          <span>この週の提出済み希望: ${requests.map(row => `${row.name} ${row.dateIso} ${row.time}`).join(" / ") || "未入力"}</span>
+        </div>
+      `;
+      document.getElementById("weeklyCloseHead").innerHTML = `
+        <tr>
+          <th>日付</th>
+          ${slots.map(slot => `<th>${slot}<br><span class="muted">必要 ${requirement(storeKey, slot)}</span></th>`).join("")}
+        </tr>
+      `;
+      document.getElementById("weeklyCloseBody").innerHTML = dates.map(date => {
+        const dateIso = iso(date);
+        const weekend = date.getDay() === 0 || date.getDay() === 6;
+        return `
+          <tr>
+            <td class="date-cell ${weekend ? "weekend" : ""}">
+              ${dateLabel(date)}
+              <span class="dow">${dowLabel(date)}</span>
+            </td>
+            ${slots.map(slot => renderSlotCell(dateIso, storeKey, slot)).join("")}
+          </tr>
+        `;
+      }).join("");
+      document.getElementById("weeklyCloseBody").querySelectorAll(".slot-cell").forEach(cell => {
+        cell.addEventListener("click", () => {
+          state.selected = {
+            dateIso: cell.dataset.date,
+            storeKey: cell.dataset.store,
+            slot: cell.dataset.slot
+          };
+          renderAll();
+        });
+      });
+      renderSelectedDetail("weeklySelectedDetail", "weeklyCandidateList");
+    }
+
     function renderSlotCell(dateIso, storeKey, slot) {
       const people = ensureCell(dateIso, storeKey, slot);
       const req = requirement(storeKey, slot);
@@ -3568,9 +3831,10 @@
       `;
     }
 
-    function renderSelectedDetail() {
-      const detail = document.getElementById("selectedDetail");
-      const list = document.getElementById("candidateList");
+    function renderSelectedDetail(detailId = "selectedDetail", listId = "candidateList") {
+      const detail = document.getElementById(detailId);
+      const list = document.getElementById(listId);
+      if (!detail || !list) return;
       if (!state.selected) {
         detail.innerHTML = `<span class="muted">不足セル、または編集したい枠を押す。</span>`;
         list.innerHTML = `<div class="muted">枠を選ぶと候補が出る。</div>`;
@@ -5003,6 +5267,10 @@
         renderSelectedDetail();
         return;
       }
+      if (view === "weeklyClose") {
+        renderWeeklyClose();
+        return;
+      }
       if (view === "today") {
         renderToday();
         return;
@@ -5466,8 +5734,9 @@
         startDay: state.startDay,
         today: state.today,
         selectedStore: state.selectedStore,
+        weeklyCloseStore: state.weeklyCloseStore,
         selectedWeekStart: state.selectedWeekStart,
-        appVersion: "beta4.10.28",
+        appVersion: "beta4.10.29",
         schedule: state.schedule,
         staff,
         requirements: storeOrder.reduce((map, storeKey) => {
@@ -5486,6 +5755,7 @@
       if (payload.startDay) state.startDay = Number(payload.startDay);
       if (payload.today) state.today = payload.today;
       if (payload.selectedStore) state.selectedStore = payload.selectedStore;
+      if (payload.weeklyCloseStore) state.weeklyCloseStore = payload.weeklyCloseStore;
       if (payload.selectedWeekStart) state.selectedWeekStart = payload.selectedWeekStart;
       if (payload.schedule) state.schedule = payload.schedule;
       if (Array.isArray(payload.staff) && payload.staff.length) {
@@ -5525,6 +5795,8 @@
       document.getElementById("homeStartDay").value = String(state.startDay);
       document.getElementById("startDayInput").value = String(state.startDay);
       document.getElementById("storeInput").value = state.selectedStore;
+      const weeklyStore = document.getElementById("weeklyCloseStore");
+      if (weeklyStore) weeklyStore.value = state.weeklyCloseStore || state.selectedStore;
       document.getElementById("todayInput").value = state.today;
       return true;
     }
@@ -5547,6 +5819,9 @@
           if (!raw) continue;
           const payload = JSON.parse(raw);
           if (applySerialized(payload)) {
+            if (state.startDay === 16) state.startDay = 1;
+            if (!state.selectedWeekStart) state.selectedWeekStart = nextWeeklyCloseStartIso(state.today);
+            state.weeklyCloseStore = state.weeklyCloseStore || "higashicho";
             state.schedule = {};
             state.selected = null;
             state.needsFreshGeneration = true;
@@ -5569,9 +5844,10 @@
       state.schedule = {};
       state.selected = null;
       state.month = "2026-07";
-      state.startDay = 16;
-      state.today = "2026-07-16";
-      state.selectedWeekStart = "";
+      state.startDay = 1;
+      state.today = "2026-07-07";
+      state.selectedWeekStart = nextWeeklyCloseStartIso(state.today);
+      state.weeklyCloseStore = "higashicho";
       const original = state.selectedStore;
       state.bulkGenerating = true;
       storeOrder.forEach(storeKey => {
@@ -5610,6 +5886,19 @@
       on("generateBtn", "click", "月間シフト作成", generateMonth);
       on("generateAllMonthlyBtn", "click", "全店舗仮作成", generateAllStores);
       on("clearStoreBtn", "click", "店舗シフトクリア", clearStore);
+      on("weeklyCloseStart", "change", "週締め対象週変更", event => {
+        state.selectedWeekStart = event.target.value;
+        renderAll();
+      });
+      on("weeklyCloseStore", "change", "週締め店舗変更", event => {
+        state.weeklyCloseStore = event.target.value;
+        state.selectedStore = event.target.value;
+        state.selected = null;
+        renderAll();
+      });
+      on("generateWeeklyBtn", "click", "週締め作成", () => generateWeeklyClose(state.weeklyCloseStore));
+      on("generateAllWeeklyBtn", "click", "全店舗週締め作成", generateAllWeeklyClose);
+      on("clearWeeklyBtn", "click", "週締めクリア", clearWeeklyClose);
       on("autoFillShortageBtn", "click", "不足自動補充", fillVisibleStoreShortages);
       on("trimOverstaffBtn", "click", "過剰削減", trimVisibleStoreOverstaffing);
       on("csvBtn", "click", "CSV出力", exportCsv);
@@ -5711,7 +6000,7 @@
         event.preventDefault();
         document.getElementById("managerMode").classList.add("active");
         document.getElementById("ownerMode").classList.remove("active");
-        switchView("monthly");
+        switchView("weeklyClose");
       });
       on("ownerMode", "click", "まこつ。用へ", event => {
         event.preventDefault();
