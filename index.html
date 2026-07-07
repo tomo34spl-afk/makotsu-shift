@@ -306,6 +306,60 @@
       background: var(--panel);
     }
 
+    .weekly-mobile-list {
+      display: none;
+      gap: 10px;
+    }
+
+    .weekly-day-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .weekly-day-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      padding: 10px;
+      background: var(--panel-2);
+      color: var(--strong);
+      font-weight: 800;
+    }
+
+    .weekly-slot-card {
+      display: grid;
+      gap: 6px;
+      border-top: 1px solid var(--line);
+      border-right: 0;
+      border-bottom: 0;
+      border-left: 0;
+      padding: 10px;
+      width: 100%;
+      background: #fff;
+      color: var(--text);
+      text-align: left;
+      border-radius: 0;
+    }
+
+    .weekly-slot-card.selected {
+      outline: 2px solid var(--accent);
+      outline-offset: -2px;
+      background: #f0fdfa;
+    }
+
+    .weekly-slot-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -961,6 +1015,24 @@
       select,
       input {
         width: 100%;
+      }
+
+      #weeklyCloseView .table-wrap {
+        display: none;
+      }
+
+      .weekly-mobile-list {
+        display: grid;
+      }
+
+      .weekly-day-head {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+
+      .timeline-track {
+        min-width: 300px;
       }
     }
 
@@ -1729,6 +1801,7 @@
                 <tbody id="weeklyCloseBody"></tbody>
               </table>
             </div>
+            <div class="weekly-mobile-list" id="weeklyCloseMobile"></div>
             <aside class="side-card no-print">
               <div class="detail-box">
                 <h3>週締めメモ</h3>
@@ -3801,7 +3874,64 @@
           renderAll();
         });
       });
+      renderWeeklyCloseMobile(storeKey, dates);
       renderSelectedDetail("weeklySelectedDetail", "weeklyCandidateList");
+    }
+
+    function renderWeeklyCloseMobile(storeKey, dates) {
+      const wrap = document.getElementById("weeklyCloseMobile");
+      if (!wrap) return;
+      wrap.innerHTML = dates.map(date => {
+        const dateIso = iso(date);
+        const weekend = date.getDay() === 0 || date.getDay() === 6;
+        const dayShortage = slots.reduce((sum, slot) => (
+          sum + Math.max(0, requirement(storeKey, slot) - ensureCell(dateIso, storeKey, slot).length)
+        ), 0);
+        return `
+          <section class="weekly-day-card">
+            <div class="weekly-day-head">
+              <span class="${weekend ? "weekend" : ""}">${dateLabel(date)}(${dowLabel(date)})</span>
+              ${dayShortage ? `<span class="tag bad">不足 ${dayShortage}</span>` : `<span class="tag ok">OK</span>`}
+            </div>
+            ${slots.map(slot => {
+              const people = ensureCell(dateIso, storeKey, slot);
+              const req = requirement(storeKey, slot);
+              const shortage = Math.max(0, req - people.length);
+              const selected = state.selected
+                && state.selected.dateIso === dateIso
+                && state.selected.storeKey === storeKey
+                && state.selected.slot === slot;
+              return `
+                <button class="weekly-slot-card ${selected ? "slot-cell selected" : ""}" type="button"
+                  data-weekly-mobile-date="${dateIso}"
+                  data-weekly-mobile-store="${storeKey}"
+                  data-weekly-mobile-slot="${slot}">
+                  <span class="weekly-slot-top">
+                    <span>${slot} 必要${req} / 配置${people.length}</span>
+                    ${shortage ? `<span class="tag bad">不足 ${shortage}</span>` : `<span class="tag ok">OK</span>`}
+                  </span>
+                  ${people.map(person => `
+                    <span class="person ${person.support ? "support" : ""}">
+                      <span>${person.name}</span>
+                      <span class="time">${person.time}</span>
+                    </span>
+                  `).join("") || `<span class="muted">未配置</span>`}
+                </button>
+              `;
+            }).join("")}
+          </section>
+        `;
+      }).join("");
+      wrap.querySelectorAll("[data-weekly-mobile-date]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          state.selected = {
+            dateIso: btn.dataset.weeklyMobileDate,
+            storeKey: btn.dataset.weeklyMobileStore,
+            slot: btn.dataset.weeklyMobileSlot
+          };
+          renderAll();
+        });
+      });
     }
 
     function renderSlotCell(dateIso, storeKey, slot) {
