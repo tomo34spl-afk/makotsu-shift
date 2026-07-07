@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Makotsu Shift beta4.10.24</title>
+  <title>Makotsu Shift beta4.10.26</title>
   <style>
     :root {
       color-scheme: light;
@@ -1058,8 +1058,8 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>Makotsu Shift beta4.10.24</h1>
-        <p>穴マップから候補とLINE文面へつなぐ版</p>
+        <h1>Makotsu Shift beta4.10.26</h1>
+        <p>手書きNG日と勤務条件を保存データより優先して反映する版</p>
       </div>
       <div class="role-switch" aria-label="表示モード">
         <a class="btn active" id="managerMode" href="#monthlyView" data-jump="monthly">りえ用</a>
@@ -1257,7 +1257,7 @@
                 <td>東町</td>
                 <td>月・火・水・木・金・土・日</td>
                 <td>22-6</td>
-                <td>主婦、夜勤、どの曜日もOK、東町3-6ワンオペ可</td>
+                <td>主婦、夜勤、どの曜日もOK、東町3-6ワンオペ可、解雇、自動配置停止</td>
               </tr>
               <tr>
                 <td><strong>済藤</strong></td>
@@ -1459,8 +1459,8 @@
           <a class="btn" href="#availabilityView" data-view="availability">希望休/有給</a>
           <a class="btn" href="#staffView" data-view="staff">スタッフ</a>
           <a class="btn" href="#dataView" data-view="data">保存/出力</a>
-          <div class="sub">beta4.10.24の軸</div>
-          <div class="muted">社員先入れ。社員休み7日・有給・急遽休みを見ながら月間作成する。</div>
+          <div class="sub">beta4.10.26の軸</div>
+          <div class="muted">手書きNG日を先に除外し、保存データが古くても条件を戻さない。</div>
         </nav>
       </aside>
 
@@ -2084,7 +2084,7 @@
       { name: "大津", stores: ["higashicho"], days: ["土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["学生", "土日どの時間もOK"], support: false },
       { name: "佐々木(絢)", stores: ["higashicho"], days: ["土", "日"], slots: [], times: ["6-9", "9-17", "17-22", "22-6"], tags: ["学生", "土日どの時間もOK"], support: false },
       { name: "碓井", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "日"], slots: [], times: ["22-2", "24-6"], tags: ["フリーター", "準夜勤", "基本22-2", "土曜以外OK", "山梨と入る日のみ24-6", "ワンオペ夜勤しばらくなし"], support: false },
-      { name: "和田", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-6"], tags: ["主婦", "夜勤", "どの曜日もOK", "東町3-6ワンオペ可"], support: false },
+      { name: "和田", stores: ["higashicho"], days: ["月", "火", "水", "木", "金", "土", "日"], slots: [], times: ["22-6"], tags: ["主婦", "夜勤", "どの曜日もOK", "東町3-6ワンオペ可", "解雇", "自動配置停止"], support: false, inactive: true },
       { name: "済藤", stores: ["higashicho"], days: ["土", "日"], slots: [], times: ["6-9"], tags: ["一般", "土日のみ", "6-9要確認"], support: false },
       { name: "隆嶺", stores: ["higashicho"], days: ["土"], slots: [], times: ["6-9"], tags: ["朝", "土のみ", "要確認"], support: false },
       { name: "多田", stores: ["higashicho"], days: ["月", "水", "金"], slots: [], times: ["6-9"], tags: ["早朝のみ", "残業不可"], support: false },
@@ -2135,6 +2135,18 @@
       "グリーン": "グルン",
       "タタ田": "多田"
     };
+    const seededAvailability = {
+      "碓井": ["2026-07-17", "2026-07-18", "2026-07-19"],
+      "済藤": ["2026-07-18", "2026-07-25", "2026-07-26"],
+      "佐々木(絢)": ["2026-08-01"],
+      "多田": ["2026-07-24"],
+      "工藤": ["2026-07-13", "2026-07-14"],
+      "加藤": ["2026-07-13"],
+      "塚脇": ["2026-07-29", "2026-07-30", "2026-07-31"],
+      "木村": ["2026-07-25"],
+      "グルン": ["2026-07-20"],
+      "鈴木（久華）": Array.from({ length: 31 }, (_, index) => `2026-07-${pad(index + 1)}`)
+    };
     const incompatiblePairs = [
       ["芳澤", "下田"],
       ["和田", "工藤"],
@@ -2174,8 +2186,10 @@
       toast: document.getElementById("toast")
     };
 
-    const STORAGE_KEY = "makotsuShiftBeta41024";
+    const STORAGE_KEY = "makotsuShiftBeta41026";
     const LEGACY_STORAGE_KEYS = [
+      "makotsuShiftBeta41025",
+      "makotsuShiftBeta41024",
       "makotsuShiftBeta41023",
       "makotsuShiftBeta41022",
       "makotsuShiftBeta41021",
@@ -2332,6 +2346,13 @@
       return staffNameAliases[value] || value;
     }
 
+    function applySeededAvailability() {
+      Object.entries(seededAvailability).forEach(([name, dates]) => {
+        const cleanName = canonicalStaffName(name);
+        availability[cleanName] = mergeUnique(availability[cleanName], dates);
+      });
+    }
+
     function mergeUnique(base, additions) {
       return [...new Set([...(base || []), ...(additions || [])])];
     }
@@ -2354,7 +2375,7 @@
           stores: ["ougicho"],
           days: ["金", "土"],
           times: ["17-22"],
-          requiredTags: ["夕方", "固定", "金土17-22固定", "扇町鈴木"]
+          requiredTags: ["夕方", "固定", "金土17-22固定", "扇町鈴木", "7月全て不可"]
         },
         "下田": {
           stores: ["ougicho", "higashicho", "miyanoshita"],
@@ -2364,6 +2385,12 @@
           stores: ["ougicho"],
           requiredTags: ["社員", "扇町メイン", "扇町社員", "7日休み"]
         },
+        "ミミ": {
+          stores: ["ougicho", "higashicho"],
+          days: ["月", "火", "水", "木", "金", "土", "日"],
+          times: ["6-9", "17-22"],
+          requiredTags: ["フリーター", "扇町東町", "多く勤務希望", "9-15全曜日不可", "金土22-2不可", "手書きメモ反映"]
+        },
         "加藤": {
           stores: ["higashicho"],
           requiredTags: ["社員", "東町メイン", "基本夜勤", "7日休み"]
@@ -2372,9 +2399,20 @@
           stores: ["higashicho"],
           requiredTags: ["社員", "東町メイン", "7日休み"]
         },
-        "塚脇": { requiredTags: ["東町扇町対応可"] },
+        "塚脇": { requiredTags: ["東町扇町対応可", "7/29-31不可"] },
         "宮崎": { requiredTags: ["夜勤短時間のみ"] },
-        "碓井": { requiredTags: ["基本22-2", "山梨と入る日のみ24-6"] },
+        "碓井": { requiredTags: ["基本22-2", "山梨と入る日のみ24-6", "7/17-19不可"] },
+        "和田": {
+          stores: ["higashicho"],
+          inactive: true,
+          requiredTags: ["解雇", "退職日:2026-07-06", "自動配置停止"]
+        },
+        "多田": {
+          stores: ["higashicho"],
+          days: ["月", "水", "金"],
+          times: ["6-9"],
+          requiredTags: ["早朝のみ", "残業不可", "7/24不可", "7/23代替可"]
+        },
         "隆嶺": {
           stores: ["higashicho"],
           days: ["土"],
@@ -2412,6 +2450,7 @@
         if (correction.stores) person.stores = [...correction.stores];
         if (correction.days) person.days = [...correction.days];
         if (correction.times) person.times = [...correction.times];
+        if (Object.prototype.hasOwnProperty.call(correction, "inactive")) person.inactive = Boolean(correction.inactive);
         person.tags = mergeUnique(person.tags, correction.requiredTags || []);
         person.slots = slotsFromTimes(person.times || []);
         if (!person.slots.length) person.slots = [...slots];
@@ -2422,8 +2461,17 @@
       return Boolean(person && person.tags && person.tags.some(tag => tag.includes(text)));
     }
 
+    function isInactiveStaff(person) {
+      return Boolean(person && (
+        person.inactive ||
+        hasTag(person, "解雇") ||
+        hasTag(person, "退職") ||
+        hasTag(person, "自動配置停止")
+      ));
+    }
+
     function canWorkAtStore(person, storeKey) {
-      return Boolean(person && person.stores && person.stores.includes(storeKey));
+      return Boolean(person && !isInactiveStaff(person) && person.stores && person.stores.includes(storeKey));
     }
 
     function matchesDay(person, dateIso) {
@@ -4621,7 +4669,8 @@
           <strong>${canonicalStaffName(person.name)}</strong>
           <div class="muted">${person.stores.map(key => stores[key].name).join(" / ")}</div>
           <div class="pill-row">
-            ${person.tags.map(tag => `<span class="tag ${person.support ? "warn" : ""}">${tag}</span>`).join("")}
+            ${isInactiveStaff(person) ? `<span class="tag bad">自動配置停止</span>` : ""}
+            ${person.tags.map(tag => `<span class="tag ${person.support || isInactiveStaff(person) ? "warn" : ""}">${tag}</span>`).join("")}
           </div>
           <div class="reason">曜日: ${(person.days || []).join("、") || "全曜日"}</div>
           <div class="reason">対応時間: ${person.times.join("、")}</div>
@@ -4747,7 +4796,7 @@
 
       const currentStaff = canonicalStaffName(staffSelect.value);
       const staffOptions = staff
-        .filter(person => !person.support)
+        .filter(person => !person.support && !isInactiveStaff(person))
         .map(person => `<option value="${person.name}">${person.name}</option>`)
         .join("");
       syncSelectOptions(staffSelect, staffOptions, currentStaff);
@@ -5049,7 +5098,8 @@
         days: person.days && person.days.length ? person.days : ["月", "火", "水", "木", "金", "土", "日"],
         times: person.times && person.times.length ? person.times : ["9-18"],
         tags: person.tags && person.tags.length ? person.tags : ["未分類"],
-        support: Boolean(person.support)
+        support: Boolean(person.support),
+        inactive: Boolean(person.inactive) || (person.tags || []).some(tag => ["解雇", "退職", "自動配置停止"].some(word => String(tag).includes(word)))
       };
       clean.slots = slotsFromTimes(clean.times);
       if (!clean.slots.length) clean.slots = [...slots];
@@ -5127,7 +5177,8 @@
         days: parseDays(document.getElementById("editStaffDays").value),
         times: splitValues(document.getElementById("editStaffTimes").value),
         tags: splitValues(document.getElementById("editStaffTags").value),
-        support: document.getElementById("editStaffSupport").value === "true"
+        support: document.getElementById("editStaffSupport").value === "true",
+        inactive: Boolean(findStaffByName(oldName)?.inactive)
       };
       if (!clean.times.length) clean.times = ["9-18"];
       if (!clean.tags.length) clean.tags = ["未分類"];
@@ -5289,6 +5340,7 @@
         if (!paidLeave[person.name]) paidLeave[person.name] = [];
         if (!emergencyAbsences[person.name]) emergencyAbsences[person.name] = [];
       });
+      applySeededAvailability();
     }
 
     function serializeState() {
@@ -5298,7 +5350,7 @@
         today: state.today,
         selectedStore: state.selectedStore,
         selectedWeekStart: state.selectedWeekStart,
-        appVersion: "beta4.10.24",
+        appVersion: "beta4.10.26",
         schedule: state.schedule,
         staff,
         requirements: storeOrder.reduce((map, storeKey) => {
@@ -5560,6 +5612,7 @@
       if (!paidLeave[person.name]) paidLeave[person.name] = [];
       if (!emergencyAbsences[person.name]) emergencyAbsences[person.name] = [];
     });
+    normalizeSavedNames();
     bindEvents();
     const restored = loadPersistedState();
     state.ready = true;
