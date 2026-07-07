@@ -3621,7 +3621,19 @@
       return removed;
     }
 
+    function syncWeeklyCloseSelectionFromInputs() {
+      const weekSelect = document.getElementById("weeklyCloseStart");
+      const storeSelect = document.getElementById("weeklyCloseStore");
+      if (weekSelect && weekSelect.value) state.selectedWeekStart = weekSelect.value;
+      if (storeSelect && storeSelect.value) {
+        state.weeklyCloseStore = storeSelect.value;
+        state.selectedStore = storeSelect.value;
+      }
+    }
+
     function generateWeeklyClose(storeKey = state.weeklyCloseStore) {
+      syncWeeklyCloseSelectionFromInputs();
+      storeKey = storeKey || state.weeklyCloseStore || "higashicho";
       const dates = selectedWeekDates();
       if (!dates.length) {
         showToast("対象週が作成期間外");
@@ -3636,6 +3648,7 @@
     }
 
     function generateAllWeeklyClose() {
+      syncWeeklyCloseSelectionFromInputs();
       const dates = selectedWeekDates();
       if (!dates.length) {
         showToast("対象週が作成期間外");
@@ -3653,6 +3666,7 @@
     }
 
     function clearWeeklyClose() {
+      syncWeeklyCloseSelectionFromInputs();
       const dates = selectedWeekDates();
       const storeKey = state.weeklyCloseStore;
       dates.forEach(date => {
@@ -6021,9 +6035,16 @@
         state.selected = null;
         renderAll();
       });
-      on("generateWeeklyBtn", "click", "週締め作成", () => generateWeeklyClose(state.weeklyCloseStore));
-      on("generateAllWeeklyBtn", "click", "全店舗週締め作成", generateAllWeeklyClose);
-      on("clearWeeklyBtn", "click", "週締めクリア", clearWeeklyClose);
+      document.addEventListener("click", safeRun("週締めボタン補助", event => {
+        const button = event.target && event.target.closest
+          ? event.target.closest("#generateWeeklyBtn, #generateAllWeeklyBtn, #clearWeeklyBtn")
+          : null;
+        if (!button) return;
+        event.preventDefault();
+        if (button.id === "generateWeeklyBtn") generateWeeklyClose();
+        if (button.id === "generateAllWeeklyBtn") generateAllWeeklyClose();
+        if (button.id === "clearWeeklyBtn") clearWeeklyClose();
+      }));
       on("autoFillShortageBtn", "click", "不足自動補充", fillVisibleStoreShortages);
       on("trimOverstaffBtn", "click", "過剰削減", trimVisibleStoreOverstaffing);
       on("csvBtn", "click", "CSV出力", exportCsv);
