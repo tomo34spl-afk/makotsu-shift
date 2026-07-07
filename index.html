@@ -2363,8 +2363,7 @@
     function selectedWeekDates() {
       const weekStartIso = ensureSelectedWeekStart();
       if (!weekStartIso) return [];
-      const periodSet = new Set(periodDates().map(date => iso(date)));
-      return weekDates(weekStartIso).filter(date => periodSet.has(iso(date)));
+      return weekDates(weekStartIso);
     }
 
     function weekLabel(dates) {
@@ -3978,7 +3977,6 @@
       if (weekStartIso) select.value = weekStartIso;
 
       const dates = weekStartIso ? weekDates(weekStartIso) : [];
-      const periodSet = new Set(periodDates().map(date => iso(date)));
       const weekEnd = dates.length ? dates[dates.length - 1] : null;
       document.getElementById("weeklyFinishedTitle").textContent = `${stores[storeKey].name} 週シフト`;
       document.getElementById("weeklyFinishedPeriod").textContent = dates.length
@@ -4000,9 +3998,6 @@
               <span class="dow">${dowLabel(date)}</span>
             </td>
             ${slots.map(slot => {
-              if (!periodSet.has(dateIso)) {
-                return `<td><span class="muted">対象外</span></td>`;
-              }
               const people = ensureCell(dateIso, storeKey, slot);
               const shortage = Math.max(0, requirement(storeKey, slot) - people.length);
               return `
