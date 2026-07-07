@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Makotsu Shift beta4.10.29 週締め運用版</title>
+  <title>Makotsu Shift beta4.10.30 週締めボタン反映版</title>
   <style>
     :root {
       color-scheme: light;
@@ -1130,7 +1130,7 @@
   <div class="app">
     <header class="topbar">
       <div class="brand">
-        <h1>Makotsu Shift beta4.10.29 週締め運用版</h1>
+        <h1>Makotsu Shift beta4.10.30 週締めボタン反映版</h1>
         <p>月間でざっくり土台を作り、毎週火曜に翌週分を締める版。</p>
       </div>
       <div class="role-switch" aria-label="表示モード">
@@ -1539,7 +1539,7 @@
           <a class="btn" href="#availabilityView" data-view="availability">希望休/有給</a>
           <a class="btn" href="#staffView" data-view="staff">スタッフ</a>
           <a class="btn" href="#dataView" data-view="data">保存/出力</a>
-          <div class="sub">beta4.10.29 週締め運用版</div>
+          <div class="sub">beta4.10.30 週締めボタン反映版</div>
           <div class="muted">月間は土台。毎週、翌週分を締めて穴を埋める。</div>
         </nav>
       </aside>
@@ -2352,8 +2352,8 @@
       toast: document.getElementById("toast")
     };
 
-    const STORAGE_KEY = "makotsuShiftBeta41029WeeklyClose";
-    const LEGACY_STORAGE_KEYS = ["makotsuShiftBeta41028RieListRefined", "makotsuShiftBeta41027RieEdit"];
+    const STORAGE_KEY = "makotsuShiftBeta41030WeeklyClose";
+    const LEGACY_STORAGE_KEYS = ["makotsuShiftBeta41029WeeklyClose", "makotsuShiftBeta41028RieListRefined", "makotsuShiftBeta41027RieEdit"];
 
     let editingStaffName = "";
 
@@ -3643,8 +3643,15 @@
       trimOverstaffingForDates(storeKey, dates);
       state.weeklyCloseStore = storeKey;
       state.selectedStore = storeKey;
-      showToast(`${stores[storeKey].name} ${weekLabel(dates)} を週締め作成した`);
-      renderAll();
+      state.currentView = "weeklyClose";
+      state.selected = null;
+      sanitizeInvalidStoreAssignments();
+      renderMetrics();
+      renderWeeklyClose();
+      persistState();
+      const assigned = weeklyAssignmentCount(storeKey, dates);
+      const shortage = weeklyCloseShortageCount(storeKey, dates);
+      showToast(`${stores[storeKey].name} ${weekLabel(dates)} 作成 ${assigned}件 / 不足${shortage}`);
     }
 
     function generateAllWeeklyClose() {
@@ -3661,8 +3668,15 @@
       });
       state.weeklyCloseStore = original || "higashicho";
       state.selectedStore = state.weeklyCloseStore;
-      renderAll();
-      showToast(`全店舗 ${weekLabel(dates)} を週締め作成した`);
+      state.currentView = "weeklyClose";
+      state.selected = null;
+      sanitizeInvalidStoreAssignments();
+      renderMetrics();
+      renderWeeklyClose();
+      persistState();
+      const assigned = storeOrder.reduce((sum, storeKey) => sum + weeklyAssignmentCount(storeKey, dates), 0);
+      const shortage = storeOrder.reduce((sum, storeKey) => sum + weeklyCloseShortageCount(storeKey, dates), 0);
+      showToast(`全店舗 ${weekLabel(dates)} 作成 ${assigned}件 / 不足${shortage}`);
     }
 
     function clearWeeklyClose() {
@@ -3676,7 +3690,10 @@
         }
       });
       state.selected = null;
-      renderAll();
+      state.currentView = "weeklyClose";
+      renderMetrics();
+      renderWeeklyClose();
+      persistState();
       showToast(`${stores[storeKey].name} ${weekLabel(dates)} を空にした`);
     }
 
@@ -3809,6 +3826,13 @@
           const shortage = Math.max(0, requirement(storeKey, slot) - ensureCell(dateIso, storeKey, slot).length);
           return sum + shortage;
         }, 0);
+      }, 0);
+    }
+
+    function weeklyAssignmentCount(storeKey, dates) {
+      return dates.reduce((total, date) => {
+        const dateIso = iso(date);
+        return total + uniqueAssignments(dateIso, storeKey).length;
       }, 0);
     }
 
@@ -5875,7 +5899,7 @@
         selectedStore: state.selectedStore,
         weeklyCloseStore: state.weeklyCloseStore,
         selectedWeekStart: state.selectedWeekStart,
-        appVersion: "beta4.10.29",
+        appVersion: "beta4.10.30",
         schedule: state.schedule,
         staff,
         requirements: storeOrder.reduce((map, storeKey) => {
